@@ -21,10 +21,6 @@ import java.util.List;
 
 
 
-
-
-
-
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.views.MapController;
@@ -62,6 +58,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -78,6 +75,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -91,14 +90,17 @@ public class OSM_Map extends Activity {
 	private ItemizedIconOverlay<OverlayItem> defalt_overlays;
 	private DefaultResourceProxyImpl resource_proxy;
 	private Context self = this;
+	private Marker loc_marker;
+	private Criteria criteria = new Criteria();
+	private String provider;
 	//public XmlGeopointHelper geoheler = new XmlGeopointHelper();
-	
-	
+
+
 	private static final String t = "Map";
 	ArrayList marker_list = new ArrayList<OverlayItem>();
 	LocationManager locationManager;
-	
-	
+
+
     @Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 		// TODO Auto-generated method stub
@@ -134,22 +136,34 @@ public class OSM_Map extends Activity {
 		super.onCreate(savedInstanceState); // Find out what this does?
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action bar
-		
+
 		//The locationManager 
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		
+		Location lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
+
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
 		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(true);
-		
+
 		//Figure this out!!!!! I want to call this a a class and return the some value!!!!!!1
 		//String name = geoheler.getGeopointDBField(temp); 
         
         //Sets the  Resource Proxy
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
+        
+        ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
+        gps_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	Toast.makeText(self, "Works", Toast.LENGTH_LONG).show();
+                // Perform action on click
+           	 //locationManager.requestLocationUpdates(1000, 1, criteria, myLocationListener);
+            	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, myLocationListener);
+            	 //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, LocationListener);
+            }
+        });
         
         //Spinner s = new Spinner(this);
         
@@ -194,16 +208,21 @@ public class OSM_Map extends Activity {
 		  public void run() {
 		    //Do something after 100ms
 				GeoPoint point = new GeoPoint(47.42625, 14.77417); 
-				mapView.getController().setZoom(5);
+				mapView.getController().setZoom(9);
 				mapView.getController().setCenter(point);
 		  }
 		}, 100);
-		
-		Location lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
+		loc_marker = new Marker(mapView);
 		if(lastLocation != null){
 			//Set the location of marker on the map
 			Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+			GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
+			loc_marker.setPosition(loc);
+			loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+			loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
+			mapView.getOverlays().add(loc_marker);
         }
+		mapView.invalidate();
 	}
 	/*
 	public void set_marker_overlay_listners(){
@@ -256,10 +275,10 @@ public class OSM_Map extends Activity {
 		        				startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 		        				startMarker.setSnippet("Snip");
 		        				startMarker.setSubDescription("Desc");
-		        				
+
 		        				//startMarker.setIcon(getResources().getDrawable(R.drawable.pin_marker));
 		        				mapView.getOverlays().add(startMarker);
-		        				
+
 		        				//OverlayItem overlayitem = new OverlayItem("Title", "SampleDescription", point);
 		        				//Drawable marker = this.getResources().getDrawable(R.drawable.d);
 		        				//overlayitem.setMarker(marker);
@@ -294,37 +313,47 @@ public class OSM_Map extends Activity {
         	 form_curser.moveToNext();
         }
         
-		 
+
 	 }
-	 
+
 	 //This is going to be the listner for the devices locations
-	 
+
 	    private LocationListener myLocationListener = new LocationListener(){
 
 			@Override
 			public void onLocationChanged(Location location) {
 				// TODO Auto-generated method stub
 				//updateLoc(location);
+				mapView.getOverlays().remove(loc_marker);
+				Toast.makeText(OSM_Map.this,"Location Update", Toast.LENGTH_LONG).show();
+				GeoPoint current_loc = new GeoPoint(location);
+				loc_marker.setPosition(current_loc);
+				mapView.getOverlays().add(loc_marker);
+				mapView.invalidate();
+
+				//loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+				//loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
+				//mapView.getOverlays().add(loc_marker);
 				//Toast.makeText(this,(location.getLatitude())+" "+location.getLongitude(), Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public void onProviderDisabled(String provider) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onProviderEnabled(String provider) {
 				// TODO Auto-generated method stub
-				
+
 			}
 
 			@Override
 			public void onStatusChanged(String provider, int status, Bundle extras) {
 				// TODO Auto-generated method stub
-				
+
 			}
-	    	
+
 	    };
 }
