@@ -1452,7 +1452,7 @@ containing a value of this type.
         public static final int abc_textfield_searchview_right_holo_light=0x7f020056;
         public static final int advance=0x7f020057;
         public static final int backup=0x7f020058;
-        public static final int black=0x7f020099;
+        public static final int black=0x7f02009a;
         public static final int common_signin_btn_icon_dark=0x7f020059;
         public static final int common_signin_btn_icon_disabled_dark=0x7f02005a;
         public static final int common_signin_btn_icon_disabled_focus_dark=0x7f02005b;
@@ -1507,16 +1507,17 @@ containing a value of this type.
         public static final int loc_logo=0x7f02008c;
         public static final int loc_logo_small=0x7f02008d;
         public static final int map_data=0x7f02008e;
-        public static final int notes=0x7f02008f;
-        public static final int notes2=0x7f020090;
-        public static final int odk_clipboard=0x7f020091;
-        public static final int pin_marker=0x7f020092;
-        public static final int powered_by_google_dark=0x7f020093;
-        public static final int powered_by_google_light=0x7f020094;
-        public static final int settings_gear=0x7f020095;
-        public static final int state_color=0x7f020096;
-        public static final int thumb=0x7f020097;
-        public static final int white=0x7f020098;
+        public static final int map_marker=0x7f02008f;
+        public static final int notes=0x7f020090;
+        public static final int notes2=0x7f020091;
+        public static final int odk_clipboard=0x7f020092;
+        public static final int pin_marker=0x7f020093;
+        public static final int powered_by_google_dark=0x7f020094;
+        public static final int powered_by_google_light=0x7f020095;
+        public static final int settings_gear=0x7f020096;
+        public static final int state_color=0x7f020097;
+        public static final int thumb=0x7f020098;
+        public static final int white=0x7f020099;
     }
     public static final class id {
         public static final int MapViewId=0x7f06008f;
@@ -1547,10 +1548,11 @@ containing a value of this type.
         public static final int btnFinishDraw=0x7f06005c;
         public static final int btnResetDraw=0x7f06005d;
         public static final int btnSelectColor=0x7f06005b;
-        public static final int bubble_description=0x7f060053;
-        public static final int bubble_image=0x7f06004f;
-        public static final int bubble_moreinfo=0x7f060052;
-        public static final int bubble_subdescription=0x7f060054;
+        public static final int bubble_description=0x7f060051;
+        public static final int bubble_edit=0x7f06004f;
+        public static final int bubble_image=0x7f060054;
+        public static final int bubble_moreinfo=0x7f060053;
+        public static final int bubble_subdescription=0x7f060052;
         public static final int bubble_title=0x7f060050;
         public static final int button=0x7f060086;
         public static final int buttonholder=0x7f060056;
@@ -1628,7 +1630,6 @@ containing a value of this type.
         public static final int manage_forms=0x7f06008d;
         public static final int map=0x7f06007a;
         public static final int mapClickMenu=0x7f0600ce;
-        public static final int map_edit_button=0x7f060051;
         public static final int map_setting_butttt=0x7f06008e;
         public static final int mapview=0x7f06002c;
         public static final int mapview_placeholder=0x7f060080;
