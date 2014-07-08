@@ -116,9 +116,9 @@ public class OSM_Map extends Activity {
 	public static final int pos_name=2;
 	public static final int pos_status=3;
 	public static final int pos_uri=4;
-
 	
-	
+	private Double lat_temp;
+	private Double lng_temp;
 
 
     @Override
@@ -355,6 +355,8 @@ public class OSM_Map extends Activity {
         
 
 	 }
+	 
+
 
 	 //This is going to be the listner for the devices locations
 
@@ -409,32 +411,45 @@ public class OSM_Map extends Activity {
 				GeoPoint newlocation = m.getPosition();
 				newlocation.getLatitude();
 				newlocation.getLongitude();
-				showRetryPrompt();
-				
+				loc_marker = new Marker(mapView);
+				String lat = Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
+				String lng = Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
+				//Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
+				askToChangePoint(m);
 				// TODO Auto-generated method stub
-				//Toast.makeText(OSM_Map.this,"Done Draging", Toast.LENGTH_LONG).show();
+				//Toast.makeText(OSM_Map.this,((CustomMarkerHelper)m).getMarker_url(), Toast.LENGTH_LONG).show();
 				
 			}
 
 			@Override
 			public void onMarkerDragStart(Marker m) {
 				// TODO Auto-generated method stub
+				//lat_temp =  Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
+				//lng_temp  =  Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
+				lat_temp =  ((CustomMarkerHelper)m).getPosition().getLatitude();
+				lng_temp  =  ((CustomMarkerHelper)m).getPosition().getLongitude();
+				//Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
 				
 			}
 	    	
 	    };
 	    
-	    protected void showRetryPrompt() {
+	    protected void askToChangePoint(Marker m) {
+	    	final Marker mk = m;
+	    	//final Double lat = ((CustomMarkerHelper)m).getPosition().getLatitude();
+	    	//final Double lng = ((CustomMarkerHelper)m).getPosition().getLongitude();
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                     //loadPublicLegends(mainActivity);
+                            		changeInstanceLocation(mk);
                                     break;
-
                             case DialogInterface.BUTTON_NEGATIVE:
-                                    // No button clicked
+                                    // Cancel button clicked
+                            		((CustomMarkerHelper)mk).setPosition(new GeoPoint(lat_temp, lng_temp));
+                            		mapView.invalidate();
                                     break;
                             }
                     }
@@ -442,8 +457,13 @@ public class OSM_Map extends Activity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(OSM_Map.this);
             builder.setMessage(
-                    "Loading the legends somehow failed. Do you want to try again?")
+                    "Are you sure you want to change the location of this point?")
                     .setPositiveButton("Yes", dialogClickListener)
-                    .setNegativeButton("No", dialogClickListener).show();
+                    .setNegativeButton("Cancel", dialogClickListener).show();
     }
+		 public void changeInstanceLocation(Marker mk){
+			 ((CustomMarkerHelper)mk).getMarker_url();
+			 //Toast.makeText(OSM_Map.this,url, Toast.LENGTH_LONG).show();
+				
+		 }
 }
