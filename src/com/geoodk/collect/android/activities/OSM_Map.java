@@ -418,7 +418,6 @@ public class OSM_Map extends Activity {
 				askToChangePoint(m);
 				// TODO Auto-generated method stub
 				//Toast.makeText(OSM_Map.this,((CustomMarkerHelper)m).getMarker_url(), Toast.LENGTH_LONG).show();
-				
 			}
 
 			@Override

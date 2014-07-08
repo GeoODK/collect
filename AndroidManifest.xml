@@ -74,11 +74,11 @@
         android:theme="@style/Collect" >
         <provider
             android:name="com.geoodk.collect.android.provider.FormsProvider"
-            android:authorities="org.odk.collect.android.provider.odk.forms"
+            android:authorities="com.geoodk.collect.android.provider.odk.forms"
             android:exported="true" />
         <provider
             android:name="com.geoodk.collect.android.provider.InstanceProvider"
-            android:authorities="org.odk.collect.android.provider.odk.instances"
+            android:authorities="com.geoodk.collect.android.provider.odk.instances"
             android:exported="true" />
 
         <activity
