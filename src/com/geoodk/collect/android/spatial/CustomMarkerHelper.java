@@ -12,8 +12,17 @@ public class CustomMarkerHelper extends Marker{
 	String marker_id;
 	String marker_url;
 	String marker_status;
+	String marker_geoField;
 	
 	
+	public String getMarker_geoField() {
+		return marker_geoField;
+	}
+
+	public void setMarker_geoField(String marker_geoField) {
+		this.marker_geoField = marker_geoField;
+	}
+
 	public CustomMarkerHelper(MapView mapView) {
 		super(mapView);
 		

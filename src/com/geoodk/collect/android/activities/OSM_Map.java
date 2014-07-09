@@ -10,6 +10,7 @@ package com.geoodk.collect.android.activities;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,10 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+
+
+
 
 
 
@@ -95,52 +100,37 @@ import android.os.Build;
 public class OSM_Map extends Activity {
 	private MapView mapView;
 	private MapController myMapController;
-	private ItemizedIconOverlay<OverlayItem> complete_overlays;
-	private ItemizedIconOverlay<OverlayItem> final_overlays;
-	private ItemizedIconOverlay<OverlayItem> defalt_overlays;
+	//private ItemizedIconOverlay<OverlayItem> complete_overlays;
+	//private ItemizedIconOverlay<OverlayItem> final_overlays;
+	//private ItemizedIconOverlay<OverlayItem> defalt_overlays;
 	private DefaultResourceProxyImpl resource_proxy;
 	private Context self = this;
-	private Marker loc_marker;
-	private Criteria criteria = new Criteria();
-	private String provider;
+	private Marker loc_marker;  //This is the marker used to display the user's location
+	private Criteria criteria = new Criteria(); // ?? Not sure what a criteria is but probably should find out!
+	private String provider; //  Gps or Network providor
 	//public XmlGeopointHelper geoheler = new XmlGeopointHelper();
 
 
 	private static final String t = "Map";
-	ArrayList marker_list = new ArrayList<OverlayItem>();
+	//ArrayList<OverlayItem> marker_list = new ArrayList<OverlayItem>();
 	private List<String[]> markerListArray = new ArrayList<String[]>();
 	LocationManager locationManager;
 	
+	//This section is used to know the order of a array of instance data in the db cursor
 	public static final int pos_url=0;
 	public static final int pos_id=1;
 	public static final int pos_name=2;
 	public static final int pos_status=3;
 	public static final int pos_uri=4;
+	public static final int pos_geoField=5;
 	
+	//This is used to store temp latitude values
 	private Double lat_temp;
 	private Double lng_temp;
-
-
-    @Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		// TODO Auto-generated method stub
-		super.onCreateContextMenu(menu, v, menuInfo);
-		  MenuInflater inflater = getMenuInflater();
-		  inflater.inflate(R.menu.map_click_menu, menu);
-	}
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.layout.map_menu_layout, menu);
-        return true;
-    }
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		return super.onOptionsItemSelected(item);
-	}
-
-    
+	
+	XmlPullParserFactory factory;
+	
+	
     //This function comes after the onCreate function
 	@Override
 	protected void onStart() {
@@ -158,7 +148,7 @@ public class OSM_Map extends Activity {
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action bar
 
 		//The locationManager 
-		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Location lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
 
 		//Layout Code MapView Connection and options
@@ -203,14 +193,27 @@ public class OSM_Map extends Activity {
         	String instance_form_status = (String) instance_cur.getString(instance_cur.getColumnIndex("status"));
             Uri instanceUri = ContentUris.withAppendedId(InstanceColumns.CONTENT_URI, instance_cur.getLong(instance_cur.getColumnIndex(InstanceColumns._ID)));
             String instanceUriString = instanceUri.toString();
-            String[] cur_mark = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString};
-            markerListArray.add(cur_mark);
-            //Toast.makeText(this, instanceUri.toString(), Toast.LENGTH_SHORT).show();
-            getGeoField(instance_form_id);
+            String geopoint_field = null;
+
+			try {
+				geopoint_field = (String)getGeoField(instance_form_id);
+				//Toast.makeText(this,geopoint_field, Toast.LENGTH_SHORT).show();
+			} catch (XmlPullParserException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			String[] markerObj = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString,geopoint_field};
+            markerListArray.add(markerObj);
+            
             //startActivity(new Intent(Intent.ACTION_EDIT, instanceUri));
+            
         	//Determine the geoPoint Field
         	try {
-				addGeoPointMarkerList(cur_mark);
+				createMaker(markerObj);
 				//addGeoPointMarkerList(instance_cur);
 			} catch (XmlPullParserException e) {
 				// TODO Auto-generated catch block
@@ -253,41 +256,19 @@ public class OSM_Map extends Activity {
         }
 		mapView.invalidate();
 	}
-	/*
-	public void set_marker_overlay_listners(){
-        Drawable marker = this.getResources().getDrawable(R.drawable.pin_marker);
-        defalt_overlays = new ItemizedIconOverlay<OverlayItem>(marker_list, marker, new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-        	
-        	//I need to know which marker is selected when close
-			@Override
-			public boolean onItemLongPress(int arg0, OverlayItem item) {
-				Uri instanceUri =Uri.parse(item.getTitle());
-				Toast.makeText(self, item.getTitle(), Toast.LENGTH_LONG).show();
-				// TODO Auto-generated method stub
-				//startActivity(new Intent,Intent.ACTION_EDIT,item.getTitle()));
-        		startActivity(new Intent(Intent.ACTION_EDIT, instanceUri ));
-				//Toast.makeText(self, arg0, Toast.LENGTH_LONG).show();
-				return false;
-			}
-
-			@Override
-			public boolean onItemSingleTapUp(int arg0, OverlayItem arg1) {
-				// TODO Auto-generated method stub
-				Toast.makeText(self, arg1.getTitle(), Toast.LENGTH_LONG).show();
-				return false;
-			}
-		}, resource_proxy);
-	}*/
-
-	 public void addGeoPointMarkerList (String[] cur_mark) throws XmlPullParserException, IOException {
+	 public void createMaker (String[] cur_mark) throws XmlPullParserException, IOException {
+		 
+		 	//Read the Xml file of the instance 
 	         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 	         factory.setNamespaceAware(true);
 	         XmlPullParser xpp = factory.newPullParser();
 	         xpp.setInput(new FileReader(new File(cur_mark[pos_url])));
 	         int eventType = xpp.getEventType();
+	         
+	         //For each of the objects in the instance xml <location>
 	         while (eventType != XmlPullParser.END_DOCUMENT) {
 	        	 if (xpp.getName()!=null){
-	        		if(xpp.getName().equals("location")){
+	        		if(xpp.getName().equals(cur_mark[pos_geoField])){
 	        			if (eventType == XmlPullParser.START_TAG){
 	        				String tagname = xpp.getName();
 	        				eventType = xpp.next();
@@ -304,6 +285,7 @@ public class OSM_Map extends Activity {
 		        				startMarker.setMarker_status(cur_mark[pos_status]);
 		        				startMarker.setMarker_url(cur_mark[pos_url]);
 		        				startMarker.setMarker_id(cur_mark[pos_id]);
+		        				startMarker.setMarker_geoField(cur_mark[pos_geoField]);
 		        				startMarker.setPosition(point);
 		        				startMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 		        				startMarker.setTitle("Name: "+ cur_mark[pos_name]);
@@ -335,7 +317,8 @@ public class OSM_Map extends Activity {
 	         }
 	 }
 	//Make this more eficient so that you dont have to use the cursor all the time only if the form has not be queried 
-	 public void getGeoField(String form_id){
+	 public String getGeoField(String form_id) throws XmlPullParserException, IOException{
+		String formFilePath ="";
 		String formsortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
         Cursor form_curser =  getContentResolver().query(FormsColumns.CONTENT_URI, null, null, null, formsortOrder);  
         form_curser.moveToFirst();
@@ -345,6 +328,8 @@ public class OSM_Map extends Activity {
         	 if(tempformID.equals(form_id)){
         		 //read xml and get geopoint table name
         		 //Toast.makeText(this,form_id+" == "+tempformID, Toast.LENGTH_SHORT).show();
+        		 formFilePath =form_curser.getString(form_curser.getColumnIndex("formFilePath"));
+        		 break;
         		 //Read the 
         		 //count++;
         	 }else{
@@ -352,6 +337,46 @@ public class OSM_Map extends Activity {
         	 }
         	 form_curser.moveToNext();
         }
+        form_curser.close();
+        String db_field_name= "";
+        if (formFilePath != ""){
+        	//That file exists
+		 	//Read the Xml file of the instance 
+	         factory = XmlPullParserFactory.newInstance();
+	         factory.setNamespaceAware(true);
+	         XmlPullParser xpp = factory.newPullParser();
+	         xpp.setInput(new FileReader(new File(formFilePath)));
+	         int eventType = xpp.getEventType();
+	         
+	         while (eventType != XmlPullParser.END_DOCUMENT) {
+	        	 if (xpp.getName()!=null){
+	        		if(xpp.getName().equals("bind")){
+	        			String bind_type = xpp.getAttributeValue(null, "type");
+	        			String[] bind_nodeset = (xpp.getAttributeValue(null, "nodeset")).split("/");
+	        			String bind_db_name = bind_nodeset[bind_nodeset.length -1];
+	        			//Toast.makeText(this,bind_type+" "+bind_db_name, Toast.LENGTH_SHORT).show();
+	        			if (bind_type.equals("geopoint")){
+	        				db_field_name= bind_db_name;
+	        				//Toast.makeText(this,bind_type+" "+db_field_name, Toast.LENGTH_SHORT).show();
+	        				break;
+	        			}
+	        		}
+	        	 }
+	        	 eventType = xpp.next();
+	        	 
+	         }
+	         
+	         
+	         //Now you loop through the xml form to find the geopoint.
+	         //Im sure ODK has something that figured this out, but I could not find it so I wrote it
+	         
+	         
+        }else{
+        	//File file Does not exist
+        }
+		return db_field_name;
+        
+        
         
 
 	 }
@@ -443,7 +468,15 @@ public class OSM_Map extends Activity {
                             switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                     //loadPublicLegends(mainActivity);
-                            		changeInstanceLocation(mk);
+								try {
+									changeInstanceLocation(mk);
+								} catch (XmlPullParserException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
                                     break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                     // Cancel button clicked
@@ -460,9 +493,58 @@ public class OSM_Map extends Activity {
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("Cancel", dialogClickListener).show();
     }
-		 public void changeInstanceLocation(Marker mk){
-			 ((CustomMarkerHelper)mk).getMarker_url();
+		 public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException{
+			 String url = ((CustomMarkerHelper)mk).getMarker_url();
 			 //Toast.makeText(OSM_Map.this,url, Toast.LENGTH_LONG).show();
+			 
+			 //Save the new location of the marker
+			 
+			 	//Read the Xml file of the instance 
+	         /*XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+	         factory.setNamespaceAware(true);
+	         XmlPullParser xpp = factory.newPullParser();
+	         xpp.setInput(new FileReader(new File(url)));
+	         int eventType = xpp.getEventType();
+	         
+	         //For each of the objects in the instance xml <location>
+	         while (eventType != XmlPullParser.END_DOCUMENT) {
+	        	 if (xpp.getName()!=null){
+	        		if(xpp.getName().equals(((CustomMarkerHelper)mk).getMarker_geoField())){
+	        			if (eventType == XmlPullParser.START_TAG){
+	        				String tagname = xpp.getName();
+	        				eventType = xpp.next();
+	        				String value = xpp.getText();
+	        				if (value != null){
+	        					//marker_list.add(instance);
+	        					String[] location = xpp.getText().split(" ");
+	        					Toast.makeText(OSM_Map.this,location[0]+" "+location[1], Toast.LENGTH_LONG).show();
+	        				}
+	        			}
+	        		}
+	        	 }
+	        	 xpp.next();
+	         }*/
 				
 		 }
+		 
+		 @Override
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+				// TODO Auto-generated method stub
+				super.onCreateContextMenu(menu, v, menuInfo);
+				  MenuInflater inflater = getMenuInflater();
+				  inflater.inflate(R.menu.map_click_menu, menu);
+			}
+			@Override
+		    public boolean onCreateOptionsMenu(Menu menu) {
+		        MenuInflater inflater = getMenuInflater();
+		        inflater.inflate(R.layout.map_menu_layout, menu);
+		        return true;
+		    }
+			@Override
+			public boolean onOptionsItemSelected(MenuItem item) {
+				// TODO Auto-generated method stub
+				return super.onOptionsItemSelected(item);
+			}
+
+		    
 }
