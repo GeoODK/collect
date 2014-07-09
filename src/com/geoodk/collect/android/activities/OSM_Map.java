@@ -28,6 +28,28 @@ import java.util.List;
 
 
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+
+import javax.xml.parsers.ParserConfigurationException;
+
+
+
+
+
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+
+
+import javax.xml.transform.dom.DOMSource;
+
+
+import javax.xml.transform.stream.StreamResult;
 
 
 
@@ -45,6 +67,11 @@ import org.osmdroid.util.GeoPoint;
 
 
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -110,7 +137,7 @@ public class OSM_Map extends Activity {
 	private String provider; //  Gps or Network providor
 	//public XmlGeopointHelper geoheler = new XmlGeopointHelper();
 
-
+	public Location lastLocation;
 	private static final String t = "Map";
 	//ArrayList<OverlayItem> marker_list = new ArrayList<OverlayItem>();
 	private List<String[]> markerListArray = new ArrayList<String[]>();
@@ -138,18 +165,20 @@ public class OSM_Map extends Activity {
 		super.onStart();
 		//myMapController.setZoom(4);
 	}
+	
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		//Initializing all the
-		super.onCreate(savedInstanceState); // Find out what this does?
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
-		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action bar
-
+		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
+		
 		//The locationManager 
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
+		lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
 
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
@@ -157,12 +186,13 @@ public class OSM_Map extends Activity {
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(true);
-
+		
 		//Figure this out!!!!! I want to call this a a class and return the some value!!!!!!1
 		//String name = geoheler.getGeopointDBField(temp); 
         
         //Sets the  Resource Proxy
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
+		
         
         //This is the gps button and its functionality
         ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
@@ -176,6 +206,48 @@ public class OSM_Map extends Activity {
             }
         });
         
+		//Toast.makeText(this,"Resume", Toast.LENGTH_SHORT).show();
+		//mapView.getOverlays().clear();
+		//mapView.invalidate();
+        
+        loc_marker = new Marker(mapView);
+		
+		if(lastLocation != null){
+			//Set the location of marker on the map
+			//Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+			GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
+			loc_marker.setPosition(loc);
+			
+			loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+			loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
+			mapView.getOverlays().add(loc_marker);
+        }
+        
+        //This is used to wait a second to wait the center the map on the points
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+		  @Override
+		  public void run() {
+		    //Do something after 100ms
+				GeoPoint point = new GeoPoint(47.42625, 14.77417); 
+				mapView.getController().setZoom(9);
+				mapView.getController().setCenter(point);
+		  }
+		}, 100);
+		
+		
+		
+	}
+
+
+	@Override
+	protected void onResume() {
+		//Initializing all the
+		super.onResume(); // Find out what this does? bar
+		hideInfoWindows();
+		mapView.getOverlays().clear();
+		mapView.invalidate();
+
         //Spinner s = new Spinner(this);
         
         String selection = InstanceColumns.STATUS + " != ?"; // Find out what this does
@@ -229,32 +301,18 @@ public class OSM_Map extends Activity {
         //set_marker_overlay_listners();
         
         //mapView.getOverlays().add(defalt_overlays);
-        mapView.invalidate();
-        
-        //This is used to wait a second to wait the center the map on the points
-		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-		  @Override
-		  public void run() {
-		    //Do something after 100ms
-				GeoPoint point = new GeoPoint(47.42625, 14.77417); 
-				mapView.getController().setZoom(9);
-				mapView.getController().setCenter(point);
-		  }
-		}, 100);
-		loc_marker = new Marker(mapView);
-		
-		if(lastLocation != null){
-			//Set the location of marker on the map
-			//Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-			GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
-			loc_marker.setPosition(loc);
-			
-			loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-			loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
-			mapView.getOverlays().add(loc_marker);
-        }
+        //mapView.invalidate();
 		mapView.invalidate();
+	}
+	
+	public void hideInfoWindows(){
+		List<Overlay> overlays = mapView.getOverlays();
+		for (Overlay overlay : overlays) {
+			if (overlay.getClass() == CustomMarkerHelper.class){
+				((CustomMarkerHelper)overlay).hideInfoWindow();
+			}
+		}
+		
 	}
 	 public void createMaker (String[] cur_mark) throws XmlPullParserException, IOException {
 		 
@@ -468,6 +526,7 @@ public class OSM_Map extends Activity {
                             switch (which) {
                             case DialogInterface.BUTTON_POSITIVE:
                                     //loadPublicLegends(mainActivity);
+								
 								try {
 									changeInstanceLocation(mk);
 								} catch (XmlPullParserException e) {
@@ -476,7 +535,18 @@ public class OSM_Map extends Activity {
 								} catch (IOException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
+								} catch (ParserConfigurationException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (SAXException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (TransformerException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
+						
+					
                                     break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                     // Cancel button clicked
@@ -493,14 +563,40 @@ public class OSM_Map extends Activity {
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("Cancel", dialogClickListener).show();
     }
-		 public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException{
+		 public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException, ParserConfigurationException, SAXException, TransformerException{
 			 String url = ((CustomMarkerHelper)mk).getMarker_url();
+			 File xmlFile = new File(url);
+			 DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			 DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			 Document doc = docBuilder.parse(xmlFile);
+			 Node file_value = doc.getElementsByTagName(((CustomMarkerHelper)mk).getMarker_geoField()).item(0).getFirstChild();
+			 String temp = Double.toString((((CustomMarkerHelper)mk).getPosition().getLatitude()))+ " "+ Double.toString((((CustomMarkerHelper)mk).getPosition().getLongitude()))+ " 0.1 0.1";
+			 String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp); 
+			 file_value.setNodeValue(temp);
+			 //String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp);
+			 TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			 Transformer transformer = transformerFactory.newTransformer();
+			 DOMSource source = new DOMSource(doc);
+			 StreamResult results = new StreamResult(xmlFile);
+			 transformer.setOutputProperty(OutputKeys.INDENT,"yes");
+			 transformer.transform(source, results);
+			 
+			 mapView.invalidate();
+			 
+			 
+			 //Node node = doc.getFirstChild();
+			 //NamedNodeMap nodeAttributes = node.getAttributes();
+			 //Node x = nodeAttributes.getNamedItem("location");
+			 //NamedNodeMap temp = (NamedNodeMap) node.getChildNodes();
+			 //Node temp = nodeAttributes.getNamedItem(((CustomMarkerHelper)mk).getMarker_geoField());
+			 //Node temp =nodeAttributes.getNamedItemNS(null, ((CustomMarkerHelper)mk).getMarker_geoField());
+			 
 			 //Toast.makeText(OSM_Map.this,url, Toast.LENGTH_LONG).show();
 			 
 			 //Save the new location of the marker
 			 
 			 	//Read the Xml file of the instance 
-	         /*XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+	        /*XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 	         factory.setNamespaceAware(true);
 	         XmlPullParser xpp = factory.newPullParser();
 	         xpp.setInput(new FileReader(new File(url)));
@@ -518,11 +614,14 @@ public class OSM_Map extends Activity {
 	        					//marker_list.add(instance);
 	        					String[] location = xpp.getText().split(" ");
 	        					Toast.makeText(OSM_Map.this,location[0]+" "+location[1], Toast.LENGTH_LONG).show();
+	        					//I need to write the new lat/lng to the xml File 
+	        					//Help!!!!!!!111
+	        					
 	        				}
 	        			}
 	        		}
 	        	 }
-	        	 xpp.next();
+	        	 eventType = xpp.next();
 	         }*/
 				
 		 }

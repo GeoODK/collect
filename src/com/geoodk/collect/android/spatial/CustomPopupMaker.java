@@ -18,10 +18,12 @@ public class CustomPopupMaker extends MarkerInfoWindow{
          public CustomPopupMaker(MapView mapView,Uri instance_Url) {
                  super(R.layout.bonuspack_bubble, mapView);
                  instanceUrl = instance_Url;
+                 
                  Button btn = (Button)(mView.findViewById(R.id.bubble_moreinfo));
                  
                  btn.setOnClickListener(new View.OnClickListener() {
                      public void onClick(View view) {
+                    	 
                          if (instanceUrl != null){
                              //Intent myIntent = new Intent(Intent.ACTION_EDIT, instanceUrl);
                         	 view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, instanceUrl ));
