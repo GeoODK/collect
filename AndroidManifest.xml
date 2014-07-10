@@ -10,8 +10,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.geoodk.collect.android"
-    android:versionCode="1041"
-    android:versionName="1.4.3" >
+    android:versionCode="1"
+    android:versionName="1.1" >
 
     <uses-feature
         android:name="android.hardware.location"

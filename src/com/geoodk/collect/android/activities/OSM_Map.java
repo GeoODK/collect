@@ -141,7 +141,7 @@ public class OSM_Map extends Activity {
 	private static final String t = "Map";
 	//ArrayList<OverlayItem> marker_list = new ArrayList<OverlayItem>();
 	private List<String[]> markerListArray = new ArrayList<String[]>();
-	LocationManager locationManager;
+	private LocationManager locationManager;
 	
 	//This section is used to know the order of a array of instance data in the db cursor
 	public static final int pos_url=0;
@@ -154,6 +154,11 @@ public class OSM_Map extends Activity {
 	//This is used to store temp latitude values
 	private Double lat_temp;
 	private Double lng_temp;
+	
+	//Keep Track if GPS button is on or off
+	
+	public Boolean gpsStatus = false;
+	
 	
 	XmlPullParserFactory factory;
 	
@@ -176,10 +181,6 @@ public class OSM_Map extends Activity {
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
 		
-		//The locationManager 
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
-
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
 		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
@@ -193,15 +194,27 @@ public class OSM_Map extends Activity {
         //Sets the  Resource Proxy
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		
-        
+        final ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
         //This is the gps button and its functionality
-        ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
         gps_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	//Toast.makeText(self, "Works", Toast.LENGTH_LONG).show();
                 // Perform action on click
            	 //locationManager.requestLocationUpdates(1000, 1, criteria, myLocationListener);
-            	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 1, myLocationListener);
+            	//gps_button.setBackground(R.drawable.ic_menu_mylocation_blue);
+            	//gps_button.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_menu_mylocation_blue));
+            	if(gpsStatus ==false){
+            		gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+            		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, myLocationListener);
+            		gpsStatus = true;
+            	}else{
+            		gps_button.setImageResource(R.drawable.ic_menu_mylocation);
+            		locationManager.removeUpdates(myLocationListener);
+            		gpsStatus = false;
+            	}
+            	
+            	
+            	
             	 //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, LocationListener);
             }
         });
@@ -209,31 +222,14 @@ public class OSM_Map extends Activity {
 		//Toast.makeText(this,"Resume", Toast.LENGTH_SHORT).show();
 		//mapView.getOverlays().clear();
 		//mapView.invalidate();
+      //The locationManager 
         
+  		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+  		lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
         loc_marker = new Marker(mapView);
-		
-		if(lastLocation != null){
-			//Set the location of marker on the map
-			//Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-			GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
-			loc_marker.setPosition(loc);
-			
-			loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-			loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
-			mapView.getOverlays().add(loc_marker);
-        }
+        updateMyLocation();
         
-        //This is used to wait a second to wait the center the map on the points
-		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-		  @Override
-		  public void run() {
-		    //Do something after 100ms
-				GeoPoint point = new GeoPoint(47.42625, 14.77417); 
-				mapView.getController().setZoom(9);
-				mapView.getController().setCenter(point);
-		  }
-		}, 100);
+
 		
 		
 		
@@ -246,6 +242,7 @@ public class OSM_Map extends Activity {
 		super.onResume(); // Find out what this does? bar
 		hideInfoWindows();
 		mapView.getOverlays().clear();
+		updateMyLocation();
 		mapView.invalidate();
 
         //Spinner s = new Spinner(this);
@@ -298,6 +295,27 @@ public class OSM_Map extends Activity {
 		}
         
         instance_cur.close();
+        
+        
+        //This is used to wait a second to wait the center the map on the points
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+		  @Override
+		  public void run() {
+		    //Do something after 100ms
+			  GeoPoint point;
+			  int zoom;
+			  if(lastLocation != null){
+				point = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
+				zoom = 9;
+			  }else{
+				  point = new GeoPoint(34.08145, -39.85007);
+				  zoom = 3;
+			  }
+			  	mapView.getController().setZoom(zoom);
+				mapView.getController().setCenter(point);
+		  }
+		}, 100);
         //set_marker_overlay_listners();
         
         //mapView.getOverlays().add(defalt_overlays);
@@ -305,6 +323,23 @@ public class OSM_Map extends Activity {
 		mapView.invalidate();
 	}
 	
+	private void updateMyLocation() {
+		// TODO Auto-generated method stub
+		
+		if(lastLocation != null){
+			//Set the location of marker on the map
+			//Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+			GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
+			loc_marker.setPosition(loc);
+			loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+			loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
+			mapView.getOverlays().add(loc_marker);
+        }
+		
+	}
+
+
+
 	public void hideInfoWindows(){
 		List<Overlay> overlays = mapView.getOverlays();
 		for (Overlay overlay : overlays) {
