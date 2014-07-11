@@ -28,6 +28,9 @@ import java.util.List;
 
 
 
+
+
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -53,11 +56,15 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
+
+
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -85,6 +92,7 @@ import com.geoodk.collect.android.provider.InstanceProviderAPI;
 import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
+import com.geoodk.collect.android.spatial.CustomTileSource;
 import com.geoodk.collect.android.spatial.XmlGeopointHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 
@@ -106,6 +114,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.util.Xml;
@@ -156,6 +165,7 @@ public class OSM_Map extends Activity {
 	private Double lng_temp;
 	
 	//Keep Track if GPS button is on or off
+	//MyLocationOverlay myLocationOverlay = null;
 	
 	public Boolean gpsStatus = false;
 	
@@ -183,10 +193,12 @@ public class OSM_Map extends Activity {
 		
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
-		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		//mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		//final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
+		//mapView.setTileSource(tileSource);
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(true);
+		mapView.setUseDataConnection(false);
 		
 		//Figure this out!!!!! I want to call this a a class and return the some value!!!!!!1
 		//String name = geoheler.getGeopointDBField(temp); 
