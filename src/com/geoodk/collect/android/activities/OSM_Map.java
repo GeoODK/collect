@@ -19,44 +19,16 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-
-
-
-
-
-
-
-
-
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
-
 import javax.xml.parsers.ParserConfigurationException;
-
-
-
-
-
-
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-
-
 import javax.xml.transform.dom.DOMSource;
-
-
 import javax.xml.transform.stream.StreamResult;
-
-
-
-
 
 
 //import org.apache.james.mime4j.util.StringArrayMap;
@@ -67,13 +39,12 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
+import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-
-
-
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -87,12 +58,14 @@ import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.R.id;
 import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.R.menu;
+import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.database.ODKSQLiteOpenHelper;
 import com.geoodk.collect.android.provider.InstanceProviderAPI;
 import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomTileSource;
+import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.XmlGeopointHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 
@@ -127,13 +100,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.os.Build;
 
-public class OSM_Map extends Activity {
+public class OSM_Map extends Activity implements IRegisterReceiver{
 	private MapView mapView;
 	private MapController myMapController;
 	//private ItemizedIconOverlay<OverlayItem> complete_overlays;
@@ -168,6 +143,7 @@ public class OSM_Map extends Activity {
 	//MyLocationOverlay myLocationOverlay = null;
 	
 	public Boolean gpsStatus = false;
+	public Boolean layerStatus = false;
 	
 	
 	XmlPullParserFactory factory;
@@ -190,21 +166,27 @@ public class OSM_Map extends Activity {
 		
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
-		
+		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
-		//mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		//final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
 		//mapView.setTileSource(tileSource);
+		String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
+		File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(false);
-		
+		mapView.setUseDataConnection(true);
+		//MBTileProvider mbprovider = new MBTileProvider(this, mbFile);
+		//TilesOverlay mbTileOverlay = new TilesOverlay(mbprovider,this);
+		//mapView.getOverlays().add(mbTileOverlay);
+		mapView.invalidate();
+		//mapView = new MapView(this, mbprovider.getTileSource().getTileSizePixels(), resource_proxy, mbprovider);
 		//Figure this out!!!!! I want to call this a a class and return the some value!!!!!!1
 		//String name = geoheler.getGeopointDBField(temp); 
         
         //Sets the  Resource Proxy
-        resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
+        
 		
         final ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
         //This is the gps button and its functionality
@@ -224,36 +206,34 @@ public class OSM_Map extends Activity {
             		locationManager.removeUpdates(myLocationListener);
             		gpsStatus = false;
             	}
-            	
-            	
-            	
             	 //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, LocationListener);
             }
         });
+        ImageButton layers_button = (ImageButton)findViewById(R.id.layers_button);
+        layers_button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				showLayersDialog();
+				
+			}
+		});
         
-		//Toast.makeText(this,"Resume", Toast.LENGTH_SHORT).show();
-		//mapView.getOverlays().clear();
-		//mapView.invalidate();
-      //The locationManager 
         
   		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
   		lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
         loc_marker = new Marker(mapView);
-        updateMyLocation();
-        
-
-		
-		
-		
+        updateMyLocation();	
 	}
-
+	
 
 	@Override
 	protected void onResume() {
 		//Initializing all the
 		super.onResume(); // Find out what this does? bar
 		hideInfoWindows();
-		mapView.getOverlays().clear();
+		//mapView.getOverlays().clear();
 		updateMyLocation();
 		mapView.invalidate();
 
@@ -593,7 +573,6 @@ public class OSM_Map extends Activity {
 									e.printStackTrace();
 								}
 						
-					
                                     break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                     // Cancel button clicked
@@ -610,6 +589,39 @@ public class OSM_Map extends Activity {
                     .setPositiveButton("Yes", dialogClickListener)
                     .setNegativeButton("Cancel", dialogClickListener).show();
     }
+	    
+		private void showLayersDialog() {
+			// TODO Auto-generated method stub
+			//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
+			//View view=fl.inflate(self, R.layout.showlayers_layout, null);
+			AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
+			alertDialog.setTitle("Select Offline Layer");
+			String[] list= {"GlobalLights"};
+			alertDialog.setItems(list,new  DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialog, int which) {
+	                   // The 'which' argument contains the index position
+	                   // of the selected item
+	            	   File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+		           		MBTileProvider mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
+		           		TilesOverlay mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
+	            	if (layerStatus ==false){
+		           		mapView.getOverlays().add(mbTileOverlay);
+		           		//mapView.setTileSource(mbprovider);
+		           		onResume();
+		           		layerStatus= true;
+	            	}else{
+	            		mapView.getOverlays().remove(mbTileOverlay);
+	            		layerStatus= false;
+	            		onResume();
+	            	}
+	           		//mapView.invalidate();
+	           		//mapView = new MapView(this
+	               }
+	        });
+			//alertDialog.setView(view);
+			alertDialog.show();
+			
+		}
 		 public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException, ParserConfigurationException, SAXException, TransformerException{
 			 String url = ((CustomMarkerHelper)mk).getMarker_url();
 			 File xmlFile = new File(url);
