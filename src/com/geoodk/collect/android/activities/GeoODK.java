@@ -27,16 +27,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class GeoODK extends Activity {
 	private static final String t = "GeoODK";
 	private static boolean EXIT = true;
 	private AlertDialog mAlertDialog;
+	private String[] assestFormList;
 
 	
-    public static final String ODK_ROOT = Environment.getExternalStorageDirectory()
-            + File.separator + "odk";
-    public static final String FORMS_PATH = ODK_ROOT + File.separator + "forms";
+    public static final String FORMS_PATH = Collect.ODK_ROOT + File.separator + "forms";
 	
 
 	@Override
@@ -57,7 +57,8 @@ public class GeoODK extends Activity {
 		// Copy Forms from assest to SD Cards
 		//String forms[] = { "Agriculture_demo.xml", "Inbal_Ukraine_crop.xml", "Pak_Training.xml" };
 		String forms[] = { "Agriculture_demo.xml" };
-		copyForms(forms);
+		assestFormList = getAssetFormList();
+		copyForms(assestFormList);
 		
 		
 		ImageButton geoodk_collect_button = (ImageButton) findViewById(R.id.geoodk_collect_butt);
@@ -119,7 +120,6 @@ public class GeoODK extends Activity {
 		});
 		ImageButton geoodk_delete_but = (ImageButton) findViewById(R.id.geoodk_delete_data_butt);
 		geoodk_delete_but.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				Collect.getInstance().getActivityLogger()
@@ -129,10 +129,27 @@ public class GeoODK extends Activity {
 				startActivity(i);
 			}
 		});
-		
 		//End of Main activity
     }
 	
+
+
+	private String[] getAssetFormList() {
+		AssetManager assetManager = getAssets();
+		String[] formList = null;
+		try {
+			formList = assetManager.list("forms");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//assetManager.list(path);
+		// TODO Auto-generated method stub
+		return formList;
+	}
+
+
+
 	private void copyForms(String[] forms){
 		AssetManager assetManager = getAssets();
 		InputStream in = null;
@@ -142,7 +159,7 @@ public class GeoODK extends Activity {
 			File form_file = new File(FORMS_PATH,filename);
 			if (!form_file.exists()){
 				try {
-					in = assetManager.open(filename);
+					in = assetManager.open("forms/"+filename);
 					out = new FileOutputStream(FORMS_PATH+File.separator+filename);
 					copyFile(in, out);
 					in.close();
@@ -152,7 +169,7 @@ public class GeoODK extends Activity {
 		            out = null;
 					
 				} catch (IOException e) {
-					Log.e("tag", "Failed to copy asset file: " + FORMS_PATH+forms[i], e);
+					Log.e("tag", "Failed to copy asset file: " + FORMS_PATH+File.separator+forms[i], e);
 			}
 				
 			}
