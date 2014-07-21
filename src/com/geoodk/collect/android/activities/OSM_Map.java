@@ -144,7 +144,10 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	
 	public Boolean gpsStatus = false;
 	public Boolean layerStatus = false;
+	private int selected_layer= -1;
 	
+	private MBTileProvider mbprovider;
+	private TilesOverlay mbTileOverlay;
 	
 	XmlPullParserFactory factory;
 	
@@ -239,7 +242,39 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
         //Spinner s = new Spinner(this);
         
-        String selection = InstanceColumns.STATUS + " != ?"; // Find out what this does
+        drawMarkers();
+        
+        
+        //This is used to wait a second to wait the center the map on the points
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+		  @Override
+		  public void run() {
+		    //Do something after 100ms
+			  GeoPoint point;
+			  int zoom;
+			  if(lastLocation != null){
+				point = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
+				zoom = 9;
+			  }else{
+				  point = new GeoPoint(34.08145, -39.85007);
+				  zoom = 3;
+			  }
+			  	mapView.getController().setZoom(zoom);
+				mapView.getController().setCenter(point);
+		  }
+		}, 100);
+        //set_marker_overlay_listners();
+        
+        //mapView.getOverlays().add(defalt_overlays);
+        //mapView.invalidate();
+		mapView.invalidate();
+	}
+
+
+
+	private void drawMarkers() {
+		String selection = InstanceColumns.STATUS + " != ?"; // Find out what this does
         String[] selectionArgs = {InstanceProviderAPI.STATUS_SUBMITTED};  //Look like if arguments passed idk.
         
         //For each instance in the db if there is a point then add it to the overlay/marker list
@@ -287,32 +322,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		}
         
         instance_cur.close();
-        
-        
-        //This is used to wait a second to wait the center the map on the points
-		final Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-		  @Override
-		  public void run() {
-		    //Do something after 100ms
-			  GeoPoint point;
-			  int zoom;
-			  if(lastLocation != null){
-				point = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
-				zoom = 9;
-			  }else{
-				  point = new GeoPoint(34.08145, -39.85007);
-				  zoom = 3;
-			  }
-			  	mapView.getController().setZoom(zoom);
-				mapView.getController().setCenter(point);
-		  }
-		}, 100);
-        //set_marker_overlay_listners();
-        
-        //mapView.getOverlays().add(defalt_overlays);
-        //mapView.invalidate();
-		mapView.invalidate();
 	}
 	
 	private void updateMyLocation() {
@@ -572,7 +581,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-						
                                     break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                     // Cancel button clicked
@@ -596,28 +604,51 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
 			alertDialog.setTitle("Select Offline Layer");
-			String[] list= {"GlobalLights"};
-			alertDialog.setItems(list,new  DialogInterface.OnClickListener() {
-	               public void onClick(DialogInterface dialog, int which) {
-	                   // The 'which' argument contains the index position
+			String[] list= {"None","GlobalLights"};
+			//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
+			alertDialog.setSingleChoiceItems(list,selected_layer,new  DialogInterface.OnClickListener() {
+	               public void onClick(DialogInterface dialog, int item) {
+	            	   //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
+	                  // The 'which' argument contains the index position
 	                   // of the selected item
-	            	   File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
-		           		MBTileProvider mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
-		           		TilesOverlay mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
-	            	if (layerStatus ==false){
-		           		mapView.getOverlays().add(mbTileOverlay);
-		           		//mapView.setTileSource(mbprovider);
-		           		onResume();
-		           		layerStatus= true;
-	            	}else{
-	            		mapView.getOverlays().remove(mbTileOverlay);
-	            		layerStatus= false;
-	            		onResume();
-	            	}
-	           		//mapView.invalidate();
-	           		//mapView = new MapView(this
-	               }
-	        });
+			           //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
+			            switch(item){
+			            case 0 :
+			            	mapView.getOverlays().remove(mbTileOverlay);
+			            	layerStatus =false;
+			            	break;
+			            default:
+			            	    File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+				           		mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
+				           		mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
+				            	if (layerStatus ==false){
+					           		mapView.getOverlays().add(mbTileOverlay);
+					           		//mapView.setTileSource(mbprovider);
+					           		//onResume();
+					           		drawMarkers();
+					           		layerStatus= true;
+				            	}else{
+				            		mapView.getOverlays().remove(mbTileOverlay);
+				            		layerStatus= false;
+				            		drawMarkers();
+				            		//onResume();
+				            	}
+				           		
+				               }
+		            	//This resets the map and sets the selected Layer
+		            	selected_layer =item;
+		            	dialog.dismiss();
+		           		final Handler handler = new Handler();
+		        		handler.postDelayed(new Runnable() {
+		        		  @Override
+		        		  public void run() {
+		        			  mapView.invalidate();
+		        		  }
+		        		}, 400);
+		           		
+			            }
+	                       
+	        	});
 			//alertDialog.setView(view);
 			alertDialog.show();
 			
@@ -639,49 +670,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			 StreamResult results = new StreamResult(xmlFile);
 			 transformer.setOutputProperty(OutputKeys.INDENT,"yes");
 			 transformer.transform(source, results);
-			 
 			 mapView.invalidate();
-			 
-			 
-			 //Node node = doc.getFirstChild();
-			 //NamedNodeMap nodeAttributes = node.getAttributes();
-			 //Node x = nodeAttributes.getNamedItem("location");
-			 //NamedNodeMap temp = (NamedNodeMap) node.getChildNodes();
-			 //Node temp = nodeAttributes.getNamedItem(((CustomMarkerHelper)mk).getMarker_geoField());
-			 //Node temp =nodeAttributes.getNamedItemNS(null, ((CustomMarkerHelper)mk).getMarker_geoField());
-			 
-			 //Toast.makeText(OSM_Map.this,url, Toast.LENGTH_LONG).show();
-			 
-			 //Save the new location of the marker
-			 
-			 	//Read the Xml file of the instance 
-	        /*XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-	         factory.setNamespaceAware(true);
-	         XmlPullParser xpp = factory.newPullParser();
-	         xpp.setInput(new FileReader(new File(url)));
-	         int eventType = xpp.getEventType();
-	         
-	         //For each of the objects in the instance xml <location>
-	         while (eventType != XmlPullParser.END_DOCUMENT) {
-	        	 if (xpp.getName()!=null){
-	        		if(xpp.getName().equals(((CustomMarkerHelper)mk).getMarker_geoField())){
-	        			if (eventType == XmlPullParser.START_TAG){
-	        				String tagname = xpp.getName();
-	        				eventType = xpp.next();
-	        				String value = xpp.getText();
-	        				if (value != null){
-	        					//marker_list.add(instance);
-	        					String[] location = xpp.getText().split(" ");
-	        					Toast.makeText(OSM_Map.this,location[0]+" "+location[1], Toast.LENGTH_LONG).show();
-	        					//I need to write the new lat/lng to the xml File 
-	        					//Help!!!!!!!111
-	        					
-	        				}
-	        			}
-	        		}
-	        	 }
-	        	 eventType = xpp.next();
-	         }*/
 				
 		 }
 		 
