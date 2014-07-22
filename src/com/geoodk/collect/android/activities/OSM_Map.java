@@ -12,6 +12,7 @@ package com.geoodk.collect.android.activities;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -31,6 +32,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 
+
+
+
+
+
+import org.javarosa.core.util.ArrayUtilities;
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.views.MapController;
@@ -148,6 +155,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	
 	private MBTileProvider mbprovider;
 	private TilesOverlay mbTileOverlay;
+	
+	private String[] OffilineOverlays;
 	
 	XmlPullParserFactory factory;
 	
@@ -469,9 +478,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         	//File file Does not exist
         }
 		return db_field_name;
-        
-        
-        
 
 	 }
 	 
@@ -604,9 +610,9 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 			AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
 			alertDialog.setTitle("Select Offline Layer");
-			String[] list= {"None","GlobalLights"};
+			OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
 			//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
-			alertDialog.setSingleChoiceItems(list,selected_layer,new  DialogInterface.OnClickListener() {
+			alertDialog.setSingleChoiceItems(OffilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
 	               public void onClick(DialogInterface dialog, int item) {
 	            	   //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
 	                  // The 'which' argument contains the index position
@@ -618,7 +624,10 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			            	layerStatus =false;
 			            	break;
 			            default:
-			            	    File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+			            		//String mbTileLocation = getMBTileFromItem(item);
+			            		String mbFilePath = getMBTileFromItem(item);
+			            	    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+			            		File mbFile = new File(mbFilePath);
 				           		mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
 				           		mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
 				            	if (layerStatus ==false){
@@ -646,14 +655,48 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		        		  }
 		        		}, 400);
 		           		
-			            }
-	                       
+			            }             
 	        	});
 			//alertDialog.setView(view);
 			alertDialog.show();
 			
 		}
-		 public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException, ParserConfigurationException, SAXException, TransformerException{
+		
+		private String getMBTileFromItem(int item) {
+			// TODO Auto-generated method stub
+			String foldername = OffilineOverlays[item];
+			File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
+			String mbtilePath;
+			File[] files = dir.listFiles(new FilenameFilter() {
+			    public boolean accept(File dir, String name) {
+			        return name.toLowerCase().endsWith(".mbtiles");
+			    }
+			});
+			mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
+			//returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
+			
+			return mbtilePath;
+		}
+		 private String[] getOfflineLayerList() {
+			// TODO Auto-generated method stub
+			 File files = new File(Collect.OFFLINE_LAYERS);
+			 ArrayList<String> results = new ArrayList<String>();
+			 results.add("None");
+			 String[] overlay_folders =  files.list();
+			 for(int i =0;i<overlay_folders.length;i++){
+				 results.add(overlay_folders[i]);
+				 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
+			 }
+			 String[] finala = new String[results.size()]; 
+			 finala = results.toArray(finala);
+			 /*for(int j = 0;j<finala.length;j++){
+				 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
+			 }*/
+			
+			return finala;
+		}
+
+		public void changeInstanceLocation(Marker mk) throws XmlPullParserException, IOException, ParserConfigurationException, SAXException, TransformerException{
 			 String url = ((CustomMarkerHelper)mk).getMarker_url();
 			 File xmlFile = new File(url);
 			 DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
