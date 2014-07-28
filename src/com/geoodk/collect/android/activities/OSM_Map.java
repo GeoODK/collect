@@ -37,6 +37,13 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
+
+
+
+
+
+
 import org.javarosa.core.util.ArrayUtilities;
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -47,10 +54,17 @@ import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.TilesOverlay;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.IRegisterReceiver;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -87,6 +101,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -133,6 +148,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	//ArrayList<OverlayItem> marker_list = new ArrayList<OverlayItem>();
 	private List<String[]> markerListArray = new ArrayList<String[]>();
 	private LocationManager locationManager;
+	MyLocationNewOverlay mMyLocationOverlay;
 	
 	//This section is used to know the order of a array of instance data in the db cursor
 	public static final int pos_url=0;
@@ -141,6 +157,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	public static final int pos_status=3;
 	public static final int pos_uri=4;
 	public static final int pos_geoField=5;
+	public int zoom_level = 3;
 	
 	//This is used to store temp latitude values
 	private Double lat_temp;
@@ -184,11 +201,28 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		//final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
 		//mapView.setTileSource(tileSource);
-		String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
-		File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+		//String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
+		//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(true);
+		mapView.setUseDataConnection(false);
+		mapView.setMapListener(new MapListener() {
+			
+			@Override
+			public boolean onZoom(ZoomEvent zoomLev) {
+				// TODO Auto-generated method stub
+				zoom_level = zoomLev.getZoomLevel();
+				return false;
+			}
+			
+			@Override
+			public boolean onScroll(ScrollEvent arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		});
+		
+	    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		//MBTileProvider mbprovider = new MBTileProvider(this, mbFile);
 		//TilesOverlay mbTileOverlay = new TilesOverlay(mbprovider,this);
 		//mapView.getOverlays().add(mbTileOverlay);
@@ -235,6 +269,18 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         
   		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
   		lastLocation 	= locationManager.getLastKnownLocation(	LocationManager.GPS_PROVIDER);
+  		mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
+        //mMyLocationOverlay.disableMyLocation(); // not on by default
+        //mMyLocationOverlay.disableCompass();
+        //mMyLocationOverlay.disableFollowLocation();
+        //mMyLocationOverlay.setDrawAccuracyEnabled(true);
+        mMyLocationOverlay.runOnFirstFix(new Runnable() {
+            public void run() {
+                mapView.getController().animateTo(mMyLocationOverlay
+                        .getMyLocation());
+            }
+        });
+        mapView.getOverlays().add(mMyLocationOverlay);
         loc_marker = new Marker(mapView);
         updateMyLocation();	
 	}
@@ -248,9 +294,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		//mapView.getOverlays().clear();
 		updateMyLocation();
 		mapView.invalidate();
-
         //Spinner s = new Spinner(this);
-        
         drawMarkers();
         
         
@@ -261,15 +305,12 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		  public void run() {
 		    //Do something after 100ms
 			  GeoPoint point;
-			  int zoom;
 			  if(lastLocation != null){
 				point = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()); 
-				zoom = 9;
 			  }else{
 				  point = new GeoPoint(34.08145, -39.85007);
-				  zoom = 3;
 			  }
-			  	mapView.getController().setZoom(zoom);
+			  	mapView.getController().setZoom(zoom_level);
 				mapView.getController().setCenter(point);
 		  }
 		}, 100);
@@ -618,31 +659,24 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	                  // The 'which' argument contains the index position
 	                   // of the selected item
 			           //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
+	            	   
 			            switch(item){
 			            case 0 :
 			            	mapView.getOverlays().remove(mbTileOverlay);
 			            	layerStatus =false;
 			            	break;
 			            default:
+			            	    mapView.getOverlays().remove(mbTileOverlay);
 			            		//String mbTileLocation = getMBTileFromItem(item);
 			            		String mbFilePath = getMBTileFromItem(item);
 			            	    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 			            		File mbFile = new File(mbFilePath);
 				           		mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
 				           		mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
-				            	if (layerStatus ==false){
-					           		mapView.getOverlays().add(mbTileOverlay);
-					           		//mapView.setTileSource(mbprovider);
-					           		//onResume();
-					           		drawMarkers();
-					           		layerStatus= true;
-				            	}else{
-				            		mapView.getOverlays().remove(mbTileOverlay);
-				            		layerStatus= false;
-				            		drawMarkers();
-				            		//onResume();
-				            	}
-				           		
+				           		mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+					           	mapView.getOverlays().add(mbTileOverlay);
+					           	drawMarkers();
+					           	mapView.invalidate();
 				               }
 		            	//This resets the map and sets the selected Layer
 		            	selected_layer =item;
@@ -692,7 +726,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			 /*for(int j = 0;j<finala.length;j++){
 				 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
 			 }*/
-			
 			return finala;
 		}
 

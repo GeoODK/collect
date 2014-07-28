@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.AdminPreferencesActivity;
+import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.preferences.PreferencesActivity;
 
 import android.app.Activity;
@@ -99,15 +100,14 @@ public class GeoODK extends Activity {
 			public void onClick(View v) {
 				Collect.getInstance()
 				.getActivityLogger()
-				.logAction(this,"MENU_ADMIN","click");
-				Intent ig = new Intent( getApplicationContext(), AdminPreferencesActivity.class);
+				.logAction(this,"Main_Settings","click");
+				Intent ig = new Intent( getApplicationContext(), MainSettingsActivity.class);
 						startActivity(ig);
 			}
 		});
 		
 		ImageButton geoodk_send_but = (ImageButton) findViewById(R.id.geoodk_send_data_butt);
 		geoodk_send_but.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub

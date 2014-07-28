@@ -16,6 +16,8 @@ public final class Manifest {
     	do not declare anything here - detect capabilities at runtime.
 
 
+
+
     
          */
         public static final String MAPS_RECEIVE="org.opendatakit.tables.permission.MAPS_RECEIVE";

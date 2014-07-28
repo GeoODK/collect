@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <string-array name="main_settings">
+        <item>Form Management</item>
+        <item>General Settings</item>
+        <item>Admin Settings</item>
+        <item>Map Settings</item>
+    </string-array>
+</resources>
