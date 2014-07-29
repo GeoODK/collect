@@ -44,6 +44,10 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
+
+
+
 import org.javarosa.core.util.ArrayUtilities;
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -81,6 +85,9 @@ import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.R.menu;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.database.ODKSQLiteOpenHelper;
+import com.geoodk.collect.android.preferences.AdminPreferencesActivity;
+import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.preferences.PreferencesActivity;
 import com.geoodk.collect.android.provider.InstanceProviderAPI;
 import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -99,6 +106,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -129,6 +137,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 public class OSM_Map extends Activity implements IRegisterReceiver{
 	private MapView mapView;
@@ -174,7 +183,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	private TilesOverlay mbTileOverlay;
 	
 	private String[] OffilineOverlays;
-	private ITileSource baseTiles = TileSourceFactory.MAPQUESTOSM;
+	private ITileSource baseTiles;
 	
 	XmlPullParserFactory factory;
 	
@@ -196,6 +205,16 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
+		
+		//Map Settings
+		SharedPreferences sharedPreferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, false);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		setbasemapTiles(basemap);
+		//Toast.makeText(OSM_Map.this, "Online: "+online+" ", Toast.LENGTH_LONG).show();
+		
+		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
@@ -206,7 +225,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(true);
+		mapView.setUseDataConnection(online);
 		mapView.setMapListener(new MapListener() {
 			@Override
 			public boolean onZoom(ZoomEvent zoomLev) {
@@ -289,6 +308,32 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         updateMyLocation();	
 	}
 	
+
+	private void setbasemapTiles(String basemap) {
+		// TODO Auto-generated method stub
+		
+		if (basemap.equals("MAPNIK")){
+			baseTiles = TileSourceFactory.MAPNIK;
+		}else if (basemap.equals("CYCLEMAP")){
+			baseTiles = TileSourceFactory.CYCLEMAP;
+		}else if (basemap.equals("PUBLIC_TRANSPORT")){
+			baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
+		}else if(basemap.equals("CLOUDMADESTANDARDTILES")){
+			baseTiles = TileSourceFactory.CLOUDMADESTANDARDTILES;
+		}else if(basemap.equals("CLOUDMADESMALLTILES")){
+			baseTiles = TileSourceFactory.CLOUDMADESMALLTILES;
+		}else if(basemap.equals("MAPQUESTOSM")){
+			baseTiles = TileSourceFactory.MAPQUESTOSM;
+		}else if(basemap.equals("MAPQUESTAERIAL")){
+			baseTiles = TileSourceFactory.MAPQUESTAERIAL;
+		}else{
+			baseTiles = TileSourceFactory.MAPQUESTOSM;
+		}
+	
+		
+	}
+
+
 
 	@Override
 	protected void onResume() {
