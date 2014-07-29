@@ -24,13 +24,14 @@ public final class R {
         public static final int start_arrow=0x7f04000c;
     }
     public static final class array {
+        public static final int basemap_entries=0x7f0d0008;
         public static final int constraint_behavior_entries=0x7f0d0007;
         public static final int constraint_behavior_entry_values=0x7f0d0006;
         public static final int font_size_entries=0x7f0d0003;
         /**  DO NOT alter font_size_entry_values - used internally in preferences activity 
          */
         public static final int font_size_entry_values=0x7f0d0002;
-        public static final int main_settings=0x7f0d0008;
+        public static final int main_settings=0x7f0d0009;
         public static final int navigation_entries=0x7f0d0005;
         /**  DO NOT alter navigation_entry_values - used internally in preferences activity 
          */
@@ -1538,7 +1539,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f060016;
         public static final int action_menu_presenter=0x7f060017;
         public static final int action_mode_close_button=0x7f060037;
-        public static final int action_settings=0x7f0600d3;
+        public static final int action_settings=0x7f0600d6;
         public static final int activity_chooser_view_content=0x7f060038;
         public static final int add_button=0x7f06009e;
         public static final int admin_pw=0x7f0600ae;
@@ -1576,7 +1577,7 @@ containing a value of this type.
         public static final int collapseActionView=0x7f06000d;
         public static final int constraint_behavior=0x7f0600bb;
         public static final int default_activity_button=0x7f06003b;
-        public static final int default_completed=0x7f0600cf;
+        public static final int default_completed=0x7f0600d2;
         public static final int default_to_finalized=0x7f0600bd;
         public static final int delete_button=0x7f060058;
         public static final int delete_saved=0x7f0600b2;
@@ -1592,11 +1593,11 @@ containing a value of this type.
         public static final int enter_data=0x7f060087;
         public static final int expand_activities_button=0x7f060039;
         public static final int expanded_menu=0x7f06003f;
-        public static final int font_size=0x7f0600ce;
+        public static final int font_size=0x7f0600d1;
         public static final int form_back_button=0x7f060061;
         public static final int form_forward_button=0x7f060062;
         public static final int form_start_bling=0x7f060068;
-        public static final int formlist_url=0x7f0600cc;
+        public static final int formlist_url=0x7f0600cf;
         public static final int geoodk_collect_butt=0x7f06006f;
         public static final int geoodk_delete_data_butt=0x7f060075;
         public static final int geoodk_edit_butt=0x7f060072;
@@ -1619,7 +1620,7 @@ containing a value of this type.
         public static final int image=0x7f06003a;
         public static final int image_advance=0x7f06006b;
         public static final int image_backup=0x7f060069;
-        public static final int info=0x7f0600c6;
+        public static final int info=0x7f0600c9;
         public static final int jumpBeginningButton=0x7f060083;
         public static final int jumpEndButton=0x7f060084;
         public static final int jumpPreviousButton=0x7f060082;
@@ -1636,8 +1637,9 @@ containing a value of this type.
         public static final int mainlayout=0x7f060077;
         public static final int manage_forms=0x7f06008d;
         public static final int map=0x7f06007a;
-        public static final int mapClickMenu=0x7f0600d2;
+        public static final int mapClickMenu=0x7f0600d5;
         public static final int mapSettingsList=0x7f06008f;
+        public static final int map_basemap=0x7f0600c8;
         public static final int map_setting_butttt=0x7f060090;
         public static final int mapview=0x7f06002c;
         public static final int mapview_placeholder=0x7f060080;
@@ -1652,7 +1654,9 @@ containing a value of this type.
         public static final int never=0x7f060009;
         public static final int none=0x7f060010;
         public static final int normal=0x7f060000;
-        public static final int password=0x7f0600c9;
+        public static final int oflinelayers_url=0x7f0600c7;
+        public static final int onlineMapsID=0x7f0600c6;
+        public static final int password=0x7f0600cc;
         public static final int password_edit=0x7f0600a2;
         public static final int password_view=0x7f0600a1;
         public static final int pathtext=0x7f060081;
@@ -1660,7 +1664,7 @@ containing a value of this type.
         public static final int production=0x7f06001f;
         public static final int progress_circular=0x7f060018;
         public static final int progress_horizontal=0x7f060019;
-        public static final int protocol=0x7f0600cb;
+        public static final int protocol=0x7f0600ce;
         public static final int pwd_field=0x7f060095;
         public static final int pwd_label=0x7f060094;
         public static final int questionholder=0x7f060060;
@@ -1694,25 +1698,25 @@ containing a value of this type.
         public static final int search_plate=0x7f060049;
         public static final int search_src_text=0x7f06004a;
         public static final int search_voice_btn=0x7f06004e;
-        public static final int selected_google_account=0x7f0600ca;
+        public static final int selected_google_account=0x7f0600cd;
         public static final int selectionDetails=0x7f060023;
         public static final int send_data=0x7f06008a;
         public static final int send_finalized=0x7f0600b0;
-        public static final int server_url=0x7f0600c7;
+        public static final int server_url=0x7f0600ca;
         public static final int shortcut=0x7f060041;
         public static final int showCustom=0x7f060007;
         public static final int showHome=0x7f060004;
         public static final int showTitle=0x7f060006;
         public static final int show_location=0x7f06007e;
-        public static final int show_splash=0x7f0600d0;
+        public static final int show_splash=0x7f0600d3;
         public static final int show_splash_screen=0x7f0600bf;
         public static final int splash=0x7f0600a5;
         public static final int splash_default=0x7f0600a6;
-        public static final int splash_path=0x7f0600d1;
+        public static final int splash_path=0x7f0600d4;
         public static final int split_action_bar=0x7f060031;
         public static final int status_text=0x7f060055;
         public static final int strict_sandbox=0x7f060021;
-        public static final int submission_url=0x7f0600cd;
+        public static final int submission_url=0x7f0600d0;
         public static final int submit_area=0x7f06004c;
         public static final int tabMode=0x7f060002;
         public static final int terrain=0x7f06001b;
@@ -1729,7 +1733,7 @@ containing a value of this type.
         public static final int upload_button=0x7f060085;
         public static final int url=0x7f0600a9;
         public static final int useLogo=0x7f060003;
-        public static final int username=0x7f0600c8;
+        public static final int username=0x7f0600cb;
         public static final int username_edit=0x7f0600a0;
         public static final int username_view=0x7f06009f;
         public static final int verify_field=0x7f060097;
@@ -1885,7 +1889,7 @@ containing a value of this type.
         public static final int altitude=0x7f0b0036;
         /**  strings that should not be translated 
          */
-        public static final int app_name=0x7f0b014d;
+        public static final int app_name=0x7f0b0156;
         public static final int app_url=0x7f0b00b9;
         public static final int audio_file_error=0x7f0b0037;
         public static final int audio_file_invalid=0x7f0b0038;
@@ -1915,6 +1919,7 @@ containing a value of this type.
         public static final int change_font_size=0x7f0b00c3;
         public static final int change_formlist_url=0x7f0b00bc;
         public static final int change_language=0x7f0b0043;
+        public static final int change_oflinelayers_url=0x7f0b0155;
         public static final int change_password=0x7f0b0044;
         public static final int change_protocol=0x7f0b00be;
         public static final int change_server=0x7f0b00f9;
@@ -2032,9 +2037,10 @@ containing a value of this type.
         public static final int data_saved_ok=0x7f0b004e;
         public static final int default_completed=0x7f0b0050;
         public static final int default_completed_summary=0x7f0b0051;
-        public static final int default_odk_formlist=0x7f0b0152;
-        public static final int default_odk_submission=0x7f0b0153;
-        public static final int default_server_url=0x7f0b0151;
+        public static final int default_odk_formlist=0x7f0b015b;
+        public static final int default_odk_submission=0x7f0b015c;
+        public static final int default_oflinelayers_url=0x7f0b0154;
+        public static final int default_server_url=0x7f0b015a;
         public static final int default_splash_path=0x7f0b00b4;
         public static final int delete_confirm=0x7f0b0052;
         public static final int delete_file=0x7f0b0053;
@@ -2166,6 +2172,10 @@ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
         public static final int manage_files=0x7f0b0084;
         public static final int manifest_server_error=0x7f0b00c6;
         public static final int manifest_tag_error=0x7f0b00c9;
+        public static final int map_basemap_behavior=0x7f0b0152;
+        public static final int map_basemap_key=0x7f0b0151;
+        public static final int map_online_offline_key=0x7f0b014e;
+        public static final int map_preferences=0x7f0b014d;
         public static final int mark_finished=0x7f0b0085;
         public static final int markup_image=0x7f0b00f2;
         public static final int navigation=0x7f0b0113;
@@ -2178,7 +2188,10 @@ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
         public static final int no_items_display_instances=0x7f0b008a;
         public static final int no_printer=0x7f0b011c;
         public static final int noselect_error=0x7f0b0086;
+        public static final int oflinelayers_url=0x7f0b0153;
         public static final int ok=0x7f0b008b;
+        public static final int online_maps_summary=0x7f0b014f;
+        public static final int online_maps_title=0x7f0b0150;
         public static final int open_url=0x7f0b0121;
         /** http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
 http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
@@ -2194,9 +2207,9 @@ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
         public static final int please_wait=0x7f0b0092;
         public static final int please_wait_long=0x7f0b0093;
         public static final int protocol=0x7f0b00bd;
-        public static final int protocol_google=0x7f0b014f;
-        public static final int protocol_odk_default=0x7f0b014e;
-        public static final int protocol_other=0x7f0b0150;
+        public static final int protocol_google=0x7f0b0158;
+        public static final int protocol_odk_default=0x7f0b0157;
+        public static final int protocol_other=0x7f0b0159;
         public static final int provider_disabled_error=0x7f0b0074;
         public static final int quit_application=0x7f0b0094;
         public static final int quit_entry=0x7f0b0095;

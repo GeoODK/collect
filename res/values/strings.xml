@@ -303,7 +303,21 @@
     <string name="title_activity_geoodk_main">GeoodkMain</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    
     <string name="title_activity_osm__map">OSM_Map</string>
+    
     <string name="title_activity_main_settings">MainSettingsActivity</string>
+    <string name="map_preferences">Map Settings</string>
+    <string name="map_online_offline_key">Online-Offline Options</string>
+    <string name="online_maps_summary">Maps are ONLINE</string>
+    <string name="online_maps_title">Online Maps</string>
+    <string name="map_basemap_key">Basemap Options</string>
+    <string name="map_basemap_behavior">Select Default Basemap</string>
+    <string name="oflinelayers_url">Ofline Layers Path</string>
+    <string name="default_oflinelayers_url">OfflineLayers</string>
+    <string name="change_oflinelayers_url">Change Offline Layer Location</string>
+    
+    
+    
 
 </resources>

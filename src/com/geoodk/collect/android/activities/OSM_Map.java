@@ -174,6 +174,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	private TilesOverlay mbTileOverlay;
 	
 	private String[] OffilineOverlays;
+	private ITileSource baseTiles = TileSourceFactory.MAPQUESTOSM;
 	
 	XmlPullParserFactory factory;
 	
@@ -198,26 +199,29 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
-		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
+		mapView.setTileSource(baseTiles);
 		//final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
 		//mapView.setTileSource(tileSource);
 		//String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
 		//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(false);
+		mapView.setUseDataConnection(true);
 		mapView.setMapListener(new MapListener() {
-			
 			@Override
 			public boolean onZoom(ZoomEvent zoomLev) {
 				// TODO Auto-generated method stub
 				zoom_level = zoomLev.getZoomLevel();
+				//This is the level of zoom that is globably set and is used to help the UX 
+				// When the user does Zoom function this will allow for the user to keep the same zoom when switching layer
+				// I still thing there is a problem when the screen rotates. 
+				// There must be a function for dealing with this
 				return false;
 			}
-			
 			@Override
 			public boolean onScroll(ScrollEvent arg0) {
 				// TODO Auto-generated method stub
+				// This function is for wwhebn ]
 				return false;
 			}
 		});
@@ -418,7 +422,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	        				eventType = xpp.next();
 	        				String value = xpp.getText();
 	        				if (value != null){
-	        					//marker_list.add(instance);
 	        					String[] location = xpp.getText().split(" ");
 		        				Double lat = Double.parseDouble(location[0]);
 		        				Double lng = Double.parseDouble(location[1]);
@@ -438,7 +441,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		        				startMarker.setDraggable(true);
 		        				startMarker.setOnMarkerDragListener(draglistner);
 		        				startMarker.setInfoWindow(new CustomPopupMaker(mapView, Uri.parse(cur_mark[pos_uri])));
-		        				
 		        				//popup_button.setOnClickListener(new on);
 		        				//startMarker.setSubDescription("Desc");
 

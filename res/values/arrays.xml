@@ -60,4 +60,18 @@
 		<item>@string/constraint_behavior_on_swipe</item>
 		<item>@string/constraint_behavior_on_finalize</item>
 	</string-array>
+	<string-array
+	    name="basemap_entries">
+		<item>OSMARENDER</item>
+		<item>MAPNIK</item>
+		<item>CYCLEMAP</item>
+		<item>PUBLIC_TRANSPORT</item>
+		<item>BASE</item>
+		<item>TOPO</item>
+		<item>HILLS</item>
+		<item>CLOUDMADESTANDARDTILES</item>
+		<item>CLOUDMADESMALLTILES</item>
+		<item>MAPQUESTOSM</item>
+		<item>MAPQUESTAERIAL</item>
+	</string-array>
 </resources>
