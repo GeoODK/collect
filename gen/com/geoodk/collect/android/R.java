@@ -1889,7 +1889,7 @@ containing a value of this type.
         public static final int altitude=0x7f0b0036;
         /**  strings that should not be translated 
          */
-        public static final int app_name=0x7f0b0156;
+        public static final int app_name=0x7f0b0157;
         public static final int app_url=0x7f0b00b9;
         public static final int audio_file_error=0x7f0b0037;
         public static final int audio_file_invalid=0x7f0b0038;
@@ -2037,10 +2037,10 @@ containing a value of this type.
         public static final int data_saved_ok=0x7f0b004e;
         public static final int default_completed=0x7f0b0050;
         public static final int default_completed_summary=0x7f0b0051;
-        public static final int default_odk_formlist=0x7f0b015b;
-        public static final int default_odk_submission=0x7f0b015c;
+        public static final int default_odk_formlist=0x7f0b015c;
+        public static final int default_odk_submission=0x7f0b015d;
         public static final int default_oflinelayers_url=0x7f0b0154;
-        public static final int default_server_url=0x7f0b015a;
+        public static final int default_server_url=0x7f0b015b;
         public static final int default_splash_path=0x7f0b00b4;
         public static final int delete_confirm=0x7f0b0052;
         public static final int delete_file=0x7f0b0053;
@@ -2207,12 +2207,13 @@ http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
         public static final int please_wait=0x7f0b0092;
         public static final int please_wait_long=0x7f0b0093;
         public static final int protocol=0x7f0b00bd;
-        public static final int protocol_google=0x7f0b0158;
-        public static final int protocol_odk_default=0x7f0b0157;
-        public static final int protocol_other=0x7f0b0159;
+        public static final int protocol_google=0x7f0b0159;
+        public static final int protocol_odk_default=0x7f0b0158;
+        public static final int protocol_other=0x7f0b015a;
         public static final int provider_disabled_error=0x7f0b0074;
         public static final int quit_application=0x7f0b0094;
         public static final int quit_entry=0x7f0b0095;
+        public static final int record_geoshape=0x7f0b0156;
         public static final int refresh=0x7f0b0096;
         public static final int replace_barcode=0x7f0b0097;
         public static final int replace_bearing=0x7f0b0123;

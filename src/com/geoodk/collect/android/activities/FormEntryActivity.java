@@ -2747,7 +2747,7 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 
 	private void sendSavedBroadcast() {
 		Intent i = new Intent();
-		i.setAction("org.odk.collect.android.FormSaved");
+		i.setAction("com.geoodk.collect.android.FormSaved");
 		this.sendBroadcast(i);
 	}
 
