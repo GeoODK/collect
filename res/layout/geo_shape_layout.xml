@@ -1,15 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="${packageName}.${activityClass}" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
+	<org.osmdroid.views.MapView
+	    android:id="@+id/geoshape_mapview"
+	    android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+
+	<ImageButton
+	    android:id="@+id/gps_button"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="20dp"
+	    android:src="@drawable/ic_menu_mylocation" />
+    <ImageButton
+	    android:id="@+id/layers_button"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:padding="20dp"
+	    android:src="@drawable/layers" />
 
     <Button
         android:id="@+id/geoshape_Button"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginTop="160dp"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
         android:text="Return Shape" />
-
 </RelativeLayout>
