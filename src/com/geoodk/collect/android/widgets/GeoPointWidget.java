@@ -19,8 +19,8 @@ import java.text.DecimalFormat;
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.form.api.FormEntryPrompt;
-import com.geoodk.collect.android.R;
 
+import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.activities.FormEntryActivity;
 import com.geoodk.collect.android.activities.GeoPointActivity;
 import com.geoodk.collect.android.activities.GeoPointMapActivity;
@@ -39,6 +39,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * GeoPointWidget is the widget that allows the user to get GPS readings.
@@ -222,6 +223,7 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
 		boolean dataAvailable = false;
 		String s = prompt.getAnswerText();
 		if (s != null && !s.equals("")) {
+			Toast.makeText(getContext(), prompt.getAnswerText()+" ", Toast.LENGTH_LONG).show();
 			dataAvailable = true;
 			setBinaryData(s);
 		}

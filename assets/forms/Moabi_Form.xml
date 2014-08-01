@@ -1,0 +1,666 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Moabi Local Observer Survey</h:title>
+    <model>
+      <instance>
+        <Moabi_Form id="local_observer_survey">
+          <contextuels>
+            <date/>
+            <location/>
+            <interviewer/>
+            <village/>
+            <groupement/>
+            <population_size/>
+            <participants_number/>
+            <participants_number_women/>
+            <telephone_reception/>
+            <telephone_operator/>
+            <socio_economic_activities/>
+          </contextuels>
+          <connaissances_era_wwc>
+            <heard_of_era/>
+            <know_about_era/>
+            <who_told_you/>
+            <duration_of_era_project/>
+            <project_objectives/>
+            <project_location/>
+            <project_representatives/>
+            <contract_signed/>
+            <project_activities/>
+            <project_signatories/>
+            <project_chosen/>
+          </connaissances_era_wwc>
+          <project_evaluation>
+            <heard_redd/>
+            <heard_redd_info/>
+            <heard_redd_who/>
+            <heard_redd_envviron/>
+            <heard_redd_what/>
+          </project_evaluation>
+          <identifying_problem_redd>
+            <activities_preformed/>
+            <agriculture/>
+            <artisanale/>
+            <production/>
+            <coupe/>
+            <feux/>
+            <industrielle/>
+            <autres/>
+            <delimitation/>
+            <ressources/>
+            <intervienne/>
+            <implantation/>
+            <clauses/>
+            <propose/>
+            <actuellement/>
+            <applique/>
+            <terres/>
+            <comment_exemple/>
+            <problem/>
+            <pourquoi/>
+          </identifying_problem_redd>
+          <identifying_problem_redd_continue>
+            <benefices/>
+            <pertes/>
+          </identifying_problem_redd_continue>
+          <capacite_technique>
+            <Maitrise/>
+            <proprietaire_telephone/>
+            <capacite_rediger/>
+          </capacite_technique>
+          <meta>
+            <instanceID/>
+          </meta>
+        </Moabi_Form>
+      </instance>
+      <bind nodeset="/Moabi_Form/contextuels/date" type="date"/>
+      <bind nodeset="/Moabi_Form/contextuels/location" type="geopoint"/>
+      <bind nodeset="/Moabi_Form/contextuels/interviewer" type="string"/>
+      <bind nodeset="/Moabi_Form/contextuels/village" type="string"/>
+      <bind nodeset="/Moabi_Form/contextuels/groupement" type="select1"/>
+      <bind nodeset="/Moabi_Form/contextuels/population_size" type="string"/>
+      <bind nodeset="/Moabi_Form/contextuels/participants_number" type="int"/>
+      <bind nodeset="/Moabi_Form/contextuels/participants_number_women" type="int"/>
+      <bind nodeset="/Moabi_Form/contextuels/telephone_reception" type="select1"/>
+      <bind nodeset="/Moabi_Form/contextuels/telephone_operator" type="string"/>
+      <bind nodeset="/Moabi_Form/contextuels/socio_economic_activities" type="select"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/heard_of_era" type="select1"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/know_about_era" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/who_told_you" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/duration_of_era_project" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_objectives" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_location" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_representatives" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/contract_signed" type="select1"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_activities" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_signatories" type="string"/>
+      <bind nodeset="/Moabi_Form/connaissances_era_wwc/project_chosen" type="string"/>
+      <bind nodeset="/Moabi_Form/project_evaluation/heard_redd" type="select1"/>
+      <bind nodeset="/Moabi_Form/project_evaluation/heard_redd_info" type="string"/>
+      <bind nodeset="/Moabi_Form/project_evaluation/heard_redd_who" type="string"/>
+      <bind nodeset="/Moabi_Form/project_evaluation/heard_redd_envviron" type="select1"/>
+      <bind nodeset="/Moabi_Form/project_evaluation/heard_redd_what" type="string"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/activities_preformed" readonly="true()" type="string"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/agriculture" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/artisanale" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/production" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/coupe" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/feux" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/industrielle" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/autres" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/delimitation" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/ressources" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/intervienne" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/implantation" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/clauses" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/propose" type="string"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/actuellement" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/applique" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/terres" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/comment_exemple" type="string"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/problem" type="select1"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd/pourquoi" type="string"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd_continue/benefices" type="select"/>
+      <bind nodeset="/Moabi_Form/identifying_problem_redd_continue/pertes" type="select"/>
+      <bind nodeset="/Moabi_Form/capacite_technique/Maitrise" type="select1"/>
+      <bind nodeset="/Moabi_Form/capacite_technique/proprietaire_telephone" type="select1"/>
+      <bind nodeset="/Moabi_Form/capacite_technique/capacite_rediger" type="select1"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/Moabi_Form/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group appearance="field-list" ref="/Moabi_Form/contextuels">
+      <label>Eléments Contextuels</label>
+      <input ref="/Moabi_Form/contextuels/date">
+        <label>Date et heure</label>
+      </input>
+      <input ref="/Moabi_Form/contextuels/location">
+        <label>GPS Location</label>
+        <hint>GPS coordinates can only be collected when outside.</hint>
+      </input>
+      <input ref="/Moabi_Form/contextuels/interviewer">
+        <label>Nom de l’enquêteur</label>
+      </input>
+      <input ref="/Moabi_Form/contextuels/village">
+        <label>Nom du village</label>
+      </input>
+      <select1 ref="/Moabi_Form/contextuels/groupement">
+        <label>Groupement</label>
+        <item>
+          <label>Bolia</label>
+          <value>bolia</value>
+        </item>
+        <item>
+          <label>Ntomba</label>
+          <value>ntomba</value>
+        </item>
+        <item>
+          <label>Sengele</label>
+          <value>sengele</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/contextuels/population_size">
+        <label>Effectif de la population</label>
+      </input>
+      <input ref="/Moabi_Form/contextuels/participants_number">
+        <label>Nombre de participants à la réunion</label>
+      </input>
+      <input ref="/Moabi_Form/contextuels/participants_number_women">
+        <label>Proportion de femmes à la réunion</label>
+      </input>
+      <select1 ref="/Moabi_Form/contextuels/telephone_reception">
+        <label>Réception téléphonique</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/contextuels/telephone_operator">
+        <label>Opérateur téléphonique</label>
+      </input>
+      <select ref="/Moabi_Form/contextuels/socio_economic_activities">
+        <label>Activités socioéconomiques</label>
+        <hint>classer par importance</hint>
+        <item>
+          <label>Agriculture vivrière (préciser les principales cultures)</label>
+          <value>agriculture_vivriere</value>
+        </item>
+        <item>
+          <label>Culture de rente (préciser caoutchouc, café, cacao, etc.)</label>
+          <value>culture</value>
+        </item>
+        <item>
+          <label>Chasse</label>
+          <value>chasse</value>
+        </item>
+        <item>
+          <label>Pêche</label>
+          <value>peche</value>
+        </item>
+        <item>
+          <label>Elevage</label>
+          <value>elevage</value>
+        </item>
+        <item>
+          <label>Commerce</label>
+          <value>commerce</value>
+        </item>
+        <item>
+          <label>Artisanat</label>
+          <value>artisanat</value>
+        </item>
+        <item>
+          <label>Exploitation artisanale de bois</label>
+          <value>Exploitation_artisanale</value>
+        </item>
+        <item>
+          <label>Carbonisation</label>
+          <value>carbonisation</value>
+        </item>
+        <item>
+          <label>Employé chez ERA-WWC</label>
+          <value>employe_chez_era_wwc</value>
+        </item>
+        <item>
+          <label>Autres (préciser)</label>
+          <value>autres</value>
+        </item>
+      </select>
+    </group>
+    <group appearance="field-list" ref="/Moabi_Form/connaissances_era_wwc">
+      <label>Evaluation des connaissances du Projet ERA-WWC</label>
+      <select1 ref="/Moabi_Form/connaissances_era_wwc/heard_of_era">
+        <label>Avez-vous déjà entendu parler du Projet ERA-WWC</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/connaissances_era_wwc/know_about_era">
+        <label>Que connaissez-vous du Projet d’ERA-WWC+</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/who_told_you">
+        <label>Qui vous en a parlé ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/duration_of_era_project">
+        <label>Quelle est la durée du Projet ERA-WWC ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_objectives">
+        <label>Quels sont les objectifs du Projet ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_location">
+        <label>Où est localisé le Projet ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_representatives">
+        <label>Quels sont ses représentants ?</label>
+      </input>
+      <select1 ref="/Moabi_Form/connaissances_era_wwc/contract_signed">
+        <label>Un contrat a-t-il été signé entre votre village et la société ERA-WWC ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_activities">
+        <label>Quelles sont les activités mises en place dans le cadre de ce contrat ? Quelles sont les échéances ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_signatories">
+        <label>Quels sont les signataires du contrat ?</label>
+      </input>
+      <input ref="/Moabi_Form/connaissances_era_wwc/project_chosen">
+        <label>Comment ont-ils été choisis ?</label>
+      </input>
+    </group>
+    <group appearance="field-list" ref="/Moabi_Form/project_evaluation">
+      <label>Evaluation of knowledge on REDD +</label>
+      <select1 ref="/Moabi_Form/project_evaluation/heard_redd">
+        <label>Avez-vous déjà entendu parler du terme « REDD+</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/project_evaluation/heard_redd_info">
+        <label>Qu’avez-vous entendu dire</label>
+      </input>
+      <input ref="/Moabi_Form/project_evaluation/heard_redd_who">
+        <label>Qui vous en a parlé</label>
+      </input>
+      <select1 ref="/Moabi_Form/project_evaluation/heard_redd_envviron">
+        <label>Connaissez-vous ce que sont les sauvegardes environnementales et sociales ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/project_evaluation/heard_redd_what">
+        <label>Qu’est-ce que c’est ?</label>
+      </input>
+    </group>
+    <group appearance="field-list" ref="/Moabi_Form/identifying_problem_redd">
+      <label>Identification des problématiques REDD+</label>
+      <input ref="/Moabi_Form/identifying_problem_redd/activities_preformed">
+        <label>Les activités suivantes sont-elles pratiquées ? Si oui, par quelles personnes : villageois (V) ou « étranger » (E) ? (Préciser)</label>
+      </input>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/agriculture">
+        <label>L’agriculture sur brulis – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/artisanale">
+        <label>L’exploitation artisanale du bois – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/production">
+        <label>La production de Makala – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/coupe">
+        <label>La coupe de bois de feu – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/feux">
+        <label>Les feux de brousse – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/industrielle">
+        <label>L’exploitation industrielle de bois – V / E</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/autres">
+        <label>Autres : (Préciser)</label>
+        <item>
+          <label>villageois (V)</label>
+          <value>villageois</value>
+        </item>
+        <item>
+          <label>étranger » (E)</label>
+          <value>etranger</value>
+        </item>
+        <item>
+          <label>préciser</label>
+          <value>preciser</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/delimitation">
+        <label>Des activités de délimitation de vos villages ont-elles eu lieu ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/ressources">
+        <label>L’usage de vos terres et ressources a-t-il été cartographié ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/intervienne">
+        <label>Avez-vous été consulté avant que le Projet n’intervienne ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/implantation">
+        <label>Etiez-vous d’accord avec l’implantation du Projet ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/clauses">
+        <label>Avez-vous proposé certaines actions notées dans les clauses sociales ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/identifying_problem_redd/propose">
+        <label>Pourquoi n’avez-vous rien proposé ? Qu’auriez-vous proposé ?</label>
+      </input>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/actuellement">
+        <label>Disposez-vous actuellement de la possibilité de proposer des évolutions dans les activités entreprises (via les réunions avec ERA-WWC) ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/applique">
+        <label>Quel droit s’applique sur vos terres ?</label>
+        <item>
+          <label>Droit officiel</label>
+          <value>droit_officiel</value>
+        </item>
+        <item>
+          <label>Droits coutumiers</label>
+          <value>droits_coutumiers</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/terres">
+        <label>Vos droits d’usage des terres et des ressources naturelles ont-ils changé ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/identifying_problem_redd/comment_exemple">
+        <label>Comment ? Donnez un exemple</label>
+      </input>
+      <select1 ref="/Moabi_Form/identifying_problem_redd/problem">
+        <label>Est-ce un problème ?</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <input ref="/Moabi_Form/identifying_problem_redd/pourquoi">
+        <label>Pourquoi ?</label>
+      </input>
+    </group>
+    <group appearance="field-list" ref="/Moabi_Form/identifying_problem_redd_continue">
+      <label>Continue…</label>
+      <select ref="/Moabi_Form/identifying_problem_redd_continue/benefices">
+        <label>Quels bénéfices avez-vous obtenus depuis l’arrivée du Projet ERA-WWC ?</label>
+        <item>
+          <label>Création / Rénovation d’écoles</label>
+          <value>creation_ecoles</value>
+        </item>
+        <item>
+          <label>Création / Rénovation de centres de santé</label>
+          <value>creation_centres</value>
+        </item>
+        <item>
+          <label>Création / Rénovation d’autres bâtiments (préciser)</label>
+          <value>creation_autres</value>
+        </item>
+        <item>
+          <label>Ouvertures de routes</label>
+          <value>routes</value>
+        </item>
+        <item>
+          <label>Diversification / Intensification des activités agricoles</label>
+          <value>intensification_activities</value>
+        </item>
+        <item>
+          <label>Création d’emploi</label>
+          <value>creation_emploi</value>
+        </item>
+        <item>
+          <label>Formation (Préciser le domaine : agriculture, gestion financière, CLD, élevage, artisanat, etc.)</label>
+          <value>formation</value>
+        </item>
+        <item>
+          <label>Augmentation / diversification de la faune</label>
+          <value>augmentation</value>
+        </item>
+        <item>
+          <label>Cartographie de l’usage des ressources du territoire</label>
+          <value>cartographie</value>
+        </item>
+        <item>
+          <label>Baisse des conflits sur l’usage des ressources</label>
+          <value>baisse</value>
+        </item>
+        <item>
+          <label>Autre (Préciser</label>
+          <value>autre</value>
+        </item>
+      </select>
+      <select ref="/Moabi_Form/identifying_problem_redd_continue/pertes">
+        <label>Quelles pertes avez-vous constaté depuis l’arrivée du Projet ERA-WWC ?</label>
+        <item>
+          <label>Dégradation / fermeture d’écoles</label>
+          <value>degradation_fermeture_ecoles</value>
+        </item>
+        <item>
+          <label>Dégradation / fermeture de centres de santé</label>
+          <value>degradation_fermeture_centres</value>
+        </item>
+        <item>
+          <label>Dégradation / fermeture d’autres bâtiments</label>
+          <value>degradation_fermeture_autres</value>
+        </item>
+        <item>
+          <label>Dégradation / fermeture de routes</label>
+          <value>degradation_fermeture_routes</value>
+        </item>
+        <item>
+          <label>Baisse des productions agricoles</label>
+          <value>productions_agricoles</value>
+        </item>
+        <item>
+          <label>Perte d’emploi</label>
+          <value>perte_emploi</value>
+        </item>
+        <item>
+          <label>Diminution de la faune</label>
+          <value>diminution_faune</value>
+        </item>
+        <item>
+          <label>Augmentation des conflits sur l’usage des ressources</label>
+          <value>augmentation_conflits</value>
+        </item>
+        <item>
+          <label>Autre (Préciser)</label>
+          <value>autre</value>
+        </item>
+      </select>
+    </group>
+    <group appearance="field-list" ref="/Moabi_Form/capacite_technique">
+      <label>Capacité technique de l’observateur local</label>
+      <select1 ref="/Moabi_Form/capacite_technique/Maitrise">
+        <label>Maitrise du Français (lu, parlé, écrit)</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/capacite_technique/proprietaire_telephone">
+        <label>Propriétaire d’un téléphone</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+      <select1 ref="/Moabi_Form/capacite_technique/capacite_rediger">
+        <label>Capacité à rédiger un sms</label>
+        <item>
+          <label>Oui</label>
+          <value>oui</value>
+        </item>
+        <item>
+          <label>Non</label>
+          <value>non</value>
+        </item>
+      </select1>
+    </group>
+  </h:body>
+</h:html>

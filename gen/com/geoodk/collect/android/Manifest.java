@@ -18,6 +18,7 @@ public final class Manifest {
 
 
 
+
     
          */
         public static final String MAPS_RECEIVE="org.opendatakit.tables.permission.MAPS_RECEIVE";
