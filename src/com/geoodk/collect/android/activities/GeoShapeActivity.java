@@ -1,32 +1,49 @@
 package com.geoodk.collect.android.activities;
 
+import java.util.ArrayList;
+
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
+import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.PathOverlay;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.spatial.CustomMarkerHelper;
+import com.geoodk.collect.android.spatial.CustomPopupMaker;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class GeoShapeActivity extends Activity {
 	private MapView mapView;
+	private ArrayList<GeoPoint> map_points =new ArrayList<GeoPoint>();
+	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	private PathOverlay myOverlay= new PathOverlay(Color.RED, this);
 	private ITileSource baseTiles;
 	private DefaultResourceProxyImpl resource_proxy;
-	public int zoom_level = 3;
+	public int zoom_level = 10;
 	String point1;
 	String point2;
 	String point3;
@@ -36,7 +53,7 @@ public class GeoShapeActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.geo_shape_layout);
-		Button return_button = (Button) findViewById(R.id.geoshape_Button);
+		ImageButton return_button = (ImageButton) findViewById(R.id.geoshape_Button);
 		
 		//Map Settings
 				SharedPreferences sharedPreferences = PreferenceManager
@@ -55,6 +72,7 @@ public class GeoShapeActivity extends Activity {
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(online);
+		mapView.getController().setCenter(new GeoPoint(13.002798, 77.580000));
 		mapView.setMapListener(new MapListener() {
 			@Override
 			public boolean onZoom(ZoomEvent zoomLev) {
@@ -65,7 +83,36 @@ public class GeoShapeActivity extends Activity {
 			public boolean onScroll(ScrollEvent arg0) {
 				return false;
 			}
+			
 		});
+		MapEventsReceiver mReceive = new MapEventsReceiver() {
+
+			@Override
+			public boolean longPressHelper(GeoPoint point) {
+				// TODO Auto-generated method stub
+				//Toast.makeText(GeoShapeActivity.this, point.getLatitude()+" ", Toast.LENGTH_LONG).show();
+				//map_points.add(point);
+				Marker marker = new Marker(mapView);
+				marker.setPosition(point);
+				marker.setDraggable(true);
+				marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+				map_markers.add(marker);
+				setMarkers();
+				//mapView.getOverlays().add(marker);
+				//mapView.invalidate();
+				return false;
+			}
+
+			@Override
+			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		};
+		MapEventsOverlay OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceive);
+		mapView.getOverlays().add(OverlayEventos);
+		
+		
 		mapView.getController().setZoom(zoom_level);
 		mapView.invalidate();
 		point1 = "36.15524344399181 -81.80068351328373 0.0 0.0;";
@@ -83,6 +130,33 @@ public class GeoShapeActivity extends Activity {
 				
 			}
 		});
+		
+	    int diff=1000;
+
+	    GeoPoint pt1=new GeoPoint(13.002798, 77.580000);
+	    GeoPoint pt2= new GeoPoint(pt1.getLatitudeE6()+diff, pt1.getLongitudeE6());
+	    GeoPoint pt3= new GeoPoint(pt1.getLatitudeE6()+diff, pt1.getLongitudeE6()+diff);
+	    GeoPoint pt4= new GeoPoint(pt1.getLatitudeE6(), pt1.getLongitudeE6()+diff);
+	    GeoPoint pt5= new GeoPoint(pt1);
+
+
+	    //PathOverlay myOverlay= new PathOverlay(Color.RED, this);
+	    //myOverlay.getPaint().setStyle(Paint.Style.FILL);
+
+	    myOverlay.addPoint(pt1);
+	    myOverlay.addPoint(pt2);
+	    myOverlay.addPoint(pt3);
+	    myOverlay.addPoint(pt4);
+	    myOverlay.addPoint(pt5);
+
+	    mapView.getOverlays().add(myOverlay);
+	    mapView.invalidate();
+		
+		
+		
+	}
+	private void setMarkers() {
+		// TODO Auto-generated method stub
 		
 	}
 	
@@ -104,10 +178,6 @@ public class GeoShapeActivity extends Activity {
 			baseTiles = TileSourceFactory.CYCLEMAP;
 		}else if (basemap.equals("PUBLIC_TRANSPORT")){
 			baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-		}else if(basemap.equals("CLOUDMADESTANDARDTILES")){
-			baseTiles = TileSourceFactory.CLOUDMADESTANDARDTILES;
-		}else if(basemap.equals("CLOUDMADESMALLTILES")){
-			baseTiles = TileSourceFactory.CLOUDMADESMALLTILES;
 		}else if(basemap.equals("MAPQUESTOSM")){
 			baseTiles = TileSourceFactory.MAPQUESTOSM;
 		}else if(basemap.equals("MAPQUESTAERIAL")){

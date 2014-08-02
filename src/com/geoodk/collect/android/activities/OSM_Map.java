@@ -311,10 +311,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 			baseTiles = TileSourceFactory.CYCLEMAP;
 		}else if (basemap.equals("PUBLIC_TRANSPORT")){
 			baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-		}else if(basemap.equals("CLOUDMADESTANDARDTILES")){
-			baseTiles = TileSourceFactory.CLOUDMADESTANDARDTILES;
-		}else if(basemap.equals("CLOUDMADESMALLTILES")){
-			baseTiles = TileSourceFactory.CLOUDMADESMALLTILES;
 		}else if(basemap.equals("MAPQUESTOSM")){
 			baseTiles = TileSourceFactory.MAPQUESTOSM;
 		}else if(basemap.equals("MAPQUESTAERIAL")){

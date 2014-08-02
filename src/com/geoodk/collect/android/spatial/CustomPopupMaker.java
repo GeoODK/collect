@@ -16,7 +16,7 @@ import android.widget.Toast;
 public class CustomPopupMaker extends MarkerInfoWindow{
 		Uri instanceUrl;
          public CustomPopupMaker(MapView mapView,Uri instance_Url) {
-                 super(R.layout.bonuspack_bubble, mapView);
+                 super(R.layout.custom_popup, mapView);
                  instanceUrl = instance_Url;
                  
                  Button btn = (Button)(mView.findViewById(R.id.bubble_moreinfo));
