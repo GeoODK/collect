@@ -231,6 +231,7 @@
 
         <activity
             android:name="com.geoodk.collect.android.activities.OSM_Map"
+            android:configChanges="orientation"
             android:label="@string/title_activity_osm__map" >
         </activity>
         <activity
@@ -239,6 +240,7 @@
         </activity>
         <activity
             android:name="com.geoodk.collect.android.activities.GeoShapeActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_geo_shape" >
         </activity>
     </application>
