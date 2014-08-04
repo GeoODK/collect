@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
 import org.javarosa.core.util.ArrayUtilities;
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -205,7 +206,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
-		
 		//Map Settings
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
@@ -249,7 +249,16 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         
         //Sets the  Resource Proxy
         
-		
+		final ImageButton map_setting_button = (ImageButton) findViewById(R.id.map_setting_button);
+		map_setting_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(self, MapSettings.class);
+				startActivity(i);
+				
+			}
+		});
         final ImageButton gps_button = (ImageButton)findViewById(R.id.gps_button);
         //This is the gps button and its functionality
         gps_button.setOnClickListener(new View.OnClickListener() {
