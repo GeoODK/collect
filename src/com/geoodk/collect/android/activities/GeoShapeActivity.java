@@ -140,6 +140,14 @@ public class GeoShapeActivity extends Activity {
 		}
 	}
 	
+	private void update_polygon(){
+		pathOverlay.clearPath();
+		
+		for (int i =0;i<map_markers.size();i++){
+			pathOverlay.addPoint(map_markers.get(i).getPosition());
+		}
+		mapView.invalidate();
+	}
 	private MapEventsReceiver mReceive = new MapEventsReceiver() {
 		@Override
 		public boolean longPressHelper(GeoPoint point) {
@@ -182,18 +190,18 @@ public class GeoShapeActivity extends Activity {
 	
 	private OnMarkerDragListener draglistner = new OnMarkerDragListener() {
 		@Override
-		public void onMarkerDragStart(Marker arg0) {
-			// TODO Auto-generated method stub
+		public void onMarkerDragStart(Marker marker) {
 			
 		}
 		@Override
 		public void onMarkerDragEnd(Marker arg0) {
 			// TODO Auto-generated method stub
+			update_polygon();
 			
 		}
 		@Override
-		public void onMarkerDrag(Marker arg0) {
-			// TODO Auto-generated method stub
+		public void onMarkerDrag(Marker marker) {
+			update_polygon();
 			
 		}
 	};
