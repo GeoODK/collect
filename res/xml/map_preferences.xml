@@ -4,7 +4,6 @@
         android:summary="@string/admin_access_settings"
         android:title="@string/general_preferences" >
     </Preference>
-     
      <PreferenceCategory
         android:key="@string/map_online_offline_key"
         android:title="@string/map_online_offline_key" >
@@ -14,7 +13,6 @@
             android:key="online_maps_key"
             android:summary="@string/online_maps_summary"
             android:title="@string/online_maps_title" />
-        
         <EditTextPreference
             android:id="@+id/oflinelayers_url"
             android:defaultValue="@string/default_oflinelayers_url"
@@ -23,7 +21,6 @@
             android:key="oflinelayers_url"
             android:title="@string/oflinelayers_url" />
     </PreferenceCategory>
-    
       <PreferenceCategory
         android:key="@string/map_basemap_key"
         android:title="@string/map_basemap_key" >

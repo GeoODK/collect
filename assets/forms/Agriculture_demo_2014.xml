@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <h:head>
-    <h:title>Agriculture Validation Form</h:title>
+    <h:title>Agriculture Land Survey</h:title>
     <model>
       <instance>
-        <agriculture_validation_form id="agriculture_validation">
+        <Agriculture_demo_2014 id="agriculture_demo_form">
           <date_time/>
           <location/>
-          <orientation/>
           <image/>
           <crop_type/>
           <other_crop_type/>
+          <height_meter/>
           <condition>
             <crop_condition/>
             <crop_stage/>
@@ -26,40 +26,37 @@
           <meta>
             <instanceID/>
           </meta>
-        </agriculture_validation_form>
+        </Agriculture_demo_2014>
       </instance>
-      <bind nodeset="/agriculture_validation_form/date_time" type="dateTime"/>
-      <bind nodeset="/agriculture_validation_form/location" type="geopoint"/>
-      <bind nodeset="/agriculture_validation_form/orientation" type="int"/>
-      <bind nodeset="/agriculture_validation_form/image" type="binary"/>
-      <bind nodeset="/agriculture_validation_form/crop_type" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/other_crop_type" relevant="selected( /agriculture_validation_form/crop_type ,'other')" type="string"/>
-      <bind nodeset="/agriculture_validation_form/condition/crop_condition" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/condition/crop_stage" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/ground/crop_tillage" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/ground/soil_quality" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/ground/irrigation" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/previous_crop" type="select1"/>
-      <bind nodeset="/agriculture_validation_form/other_prev_crop" relevant="selected( /agriculture_validation_form/previous_crop ,'other')" type="string"/>
-      <bind nodeset="/agriculture_validation_form/comments" type="string"/>
-      <bind calculate="concat('uuid:', uuid())" nodeset="/agriculture_validation_form/meta/instanceID" readonly="true()" type="string"/>
+      <bind nodeset="/Agriculture_demo_2014/date_time" type="dateTime"/>
+      <bind nodeset="/Agriculture_demo_2014/location" type="geopoint"/>
+      <bind nodeset="/Agriculture_demo_2014/image" type="binary"/>
+      <bind nodeset="/Agriculture_demo_2014/crop_type" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/other_crop_type" relevant="selected( /Agriculture_demo_2014/crop_type ,'other')" type="string"/>
+      <bind nodeset="/Agriculture_demo_2014/height_meter" type="decimal"/>
+      <bind nodeset="/Agriculture_demo_2014/condition/crop_condition" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/condition/crop_stage" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/ground/crop_tillage" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/ground/soil_quality" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/ground/irrigation" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/previous_crop" type="select1"/>
+      <bind nodeset="/Agriculture_demo_2014/other_prev_crop" relevant="selected( /Agriculture_demo_2014/previous_crop ,'other')" type="string"/>
+      <bind nodeset="/Agriculture_demo_2014/comments" type="string"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/Agriculture_demo_2014/meta/instanceID" readonly="true()" type="string"/>
     </model>
   </h:head>
   <h:body>
-    <input ref="/agriculture_validation_form/date_time">
+    <input ref="/Agriculture_demo_2014/date_time">
       <label>Date and Time</label>
     </input>
-    <input ref="/agriculture_validation_form/location">
+    <input ref="/Agriculture_demo_2014/location">
       <label>Location</label>
       <hint>GPS coordinates can only be collected when outside.</hint>
     </input>
-    <input appearance="ex:com.example.android.OT" ref="/agriculture_validation_form/orientation">
-      <label>Orientation</label>
-    </input>
-    <upload mediatype="image/*" ref="/agriculture_validation_form/image">
+    <upload mediatype="image/*" ref="/Agriculture_demo_2014/image">
       <label>Picture of Crop</label>
     </upload>
-    <select1 ref="/agriculture_validation_form/crop_type">
+    <select1 ref="/Agriculture_demo_2014/crop_type">
       <label>Crop Type</label>
       <item>
         <label>soy</label>
@@ -126,12 +123,15 @@
         <value>other</value>
       </item>
     </select1>
-    <input ref="/agriculture_validation_form/other_crop_type">
+    <input ref="/Agriculture_demo_2014/other_crop_type">
       <label>Other Crop Type</label>
     </input>
-    <group appearance="field-list" ref="/agriculture_validation_form/condition">
+    <input ref="/Agriculture_demo_2014/height_meter">
+      <label>Meter</label>
+    </input>
+    <group appearance="field-list" ref="/Agriculture_demo_2014/condition">
       <label>The Crops Condtion</label>
-      <select1 ref="/agriculture_validation_form/condition/crop_condition">
+      <select1 ref="/Agriculture_demo_2014/condition/crop_condition">
         <label>Condition</label>
         <item>
           <label>Good</label>
@@ -154,7 +154,7 @@
           <value>unknown</value>
         </item>
       </select1>
-      <select1 ref="/agriculture_validation_form/condition/crop_stage">
+      <select1 ref="/Agriculture_demo_2014/condition/crop_stage">
         <label>Stage</label>
         <item>
           <label>Germination</label>
@@ -182,9 +182,9 @@
         </item>
       </select1>
     </group>
-    <group appearance="field-list" ref="/agriculture_validation_form/ground">
+    <group appearance="field-list" ref="/Agriculture_demo_2014/ground">
       <label>Ground Observation</label>
-      <select1 ref="/agriculture_validation_form/ground/crop_tillage">
+      <select1 ref="/Agriculture_demo_2014/ground/crop_tillage">
         <label>Tillage</label>
         <item>
           <label>Till</label>
@@ -199,7 +199,7 @@
           <value>unknown</value>
         </item>
       </select1>
-      <select1 ref="/agriculture_validation_form/ground/soil_quality">
+      <select1 ref="/Agriculture_demo_2014/ground/soil_quality">
         <label>Soil Quality</label>
         <item>
           <label>Good</label>
@@ -218,7 +218,7 @@
           <value>unknown</value>
         </item>
       </select1>
-      <select1 ref="/agriculture_validation_form/ground/irrigation">
+      <select1 ref="/Agriculture_demo_2014/ground/irrigation">
         <label>Irrigation</label>
         <item>
           <label>Yes</label>
@@ -234,7 +234,7 @@
         </item>
       </select1>
     </group>
-    <select1 ref="/agriculture_validation_form/previous_crop">
+    <select1 ref="/Agriculture_demo_2014/previous_crop">
       <label>Previous Crop</label>
       <item>
         <label>Soy</label>
@@ -261,10 +261,10 @@
         <value>other</value>
       </item>
     </select1>
-    <input ref="/agriculture_validation_form/other_prev_crop">
+    <input ref="/Agriculture_demo_2014/other_prev_crop">
       <label>Other Previous Crop</label>
     </input>
-    <input ref="/agriculture_validation_form/comments">
+    <input ref="/Agriculture_demo_2014/comments">
       <label>Comments</label>
     </input>
   </h:body>

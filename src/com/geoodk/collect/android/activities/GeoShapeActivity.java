@@ -52,12 +52,19 @@ public class GeoShapeActivity extends Activity {
 	public String final_return_string;
 	private MapEventsOverlay OverlayEventos;
 	private boolean polygon_connection = false;
+	private boolean clear_button_test = false;
+	private ImageButton clear_button;
+	private ImageButton return_button;
+	private ImageButton polygon_button;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.geo_shape_layout);
+		setTitle("LONG CLICK to Create Point"); // Setting title of the action
 		ImageButton return_button = (ImageButton) findViewById(R.id.geoshape_Button);
 		ImageButton polygon_button = (ImageButton) findViewById(R.id.polygon_button);
+		clear_button = (ImageButton) findViewById(R.id.clear_button);
 		
 		//Map Settings
 		SharedPreferences sharedPreferences = PreferenceManager
@@ -90,14 +97,38 @@ public class GeoShapeActivity extends Activity {
 				if (polygon_connection ==true){
 					showClearDialog();
 				}else{
-					int p = map_markers.size();
-					map_markers.add(map_markers.get(0));
-					pathOverlay.addPoint(map_markers.get(0).getPosition());
-					mapView.invalidate();
-					polygon_connection= true;
+					if (map_markers.size()>2){
+						int p = map_markers.size();
+						map_markers.add(map_markers.get(0));
+						pathOverlay.addPoint(map_markers.get(0).getPosition());
+						mapView.invalidate();
+						polygon_connection= true;
+					}else{
+						showPolyonErrorDialog();
+					}
 				}
 			}
 		});
+		
+		
+		clear_button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (map_markers.size() != 0){
+					if (polygon_connection ==true){
+						showClearDialog();
+					}else{
+						Marker c_mark = map_markers.get(map_markers.size()-1);
+						mapView.getOverlays().remove(c_mark);
+						map_markers.remove(map_markers.size()-1);
+						update_polygon();
+						mapView.invalidate();
+					}
+				}
+			}
+		});
+		
 	    mapView.invalidate();
 	}
 	private void overlayMapLayerListner(){
@@ -134,6 +165,16 @@ public class GeoShapeActivity extends Activity {
                    }
                }).show();
         
+	}
+	private void showPolyonErrorDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Must have at least 3 points to create Polygon")
+               .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       // FIRE ZE MISSILES!
+                }
+               }).show();
+		
 	}
 	private String generateReturnString() {
 		String temp_string = "";
@@ -187,6 +228,10 @@ public class GeoShapeActivity extends Activity {
 			// TODO Auto-generated method stub
 			//Toast.makeText(GeoShapeActivity.this, point.getLatitude()+" ", Toast.LENGTH_LONG).show();
 			//map_points.add(point);
+			if (clear_button_test ==false){
+				clear_button.setVisibility(View.VISIBLE);
+				clear_button_test = true;
+			}			
 			Marker marker = new Marker(mapView);
 			marker.setPosition(point);
 			marker.setDraggable(true);

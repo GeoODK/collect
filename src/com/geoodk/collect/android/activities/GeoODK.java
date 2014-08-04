@@ -54,10 +54,6 @@ public class GeoODK extends Activity {
 			createErrorDialog(e.getMessage(), EXIT);
 			return;
 		}
-        
-		// Copy Forms from assest to SD Cards
-		//String forms[] = { "Agriculture_demo.xml", "Inbal_Ukraine_crop.xml", "Pak_Training.xml" };
-		String forms[] = { "Agriculture_demo.xml" };
 		assestFormList = getAssetFormList();
 		copyForms(assestFormList);
 		

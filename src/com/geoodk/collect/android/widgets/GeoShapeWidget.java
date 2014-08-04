@@ -51,8 +51,8 @@ import android.widget.Toast;
  *
  * @author Jon Nordling (jonnordling@gmail.com)
  */
+
 public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
-	public static final String LOCATION = "gp";
 	public static final String ACCURACY_THRESHOLD = "accuracyThreshold";
 	public static final String READ_ONLY = "readOnly";
 	private final boolean mReadOnly;
@@ -99,14 +99,11 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 				// TODO Auto-generated method stub
 				Intent i = null;
 				i = new Intent(getContext(), GeoShapeActivity.class);
-				String s = mStringAnswer.getText().toString();				
-				//i.putExtra(READ_ONLY, mReadOnly);
 				Collect.getInstance().getFormController()
 				.setIndexWaitingForData(mPrompt.getIndex());
 				((Activity) getContext()).startActivityForResult(i,FormEntryActivity.GEOSHAPE_CAPTURE);
 			}
 		});
-		
 		addView(getShapeButton);
 		addView(mAnswerDisplay);
 		
@@ -145,7 +142,7 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 		Boolean test = mPrompt.getIndex().equals(
 				Collect.getInstance().getFormController()
 				.getIndexWaitingForData());
-		Toast.makeText(getContext(), test+" ", Toast.LENGTH_LONG).show();
+		//Toast.makeText(getContext(), test+" ", Toast.LENGTH_LONG).show();
 		return mPrompt.getIndex().equals(
 				Collect.getInstance().getFormController()
 				.getIndexWaitingForData());

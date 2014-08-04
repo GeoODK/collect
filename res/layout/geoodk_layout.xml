@@ -17,7 +17,7 @@
         android:gravity="center"
         android:paddingBottom="5dp"
         android:paddingTop="10dp"
-        android:text="Beta Version 1.1"
+        android:text="Beta Version 2.8"
         android:textSize="18sp"
         android:textStyle="italic"/>
 

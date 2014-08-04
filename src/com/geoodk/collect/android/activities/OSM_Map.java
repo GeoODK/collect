@@ -210,7 +210,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		//Map Settings
 		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, false);
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
 		setbasemapTiles(basemap);
 		//Toast.makeText(OSM_Map.this, "Online: "+online+" ", Toast.LENGTH_LONG).show();
@@ -264,11 +264,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //This is the gps button and its functionality
         gps_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	//Toast.makeText(self, "Works", Toast.LENGTH_LONG).show();
-                // Perform action on click
-           	 //locationManager.requestLocationUpdates(1000, 1, criteria, myLocationListener);
-            	//gps_button.setBackground(R.drawable.ic_menu_mylocation_blue);
-            	//gps_button.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_menu_mylocation_blue));
             	if(gpsStatus ==false){
             		gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
             		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, myLocationListener);
@@ -328,11 +323,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		}else{
 			baseTiles = TileSourceFactory.MAPQUESTOSM;
 		}
-	
-		
 	}
-
-
 
 	@Override
 	protected void onResume() {
@@ -347,8 +338,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		mapView.setUseDataConnection(online);
         drawMarkers();
         mapView.invalidate();
-        
-        
         //This is used to wait a second to wait the center the map on the points
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
@@ -365,10 +354,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 				mapView.getController().setCenter(point);
 		  }
 		}, 100);
-        //set_marker_overlay_listners();
-        
-        //mapView.getOverlays().add(defalt_overlays);
-        //mapView.invalidate();
 		mapView.invalidate();
 	}
 
