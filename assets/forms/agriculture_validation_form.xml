@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Agriculture Validation Form</h:title>
+    <model>
+      <instance>
+        <agriculture_validation_form id="agriculture_validation">
+          <date_time/>
+          <location/>
+          <orientation/>
+          <image/>
+          <crop_type/>
+          <other_crop_type/>
+          <condition>
+            <crop_condition/>
+            <crop_stage/>
+          </condition>
+          <ground>
+            <crop_tillage/>
+            <soil_quality/>
+            <irrigation/>
+          </ground>
+          <previous_crop/>
+          <other_prev_crop/>
+          <comments/>
+          <meta>
+            <instanceID/>
+          </meta>
+        </agriculture_validation_form>
+      </instance>
+      <bind nodeset="/agriculture_validation_form/date_time" type="dateTime"/>
+      <bind nodeset="/agriculture_validation_form/location" type="geopoint"/>
+      <bind nodeset="/agriculture_validation_form/orientation" type="int"/>
+      <bind nodeset="/agriculture_validation_form/image" type="binary"/>
+      <bind nodeset="/agriculture_validation_form/crop_type" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/other_crop_type" relevant="selected( /agriculture_validation_form/crop_type ,'other')" type="string"/>
+      <bind nodeset="/agriculture_validation_form/condition/crop_condition" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/condition/crop_stage" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/ground/crop_tillage" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/ground/soil_quality" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/ground/irrigation" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/previous_crop" type="select1"/>
+      <bind nodeset="/agriculture_validation_form/other_prev_crop" relevant="selected( /agriculture_validation_form/previous_crop ,'other')" type="string"/>
+      <bind nodeset="/agriculture_validation_form/comments" type="string"/>
+      <bind calculate="concat('uuid:', uuid())" nodeset="/agriculture_validation_form/meta/instanceID" readonly="true()" type="string"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/agriculture_validation_form/date_time">
+      <label>Date and Time</label>
+    </input>
+    <input ref="/agriculture_validation_form/location">
+      <label>Location</label>
+      <hint>GPS coordinates can only be collected when outside.</hint>
+    </input>
+    <input appearance="ex:com.example.android.OT" ref="/agriculture_validation_form/orientation">
+      <label>Orientation</label>
+    </input>
+    <upload mediatype="image/*" ref="/agriculture_validation_form/image">
+      <label>Picture of Crop</label>
+    </upload>
+    <select1 ref="/agriculture_validation_form/crop_type">
+      <label>Crop Type</label>
+      <item>
+        <label>soy</label>
+        <value>soy</value>
+      </item>
+      <item>
+        <label>corn</label>
+        <value>corn</value>
+      </item>
+      <item>
+        <label>rice</label>
+        <value>rice</value>
+      </item>
+      <item>
+        <label>cotton</label>
+        <value>cotton</value>
+      </item>
+      <item>
+        <label>sugar Cane</label>
+        <value>sugar_cane</value>
+      </item>
+      <item>
+        <label>wheat</label>
+        <value>wheat</value>
+      </item>
+      <item>
+        <label>dry Beans</label>
+        <value>dry_beans</value>
+      </item>
+      <item>
+        <label>pasture</label>
+        <value>pasture</value>
+      </item>
+      <item>
+        <label>cassava</label>
+        <value>cassava</value>
+      </item>
+      <item>
+        <label>coffee</label>
+        <value>coffee</value>
+      </item>
+      <item>
+        <label>oat</label>
+        <value>oat</value>
+      </item>
+      <item>
+        <label>potato</label>
+        <value>potato</value>
+      </item>
+      <item>
+        <label>harvest</label>
+        <value>harvest</value>
+      </item>
+      <item>
+        <label>forest</label>
+        <value>forest</value>
+      </item>
+      <item>
+        <label>natural_vegetation</label>
+        <value>natural_vegetation</value>
+      </item>
+      <item>
+        <label>other</label>
+        <value>other</value>
+      </item>
+    </select1>
+    <input ref="/agriculture_validation_form/other_crop_type">
+      <label>Other Crop Type</label>
+    </input>
+    <group appearance="field-list" ref="/agriculture_validation_form/condition">
+      <label>The Crops Condtion</label>
+      <select1 ref="/agriculture_validation_form/condition/crop_condition">
+        <label>Condition</label>
+        <item>
+          <label>Good</label>
+          <value>good</value>
+        </item>
+        <item>
+          <label>Average</label>
+          <value>average</value>
+        </item>
+        <item>
+          <label>Poor</label>
+          <value>poor</value>
+        </item>
+        <item>
+          <label>Very Poor</label>
+          <value>very_poor</value>
+        </item>
+        <item>
+          <label>Unknown</label>
+          <value>unknown</value>
+        </item>
+      </select1>
+      <select1 ref="/agriculture_validation_form/condition/crop_stage">
+        <label>Stage</label>
+        <item>
+          <label>Germination</label>
+          <value>germination</value>
+        </item>
+        <item>
+          <label>Vegetative</label>
+          <value>vegetative</value>
+        </item>
+        <item>
+          <label>Flowering</label>
+          <value>flowering</value>
+        </item>
+        <item>
+          <label>Reproductive</label>
+          <value>reproductive</value>
+        </item>
+        <item>
+          <label>Senescence</label>
+          <value>senescence</value>
+        </item>
+        <item>
+          <label>Unknown</label>
+          <value>unknown</value>
+        </item>
+      </select1>
+    </group>
+    <group appearance="field-list" ref="/agriculture_validation_form/ground">
+      <label>Ground Observation</label>
+      <select1 ref="/agriculture_validation_form/ground/crop_tillage">
+        <label>Tillage</label>
+        <item>
+          <label>Till</label>
+          <value>till</value>
+        </item>
+        <item>
+          <label>No Till</label>
+          <value>no_till</value>
+        </item>
+        <item>
+          <label>Unknown</label>
+          <value>unknown</value>
+        </item>
+      </select1>
+      <select1 ref="/agriculture_validation_form/ground/soil_quality">
+        <label>Soil Quality</label>
+        <item>
+          <label>Good</label>
+          <value>good</value>
+        </item>
+        <item>
+          <label>Average</label>
+          <value>average</value>
+        </item>
+        <item>
+          <label>Poor</label>
+          <value>poor</value>
+        </item>
+        <item>
+          <label>Unknown</label>
+          <value>unknown</value>
+        </item>
+      </select1>
+      <select1 ref="/agriculture_validation_form/ground/irrigation">
+        <label>Irrigation</label>
+        <item>
+          <label>Yes</label>
+          <value>yes</value>
+        </item>
+        <item>
+          <label>No</label>
+          <value>no</value>
+        </item>
+        <item>
+          <label>Unknown</label>
+          <value>Unknown</value>
+        </item>
+      </select1>
+    </group>
+    <select1 ref="/agriculture_validation_form/previous_crop">
+      <label>Previous Crop</label>
+      <item>
+        <label>Soy</label>
+        <value>soy</value>
+      </item>
+      <item>
+        <label>Corn</label>
+        <value>corn</value>
+      </item>
+      <item>
+        <label>Rice</label>
+        <value>rice</value>
+      </item>
+      <item>
+        <label>Wheat</label>
+        <value>wheat</value>
+      </item>
+      <item>
+        <label>Unknown</label>
+        <value>unknown</value>
+      </item>
+      <item>
+        <label>Other</label>
+        <value>other</value>
+      </item>
+    </select1>
+    <input ref="/agriculture_validation_form/other_prev_crop">
+      <label>Other Previous Crop</label>
+    </input>
+    <input ref="/agriculture_validation_form/comments">
+      <label>Comments</label>
+    </input>
+  </h:body>
+</h:html>

@@ -117,7 +117,7 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 			dataAvailable = true;
 			setBinaryData(s);
 		}else{
-			Toast.makeText(getContext(), "Nothing", Toast.LENGTH_LONG).show();
+			//Toast.makeText(getContext(), "Nothing", Toast.LENGTH_LONG).show();
 		}
 		//addView(mStringAnswer);
 	}

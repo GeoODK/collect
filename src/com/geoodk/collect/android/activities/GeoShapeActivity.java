@@ -24,6 +24,8 @@ import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -46,7 +48,10 @@ public class GeoShapeActivity extends Activity {
 	private ITileSource baseTiles;
 	private DefaultResourceProxyImpl resource_proxy;
 	public int zoom_level = 10;
+	private static final int stroke_width = 5;
 	public String final_return_string;
+	private MapEventsOverlay OverlayEventos;
+	private boolean polygon_connection = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,8 +75,7 @@ public class GeoShapeActivity extends Activity {
 		mapView.setUseDataConnection(online);
 		mapView.getController().setCenter(new GeoPoint(13.002798, 77.580000));
 		mapView.setMapListener(mapViewListner);
-		MapEventsOverlay OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceive);
-		mapView.getOverlays().add(OverlayEventos);
+		overlayMapLayerListner();
 		mapView.getController().setZoom(zoom_level);
 		mapView.invalidate();
 		return_button.setOnClickListener(new View.OnClickListener() {
@@ -83,23 +87,55 @@ public class GeoShapeActivity extends Activity {
 		polygon_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				int p = map_markers.size();
-				map_markers.add(map_markers.get(0));
-				pathOverlay.addPoint(map_markers.get(0).getPosition());
-				mapView.invalidate();
+				if (polygon_connection ==true){
+					showClearDialog();
+				}else{
+					int p = map_markers.size();
+					map_markers.add(map_markers.get(0));
+					pathOverlay.addPoint(map_markers.get(0).getPosition());
+					mapView.invalidate();
+					polygon_connection= true;
+				}
 			}
 		});
+	    mapView.invalidate();
+	}
+	private void overlayMapLayerListner(){
+		OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceive);
 		pathOverlay= new PathOverlay(Color.RED, this);
 		Paint pPaint = pathOverlay.getPaint();
 	    pPaint.setStrokeWidth(5);
 	    mapView.getOverlays().add(pathOverlay);
-	    mapView.invalidate();
-		
-		
+		mapView.getOverlays().add(OverlayEventos);
+		mapView.invalidate();
+	}
+	private void clearFeatures(){
+		polygon_connection = false;
+		map_markers.clear();
+		pathOverlay.clearPath();
+		mapView.getOverlays().clear();
+		mapView.invalidate();		
+		overlayMapLayerListner();
 		
 	}
+	private void showClearDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Polygon already created. Would you like to CLEAR the feature?")
+               .setPositiveButton("CLEAR", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       // FIRE ZE MISSILES!
+                	   clearFeatures();
+                   }
+               })
+               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       // User cancelled the dialog
+                	   
+                   }
+               }).show();
+        
+	}
 	private String generateReturnString() {
-		//pathOverlay.clearPath();
 		String temp_string = "";
 		for (int i = 0 ; i < map_markers.size();i++){
 			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
@@ -120,8 +156,6 @@ public class GeoShapeActivity extends Activity {
             setResult(RESULT_OK, i);
         finish();
     }
-    
-    
 	private void setbasemapTiles(String basemap) {
 		// TODO Auto-generated method stub
 		
@@ -142,7 +176,6 @@ public class GeoShapeActivity extends Activity {
 	
 	private void update_polygon(){
 		pathOverlay.clearPath();
-		
 		for (int i =0;i<map_markers.size();i++){
 			pathOverlay.addPoint(map_markers.get(i).getPosition());
 		}

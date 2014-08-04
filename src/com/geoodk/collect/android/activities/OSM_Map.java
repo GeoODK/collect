@@ -159,6 +159,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	private List<String[]> markerListArray = new ArrayList<String[]>();
 	private LocationManager locationManager;
 	MyLocationNewOverlay mMyLocationOverlay;
+	public SharedPreferences sharedPreferences;
 	
 	//This section is used to know the order of a array of instance data in the db cursor
 	public static final int pos_url=0;
@@ -207,7 +208,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
 		//Map Settings
-		SharedPreferences sharedPreferences = PreferenceManager
+		sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, false);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
@@ -336,13 +337,16 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	@Override
 	protected void onResume() {
 		//Initializing all the
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, false);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
 		super.onResume(); // Find out what this does? bar
 		hideInfoWindows();
-		//mapView.getOverlays().clear();
 		updateMyLocation();
-		mapView.invalidate();
-        //Spinner s = new Spinner(this);
+		setbasemapTiles(basemap);
+		mapView.setTileSource(baseTiles);
+		mapView.setUseDataConnection(online);
         drawMarkers();
+        mapView.invalidate();
         
         
         //This is used to wait a second to wait the center the map on the points
