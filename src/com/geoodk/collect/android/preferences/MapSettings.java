@@ -55,7 +55,7 @@ import android.widget.Toast;
  */
 public class MapSettings extends PreferenceActivity implements
 		OnPreferenceChangeListener {
-	public static String MAP_PREFERENCES = "admin_prefs";
+	public static String MAP_PREFERENCES = "map_prefs";
 	public static final String KEY_offlineLayer_URL = "oflinelayers_url";
 	public static final String KEY_online_offlinePrefernce = "online_maps_key";
 	public static final String KEY_map_basemap = "map_basemap";

@@ -2,7 +2,8 @@
      <Preference
         android:key="map_preferences"
         android:summary="@string/admin_access_settings"
-        android:title="@string/general_preferences" >
+        android:title="Mapping Preferences"
+         >
     </Preference>
      <PreferenceCategory
         android:key="@string/map_online_offline_key"
@@ -25,7 +26,7 @@
         android:key="@string/map_basemap_key"
         android:title="@string/map_basemap_key" >
        <ListPreference android:id="@+id/map_basemap"
-            android:defaultValue="MAPQUESTOSM"
+            android:defaultValue="MAPNIK"
             android:dialogTitle="@string/map_basemap_behavior"
             android:entries="@array/basemap_entries"
             android:entryValues="@array/basemap_entries"

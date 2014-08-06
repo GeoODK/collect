@@ -44,7 +44,7 @@
           for Maps v2 functionality, want:
     	uses-feature android:glEsVersion="0x00020000" android:required="false"
     	BUT, the gl setting is not modified by the required parameter, so
-    	do not declare anything here - detect capabilities at runtime.
+    	do not declare anything here - detect capabilities at runtime.
     -->
 
     <permission

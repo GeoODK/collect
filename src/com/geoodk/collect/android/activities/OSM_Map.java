@@ -49,6 +49,7 @@ import javax.xml.transform.stream.StreamResult;
 
 
 
+
 import org.javarosa.core.util.ArrayUtilities;
 //import org.apache.james.mime4j.util.StringArrayMap;
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -138,6 +139,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.os.Build;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 public class OSM_Map extends Activity implements IRegisterReceiver{
@@ -160,6 +162,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 	private LocationManager locationManager;
 	MyLocationNewOverlay mMyLocationOverlay;
 	public SharedPreferences sharedPreferences;
+	private Boolean online;
+	private String basemap;
 	
 	//This section is used to know the order of a array of instance data in the db cursor
 	public static final int pos_url=0;
@@ -208,25 +212,29 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
 		setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
 		//Map Settings
-		sharedPreferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-		setbasemapTiles(basemap);
+		//PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
+		//sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		//PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
+		//PreferenceActivity.class.addPreferencesFromResource(R.xml.map_preferences);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		//sharedPreferences = getSharedPreferences(MapSettings.MAP_PREFERENCES,);
+		//online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+		//basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
+		//setbasemapTiles(basemap);
 		//Toast.makeText(OSM_Map.this, "Online: "+online+" ", Toast.LENGTH_LONG).show();
 		
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		//Layout Code MapView Connection and options
 		mapView = (MapView)findViewById(R.id.MapViewId);
-		mapView.setTileSource(baseTiles);
+		//mapView.setTileSource(baseTiles);
 		//final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
 		//mapView.setTileSource(tileSource);
 		//String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
 		//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(online);
+		//mapView.setUseDataConnection(online);
 		mapView.setMapListener(new MapListener() {
 			@Override
 			public boolean onZoom(ZoomEvent zoomLev) {
@@ -321,15 +329,15 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		}else if(basemap.equals("MAPQUESTAERIAL")){
 			baseTiles = TileSourceFactory.MAPQUESTAERIAL;
 		}else{
-			baseTiles = TileSourceFactory.MAPQUESTOSM;
+			baseTiles = TileSourceFactory.MAPNIK;
 		}
 	}
 
 	@Override
 	protected void onResume() {
 		//Initializing all the
-		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, false);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+		basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
 		super.onResume(); // Find out what this does? bar
 		hideInfoWindows();
 		updateMyLocation();
@@ -475,7 +483,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		        				startMarker.setInfoWindow(new CustomPopupMaker(mapView, Uri.parse(cur_mark[pos_uri])));
 		        				//popup_button.setOnClickListener(new on);
 		        				//startMarker.setSubDescription("Desc");
-
 		        				//startMarker.setIcon(getResources().getDrawable(R.drawable.pin_marker));
 		        				mapView.getOverlays().add(startMarker);
 
