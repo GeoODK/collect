@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/wallet_dim_foreground_holo_dark" android:state_pressed="true"/>
+    <item android:drawable="@android:color/background_light" android:state_pressed="true"/>
     <item android:drawable="@android:color/transparent"/>
 </selector>
