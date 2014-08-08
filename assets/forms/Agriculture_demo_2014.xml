@@ -46,9 +46,6 @@
     </model>
   </h:head>
   <h:body>
-    <input ref="/Agriculture_demo_2014/date_time">
-      <label>Date and Time</label>
-    </input>
     <input ref="/Agriculture_demo_2014/location">
       <label>Location</label>
       <hint>GPS coordinates can only be collected when outside.</hint>
