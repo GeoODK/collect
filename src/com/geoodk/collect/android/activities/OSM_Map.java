@@ -112,7 +112,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     public static final int pos_status=3;
     public static final int pos_uri=4;
     public static final int pos_geoField=5;
-    public int zoom_level = 3;
+    public int zoom_level = 10;
 
     //This is used to store temp latitude values
     private Double lat_temp;
@@ -146,27 +146,9 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
         setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
         setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
-        //Map Settings
-        //PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
-        //sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        //PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
-        //PreferenceActivity.class.addPreferencesFromResource(R.xml.map_preferences);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        //sharedPreferences = getSharedPreferences(MapSettings.MAP_PREFERENCES,);
-        //online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-        //basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
-        //setbasemapTiles(basemap);
-        //Toast.makeText(OSM_Map.this, "Online: "+online+" ", Toast.LENGTH_LONG).show();
-
-
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
-        //Layout Code MapView Connection and options
         mapView = (MapView)findViewById(R.id.MapViewId);
-        //mapView.setTileSource(baseTiles);
-        //final CustomTileSource tileSource = new CustomTileSource(Environment.getExternalStorageDirectory().getPath()+ "/osmdroid/tiles/MyMap", null);
-        //mapView.setTileSource(tileSource);
-        //String h = Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles";
-        //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
         mapView.setMultiTouchControls(true);
         mapView.setBuiltInZoomControls(true);
         //mapView.setUseDataConnection(online);
@@ -182,16 +164,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             }
         });
 
-        //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
-        //MBTileProvider mbprovider = new MBTileProvider(this, mbFile);
-        //TilesOverlay mbTileOverlay = new TilesOverlay(mbprovider,this);
-        //mapView.getOverlays().add(mbTileOverlay);
-        mapView.invalidate();
-        //mapView = new MapView(this, mbprovider.getTileSource().getTileSizePixels(), resource_proxy, mbprovider);
-        //Figure this out!!!!! I want to call this a a class and return the some value!!!!!!1
-        //String name = geoheler.getGeopointDBField(temp);
-
-        //Sets the  Resource Proxy
 
         map_setting_button = (ImageButton) findViewById(R.id.map_setting_button);
         map_setting_button.setOnClickListener(new View.OnClickListener() {
@@ -230,19 +202,18 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         mMyLocationOverlay.setEnabled(true);
         mMyLocationOverlay.enableMyLocation();
         mMyLocationOverlay.enableFollowLocation();
-        zoomToMyLocation();
+
 
         //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
         //compassOverlay.enableCompass();
         //mapView.getOverlays().add(compassOverlay);
         mapView.invalidate();
-        //loc_marker = new Marker(mapView);
-        //updateMyLocation();
     }
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
+    		mapView.getController().setZoom(zoom_level);
+    		mapView.getController().setCenter(mMyLocationOverlay.getMyLocation());
     		mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
-    		mapView.getController().setZoom(10);
     	}else{
     		mapView.getController().setZoom(zoom_level);
     	}
@@ -272,35 +243,32 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     	mMyLocationOverlay.enableMyLocation();
     	gpsStatus =true;
     }
+    @Override
     protected void onResume() {
         //Initializing all the
         online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
         basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
         super.onResume(); // Find out what this does? bar
         hideInfoWindows();
-        //updateMyLocation();
         setbasemapTiles(basemap);
         mapView.setTileSource(baseTiles);
         mapView.setUseDataConnection(online);
         drawMarkers();
-        //mapView.invalidate();
-        //This is used to wait a second to wait the center the map on the points
-        /*final Handler handler = new Handler();
+        final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
-            @Override
             public void run() {
                 //Do something after 100ms
                 GeoPoint point;
-                //if(lastLocation != null){
-                    //point = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
-                //}else{
-                    
-                //}
-                point = new GeoPoint(34.08145, -39.85007);
-                mapView.getController().setZoom(zoom_level);
+                if(lastLocation != null){
+                    point = new GeoPoint(mMyLocationOverlay.getMyLocation().getLatitude(), mMyLocationOverlay.getMyLocation().getLongitude());
+                }else{
+                    point = new GeoPoint(34.08145, -39.85007);
+                }
+                
+                mapView.getController().setZoom(3);
                 mapView.getController().setCenter(point);
             }
-        }, 100);*/
+        }, 100);
         mapView.invalidate();
     }
 
@@ -312,10 +280,20 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //myMapController.setZoom(4);
     }
 
+    @Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		disableMyLocation();
+	}
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		disableMyLocation();
+	}
 
-
-
-    private final OnMarkerDragListener draglistner = new OnMarkerDragListener(){
+	private final OnMarkerDragListener draglistner = new OnMarkerDragListener(){
 
         @Override
         public void onMarkerDrag(final Marker m) {
@@ -701,18 +679,5 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
     }
 
-    private void updateMyLocation() {
-        // TODO Auto-generated method stub
-        if(lastLocation != null){
-            //Set the location of marker on the map
-            //Toast.makeText(this,lastLocation.getLatitude()+" "+lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-            final GeoPoint loc = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
-            loc_marker.setPosition(loc);
-            loc_marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-            loc_marker.setIcon(getResources().getDrawable(R.drawable.loc_logo_small));
-            mapView.getOverlays().add(loc_marker);
-        }
-
-    }
 
 }
