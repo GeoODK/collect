@@ -68,10 +68,12 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
@@ -113,7 +115,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     public static final int pos_status=3;
     public static final int pos_uri=4;
     public static final int pos_geoField=5;
-    public int zoom_level = 10;
+    public int zoom_level =-1;
+    public boolean zoom_been_changed = false;
 
     //This is used to store temp latitude values
     private Double lat_temp;
@@ -165,7 +168,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             }
         });
 
-
         map_setting_button = (ImageButton) findViewById(R.id.map_setting_button);
         map_setting_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,14 +178,16 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
             }
         });
+        
         gps_button = (ImageButton)findViewById(R.id.gps_button);
         //This is the gps button and its functionality
         gps_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-            	setGPSstatus();
+            	setGPSStatus();
             }
         });
+        
         layers_button = (ImageButton)findViewById(R.id.layers_button);
         layers_button.setOnClickListener(new View.OnClickListener() {
 
@@ -194,6 +198,13 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
             }
         });
+        
+        GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
+        imlp.setLocationUpdateMinDistance(1000);
+        imlp.setLocationUpdateMinTime(60000);
+        mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
+        mMyLocationOverlay.runOnFirstFix(centerAroundFix);
+        setGPSStatus();
         
         //Initial Map Setting before Location is found
         final Handler handler = new Handler();
@@ -214,6 +225,32 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //mapView.getOverlays().add(compassOverlay);
         mapView.invalidate();
     }
+    
+    private void setGPSStatus(){
+        if(gpsStatus ==false){
+            gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+            upMyLocationOverlayLayers();
+            //enableMyLocation();
+            //zoomToMyLocation();
+            gpsStatus = true;
+        }else{
+            gps_button.setImageResource(R.drawable.ic_menu_mylocation);
+            disableMyLocation();
+            gpsStatus = false;
+        }
+    }
+    
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private Runnable centerAroundFix = new Runnable() {
+        public void run() {
+            mHandler.post(new Runnable() {
+                public void run() {
+                    zoomToMyLocation();
+                }
+            });
+        }
+    };
     
     private void showGPSDisabledAlertToUser(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -241,6 +278,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
     		overlayMyLocationLayers();
+    		//zoomToMyLocation();
     	}else{
     		showGPSDisabledAlertToUser();
     	}
@@ -248,10 +286,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     }
 
     private void overlayMyLocationLayers(){
-        GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
-        imlp.setLocationUpdateMinDistance(1000);
-        imlp.setLocationUpdateMinTime(60000);
-        mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
         mapView.getOverlays().add(mMyLocationOverlay);
         mMyLocationOverlay.setEnabled(true);
         mMyLocationOverlay.enableMyLocation();
@@ -259,25 +293,17 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     }
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
-    		mapView.getController().setZoom(zoom_level);
+    		if (zoom_level ==3){
+    			mapView.getController().setZoom(15);
+    		}else{
+    			mapView.getController().setZoom(zoom_level);
+    		}
     		mapView.getController().setCenter(mMyLocationOverlay.getMyLocation());
-    		mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
+    		//mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
     	}else{
     		mapView.getController().setZoom(zoom_level);
     	}
     	
-    }
-    private void setGPSstatus(){
-        if(gpsStatus ==false){
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-            enableMyLocation();
-            zoomToMyLocation();
-            gpsStatus = true;
-        }else{
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation);
-            disableMyLocation();
-            gpsStatus = false;
-        }
     }
     private void disableMyLocation(){
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -287,14 +313,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         	mMyLocationOverlay.disableMyLocation();
         	gpsStatus =false;
     	}
-
     }
-    private void enableMyLocation(){
-    	mMyLocationOverlay.setEnabled(true);
-    	mMyLocationOverlay.enableFollowLocation();
-    	mMyLocationOverlay.enableMyLocation();
-    	gpsStatus =true;
-    }
+    
     @Override
     protected void onResume() {
         //Initializing all the
@@ -306,7 +326,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         mapView.setTileSource(baseTiles);
         mapView.setUseDataConnection(online);
         drawMarkers();
-        upMyLocationOverlayLayers();
+        setGPSStatus();
+        
         mapView.invalidate();
     }
 
