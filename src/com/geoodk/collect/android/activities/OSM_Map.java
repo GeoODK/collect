@@ -69,6 +69,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -193,7 +194,60 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
             }
         });
+        
+        //Initial Map Setting before Location is found
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                //Do something after 100ms
+                GeoPoint  point = new GeoPoint(34.08145, -39.85007);               
+                mapView.getController().setZoom(3);
+                mapView.getController().setCenter(point);
+            }
+        }, 100);
 
+
+
+
+        //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
+        //compassOverlay.enableCompass();
+        //mapView.getOverlays().add(compassOverlay);
+        mapView.invalidate();
+    }
+    
+    private void showGPSDisabledAlertToUser(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
+        .setCancelable(false)
+        .setPositiveButton("Enable GPS",
+                new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+               // Intent callGPSSettingIntent = new Intent(
+                startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                //startActivity(callGPSSettingIntent);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id){
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+    
+    private void upMyLocationOverlayLayers(){
+    	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+    		overlayMyLocationLayers();
+    	}else{
+    		showGPSDisabledAlertToUser();
+    	}
+
+    }
+
+    private void overlayMyLocationLayers(){
         GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
         imlp.setLocationUpdateMinDistance(1000);
         imlp.setLocationUpdateMinTime(60000);
@@ -202,12 +256,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         mMyLocationOverlay.setEnabled(true);
         mMyLocationOverlay.enableMyLocation();
         mMyLocationOverlay.enableFollowLocation();
-
-
-        //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
-        //compassOverlay.enableCompass();
-        //mapView.getOverlays().add(compassOverlay);
-        mapView.invalidate();
     }
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
@@ -232,10 +280,14 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         }
     }
     private void disableMyLocation(){
-    	mMyLocationOverlay.setEnabled(false);
-    	mMyLocationOverlay.disableFollowLocation();
-    	mMyLocationOverlay.disableMyLocation();
-    	gpsStatus =false;
+    	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+        	mMyLocationOverlay.setEnabled(false);
+        	mMyLocationOverlay.disableFollowLocation();
+        	mMyLocationOverlay.disableMyLocation();
+        	gpsStatus =false;
+    	}
+
     }
     private void enableMyLocation(){
     	mMyLocationOverlay.setEnabled(true);
@@ -246,29 +298,15 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     @Override
     protected void onResume() {
         //Initializing all the
+    	super.onResume(); // Find out what this does? bar 
         online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
         basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
-        super.onResume(); // Find out what this does? bar
         hideInfoWindows();
         setbasemapTiles(basemap);
         mapView.setTileSource(baseTiles);
         mapView.setUseDataConnection(online);
         drawMarkers();
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                //Do something after 100ms
-                GeoPoint point;
-                if(lastLocation != null){
-                    point = new GeoPoint(mMyLocationOverlay.getMyLocation().getLatitude(), mMyLocationOverlay.getMyLocation().getLongitude());
-                }else{
-                    point = new GeoPoint(34.08145, -39.85007);
-                }
-                
-                mapView.getController().setZoom(3);
-                mapView.getController().setCenter(point);
-            }
-        }, 100);
+        upMyLocationOverlayLayers();
         mapView.invalidate();
     }
 
