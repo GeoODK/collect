@@ -223,7 +223,7 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
 		boolean dataAvailable = false;
 		String s = prompt.getAnswerText();
 		if (s != null && !s.equals("")) {
-			Toast.makeText(getContext(), prompt.getAnswerText()+" ", Toast.LENGTH_LONG).show();
+			//Toast.makeText(getContext(), prompt.getAnswerText()+" ", Toast.LENGTH_LONG).show();
 			dataAvailable = true;
 			setBinaryData(s);
 		}
