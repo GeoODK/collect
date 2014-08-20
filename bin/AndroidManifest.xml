@@ -11,8 +11,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.geoodk.collect.android"
-    android:versionCode="2"
-    android:versionName="1.2" >
+    android:versionCode="5"
+    android:versionName="1.5" >
 
     <uses-feature
         android:name="android.hardware.location"
