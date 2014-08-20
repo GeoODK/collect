@@ -62,10 +62,7 @@
 	</string-array>
 	<string-array
 	    name="basemap_entries">
-		<item>MAPNIK</item>
 		<item>MAPQUESTOSM</item>
 		<item>MAPQUESTAERIAL</item>
-		<item>CYCLEMAP</item>
-		<item>PUBLIC_TRANSPORT</item>
 	</string-array>
 </resources>
