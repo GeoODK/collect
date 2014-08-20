@@ -320,7 +320,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //Initializing all the
     	super.onResume(); // Find out what this does? bar 
         online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-        basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
+        basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
         hideInfoWindows();
         setbasemapTiles(basemap);
         mapView.setTileSource(baseTiles);
@@ -683,7 +683,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         }else if(basemap.equals("MAPQUESTAERIAL")){
             baseTiles = TileSourceFactory.MAPQUESTAERIAL;
         }else{
-            baseTiles = TileSourceFactory.MAPNIK;
+            baseTiles = TileSourceFactory.MAPQUESTOSM;
         }
     }
     private void showLayersDialog() {

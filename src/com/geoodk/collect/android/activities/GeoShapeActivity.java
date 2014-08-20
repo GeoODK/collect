@@ -97,7 +97,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		//sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
 		
 		setbasemapTiles(basemap);
 		
@@ -394,7 +394,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		}else if(basemap.equals("MAPQUESTAERIAL")){
 			baseTiles = TileSourceFactory.MAPQUESTAERIAL;
 		}else{
-			baseTiles = TileSourceFactory.MAPNIK;
+			baseTiles = TileSourceFactory.MAPQUESTOSM;
 		}
 	}
 	
