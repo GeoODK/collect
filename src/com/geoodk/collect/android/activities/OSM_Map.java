@@ -23,7 +23,7 @@ package com.geoodk.collect.android.activities;
 /*
  * 06.30.2014
  * Jon Nordling
- * Matias Something?
+ * Mathias Karner
  *
  * This activity is to map the data offline
  *
@@ -59,10 +59,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.TilesOverlay;
-import org.osmdroid.views.overlay.compass.CompassOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import org.w3c.dom.Document;
@@ -83,7 +81,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -93,8 +90,6 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
-
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
@@ -156,223 +151,28 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     private ITileSource baseTiles;
     private ImageButton gps_button;
     private ImageButton layers_button;
-    private ImageButton map_setting_button; 
-    
+    private ImageButton map_setting_button;
+
 
     XmlPullParserFactory factory;
 
 
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        super.onCreate(savedInstanceState);
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-        setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
-        setTitle(getString(R.string.app_name) + " > Mapping"); // Setting title of the action
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
-        mapView = (MapView)findViewById(R.id.MapViewId);
-        mapView.setMultiTouchControls(true);
-        mapView.setBuiltInZoomControls(true);
-        //mapView.setUseDataConnection(online);
-        mapView.setMapListener(new MapListener() {
-            @Override
-            public boolean onScroll(final ScrollEvent arg0) {
-                return false;
-            }
-            @Override
-            public boolean onZoom(final ZoomEvent zoomLev) {
-                zoom_level = zoomLev.getZoomLevel();
-                return false;
-            }
-        });
-
-        map_setting_button = (ImageButton) findViewById(R.id.map_setting_button);
-        map_setting_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                // TODO Auto-generated method stub
-                final Intent i = new Intent(self, MapSettings.class);
-                startActivity(i);
-
-            }
-        });
-        
-        gps_button = (ImageButton)findViewById(R.id.gps_button);
-        //This is the gps button and its functionality
-        gps_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-            	setGPSStatus();
-            }
-        });
-        
-        layers_button = (ImageButton)findViewById(R.id.layers_button);
-        layers_button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-                // TODO Auto-generated method stub
-                showLayersDialog();
-
-            }
-        });
-        
-        GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
-        imlp.setLocationUpdateMinDistance(1000);
-        imlp.setLocationUpdateMinTime(60000);
-        mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
-        mMyLocationOverlay.runOnFirstFix(centerAroundFix);
-        setGPSStatus();
-        
-        //Initial Map Setting before Location is found
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                //Do something after 100ms
-                GeoPoint  point = new GeoPoint(34.08145, -39.85007);               
-                mapView.getController().setZoom(3);
-                mapView.getController().setCenter(point);
-            }
-        }, 100);
-
-
-
-
-        //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
-        //compassOverlay.enableCompass();
-        //mapView.getOverlays().add(compassOverlay);
-        mapView.invalidate();
-    }
-    
-    private void setGPSStatus(){
-        if(gpsStatus ==false){
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-            upMyLocationOverlayLayers();
-            //enableMyLocation();
-            //zoomToMyLocation();
-            gpsStatus = true;
-        }else{
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation);
-            disableMyLocation();
-            gpsStatus = false;
-        }
-    }
-    
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-
-    private Runnable centerAroundFix = new Runnable() {
+    private final Runnable centerAroundFix = new Runnable() {
+        @Override
         public void run() {
-            mHandler.post(new Runnable() {
+            OSM_Map.this.mHandler.post(new Runnable() {
+                @Override
                 public void run() {
-                    zoomToMyLocation();
+                    OSM_Map.this.zoomToMyLocation();
                 }
             });
         }
     };
-    
-    private void showGPSDisabledAlertToUser(){
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
-        .setCancelable(false)
-        .setPositiveButton("Enable GPS",
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-               // Intent callGPSSettingIntent = new Intent(
-                startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-                //startActivity(callGPSSettingIntent);
-            }
-        });
-        alertDialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                dialog.cancel();
-            }
-        });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
-    }
-    
-    private void upMyLocationOverlayLayers(){
-    	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-    	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
-    		overlayMyLocationLayers();
-    		//zoomToMyLocation();
-    	}else{
-    		showGPSDisabledAlertToUser();
-    	}
 
-    }
-
-    private void overlayMyLocationLayers(){
-        mapView.getOverlays().add(mMyLocationOverlay);
-        mMyLocationOverlay.setEnabled(true);
-        mMyLocationOverlay.enableMyLocation();
-        mMyLocationOverlay.enableFollowLocation();
-    }
-    private void zoomToMyLocation(){
-    	if (mMyLocationOverlay.getMyLocation()!= null){
-    		if (zoom_level ==3){
-    			mapView.getController().setZoom(15);
-    		}else{
-    			mapView.getController().setZoom(zoom_level);
-    		}
-    		mapView.getController().setCenter(mMyLocationOverlay.getMyLocation());
-    		//mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
-    	}else{
-    		mapView.getController().setZoom(zoom_level);
-    	}
-    	
-    }
-    private void disableMyLocation(){
-    	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-    	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
-        	mMyLocationOverlay.setEnabled(false);
-        	mMyLocationOverlay.disableFollowLocation();
-        	mMyLocationOverlay.disableMyLocation();
-        	gpsStatus =false;
-    	}
-    }
-    
-    @Override
-    protected void onResume() {
-        //Initializing all the
-    	super.onResume(); // Find out what this does? bar 
-        online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-        basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-        hideInfoWindows();
-        setbasemapTiles(basemap);
-        mapView.setTileSource(baseTiles);
-        mapView.setUseDataConnection(online);
-        drawMarkers();
-        setGPSStatus();
-        
-        mapView.invalidate();
-    }
-
-    //This function comes after the onCreate function
-    @Override
-    protected void onStart() {
-        // TODO Auto-generated method stub
-        super.onStart();
-        //myMapController.setZoom(4);
-    }
-
-    @Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		disableMyLocation();
-	}
-	@Override
-	protected void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-		disableMyLocation();
-	}
-
-	private final OnMarkerDragListener draglistner = new OnMarkerDragListener(){
+    private final OnMarkerDragListener draglistner = new OnMarkerDragListener(){
 
         @Override
         public void onMarkerDrag(final Marker m) {
@@ -385,11 +185,11 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             final GeoPoint newlocation = m.getPosition();
             newlocation.getLatitude();
             newlocation.getLongitude();
-            loc_marker = new Marker(mapView);
+            OSM_Map.this.loc_marker = new Marker(OSM_Map.this.mapView);
             final String lat = Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
             final String lng = Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
             //Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
-            askToChangePoint(m);
+            OSM_Map.this.askToChangePoint(m);
             // TODO Auto-generated method stub
             //Toast.makeText(OSM_Map.this,((CustomMarkerHelper)m).getMarker_url(), Toast.LENGTH_LONG).show();
         }
@@ -399,14 +199,13 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             // TODO Auto-generated method stub
             //lat_temp =  Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
             //lng_temp  =  Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
-            lat_temp =  ((CustomMarkerHelper)m).getPosition().getLatitude();
-            lng_temp  =  ((CustomMarkerHelper)m).getPosition().getLongitude();
+            OSM_Map.this.lat_temp =  ((CustomMarkerHelper)m).getPosition().getLatitude();
+            OSM_Map.this.lng_temp  =  ((CustomMarkerHelper)m).getPosition().getLongitude();
             //Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
 
         }
 
     };
-
 
     protected void askToChangePoint(final Marker m) {
         final Marker mk = m;
@@ -420,7 +219,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                     //loadPublicLegends(mainActivity);
 
                     try {
-                        changeInstanceLocation(mk);
+                        OSM_Map.this.changeInstanceLocation(mk);
                     } catch (final XmlPullParserException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -440,8 +239,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     // Cancel button clicked
-                    ((CustomMarkerHelper)mk).setPosition(new GeoPoint(lat_temp, lng_temp));
-                    mapView.invalidate();
+                    ((CustomMarkerHelper)mk).setPosition(new GeoPoint(OSM_Map.this.lat_temp, OSM_Map.this.lng_temp));
+                    OSM_Map.this.mapView.invalidate();
                     break;
                 }
             }
@@ -462,7 +261,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         final Document doc = docBuilder.parse(xmlFile);
         final Node file_value = doc.getElementsByTagName(((CustomMarkerHelper)mk).getMarker_geoField()).item(0).getFirstChild();
         final String temp = Double.toString((((CustomMarkerHelper)mk).getPosition().getLatitude()))+ " "+ Double.toString((((CustomMarkerHelper)mk).getPosition().getLongitude()))+ " 0.1 0.1";
-        final String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp);
+        final String old_loc = Double.toString(this.lat_temp) +" " +Double.toString(this.lng_temp);
         file_value.setNodeValue(temp);
         //String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp);
         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -471,11 +270,9 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         final StreamResult results = new StreamResult(xmlFile);
         transformer.setOutputProperty(OutputKeys.INDENT,"yes");
         transformer.transform(source, results);
-        mapView.invalidate();
+        this.mapView.invalidate();
 
     }
-
-
 
     public void createMaker (final String[] cur_mark) throws XmlPullParserException, IOException {
         final XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -497,7 +294,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                             final Double lat = Double.parseDouble(location[0]);
                             final Double lng = Double.parseDouble(location[1]);
                             final GeoPoint point = new GeoPoint(lat, lng);
-                            final CustomMarkerHelper startMarker = new CustomMarkerHelper(mapView);
+                            final CustomMarkerHelper startMarker = new CustomMarkerHelper(this.mapView);
                             startMarker.setMarker_name(cur_mark[pos_name]);
                             startMarker.setMarker_uri(Uri.parse(cur_mark[pos_uri]));
                             startMarker.setMarker_status(cur_mark[pos_status]);
@@ -505,14 +302,14 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                             startMarker.setMarker_id(cur_mark[pos_id]);
                             startMarker.setMarker_geoField(cur_mark[pos_geoField]);
                             startMarker.setPosition(point);
-                            startMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+                            startMarker.setIcon(this.getResources().getDrawable(R.drawable.map_marker));
                             startMarker.setTitle("Name: "+ cur_mark[pos_name]);
                             startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                             startMarker.setSnippet("Status: "+cur_mark[pos_status]);
                             startMarker.setDraggable(true);
-                            startMarker.setOnMarkerDragListener(draglistner);
-                            startMarker.setInfoWindow(new CustomPopupMaker(mapView, Uri.parse(cur_mark[pos_uri])));
-                            mapView.getOverlays().add(startMarker);
+                            startMarker.setOnMarkerDragListener(this.draglistner);
+                            startMarker.setInfoWindow(new CustomPopupMaker(this.mapView, Uri.parse(cur_mark[pos_uri])));
+                            this.mapView.getOverlays().add(startMarker);
                             break;
                         }else{
                             break;
@@ -525,13 +322,22 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         }
     }
 
+    private void disableMyLocation(){
+        final LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+            this.mMyLocationOverlay.setEnabled(false);
+            this.mMyLocationOverlay.disableFollowLocation();
+            this.mMyLocationOverlay.disableMyLocation();
+            this.gpsStatus =false;
+        }
+    }
     private void drawMarkers() {
         final String selection = InstanceColumns.STATUS + " != ?"; // Find out what this does
         final String[] selectionArgs = {InstanceProviderAPI.STATUS_SUBMITTED};  //Look like if arguments passed idk.
 
         //For each instance in the db if there is a point then add it to the overlay/marker list
         final String sortOrder = InstanceColumns.STATUS + " DESC, " + InstanceColumns.DISPLAY_NAME + " ASC";
-        final Cursor instance_cur = getContentResolver().query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, sortOrder);
+        final Cursor instance_cur = this.getContentResolver().query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, sortOrder);
         //todo catch when c==null
         instance_cur.moveToFirst();
         while (!instance_cur.isAfterLast()) {
@@ -544,7 +350,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             String geopoint_field = null;
 
             try {
-                geopoint_field = getGeoField(instance_form_id);
+                geopoint_field = this.getGeoField(instance_form_id);
                 //Toast.makeText(this,geopoint_field, Toast.LENGTH_SHORT).show();
             } catch (final XmlPullParserException e1) {
                 // TODO Auto-generated catch block
@@ -555,13 +361,13 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             }
 
             final String[] markerObj = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString,geopoint_field};
-            markerListArray.add(markerObj);
+            this.markerListArray.add(markerObj);
 
             //startActivity(new Intent(Intent.ACTION_EDIT, instanceUri));
 
             //Determine the geoPoint Field
             try {
-                createMaker(markerObj);
+                this.createMaker(markerObj);
                 //addGeoPointMarkerList(instance_cur);
             } catch (final XmlPullParserException e) {
                 // TODO Auto-generated catch block
@@ -575,14 +381,11 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
         instance_cur.close();
     }
-
-
-
     //Make this more eficient so that you dont have to use the cursor all the time only if the form has not be queried
     public String getGeoField(final String form_id) throws XmlPullParserException, IOException{
         String formFilePath ="";
         final String formsortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
-        final Cursor form_curser =  getContentResolver().query(FormsColumns.CONTENT_URI, null, null, null, formsortOrder);
+        final Cursor form_curser =  this.getContentResolver().query(FormsColumns.CONTENT_URI, null, null, null, formsortOrder);
         form_curser.moveToFirst();
         //int count = 0;
         while(!form_curser.isAfterLast()){
@@ -604,25 +407,25 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         if (formFilePath != ""){
             //That file exists
             //Read the Xml file of the instance
-            factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            final XmlPullParser xpp = factory.newPullParser();
+            this.factory = XmlPullParserFactory.newInstance();
+            this.factory.setNamespaceAware(true);
+            final XmlPullParser xpp = this.factory.newPullParser();
             xpp.setInput(new FileReader(new File(formFilePath)));
             int eventType = xpp.getEventType();
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
-            	String name = xpp.getName();
-            	String name_space = xpp.getNamespace();
+                final String name = xpp.getName();
+                final String name_space = xpp.getNamespace();
                 if (xpp.getName()!=null){
                     if(xpp.getName().equals("bind")){
-                    	if (xpp.getAttributeValue(null,"type")!=null){
-                    		String bind_type = xpp.getAttributeValue(null,"type");
-		                        if (bind_type.equals("geopoint")){
-		                        	String[] bind_nodeset = (xpp.getAttributeValue(null, "nodeset")).split("/");
-		                        	String bind_db_name = bind_nodeset[bind_nodeset.length -1];
-		                            db_field_name= bind_db_name;
-		                            break;
-		                        }
+                        if (xpp.getAttributeValue(null,"type")!=null){
+                            final String bind_type = xpp.getAttributeValue(null,"type");
+                            if (bind_type.equals("geopoint")){
+                                final String[] bind_nodeset = (xpp.getAttributeValue(null, "nodeset")).split("/");
+                                final String bind_db_name = bind_nodeset[bind_nodeset.length -1];
+                                db_field_name= bind_db_name;
+                                break;
+                            }
                         }
 
                     }
@@ -642,9 +445,10 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         return db_field_name;
 
     }
+
     private String getMBTileFromItem(final int item) {
         // TODO Auto-generated method stub
-        final String foldername = OffilineOverlays[item];
+        final String foldername = this.OffilineOverlays[item];
         final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
         String mbtilePath;
         final File[] files = dir.listFiles(new FilenameFilter() {
@@ -658,6 +462,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
         return mbtilePath;
     }
+
     private String[] getOfflineLayerList() {
         // TODO Auto-generated method stub
         final File files = new File(Collect.OFFLINE_LAYERS);
@@ -676,12 +481,8 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         return finala;
     }
 
-
-
-    //This is going to be the listner for the devices locations
-
     public void hideInfoWindows(){
-        final List<Overlay> overlays = mapView.getOverlays();
+        final List<Overlay> overlays = this.mapView.getOverlays();
         for (final Overlay overlay : overlays) {
             if (overlay.getClass() == CustomMarkerHelper.class){
                 ((CustomMarkerHelper)overlay).hideInfoWindow();
@@ -689,32 +490,207 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         }
 
     }
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        // TODO Auto-generated method stub
+        super.onCreate(savedInstanceState);
+
+        this.setContentView(R.layout.osmmap_layout); //Setting Content to layout xml
+        this.setTitle(this.getString(R.string.app_name) + " > Mapping"); // Setting title of the action
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        this.resource_proxy = new DefaultResourceProxyImpl(this.getApplicationContext());
+        this.mapView = (MapView)this.findViewById(R.id.MapViewId);
+        this.mapView.setMultiTouchControls(true);
+        this.mapView.setBuiltInZoomControls(true);
+        //mapView.setUseDataConnection(online);
+        this.mapView.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(final ScrollEvent arg0) {
+                return false;
+            }
+            @Override
+            public boolean onZoom(final ZoomEvent zoomLev) {
+                OSM_Map.this.zoom_level = zoomLev.getZoomLevel();
+                return false;
+            }
+        });
+
+        this.map_setting_button = (ImageButton) this.findViewById(R.id.map_setting_button);
+        this.map_setting_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                // TODO Auto-generated method stub
+                final Intent i = new Intent(OSM_Map.this.self, MapSettings.class);
+                OSM_Map.this.startActivity(i);
+
+            }
+        });
+
+        this.gps_button = (ImageButton)this.findViewById(R.id.gps_button);
+        //This is the gps button and its functionality
+        this.gps_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                OSM_Map.this.setGPSStatus();
+            }
+        });
+
+        this.layers_button = (ImageButton)this.findViewById(R.id.layers_button);
+        this.layers_button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(final View v) {
+                // TODO Auto-generated method stub
+                OSM_Map.this.showLayersDialog();
+
+            }
+        });
+
+        final GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
+        imlp.setLocationUpdateMinDistance(1000);
+        imlp.setLocationUpdateMinTime(60000);
+        this.mMyLocationOverlay = new MyLocationNewOverlay(this, this.mapView);
+        this.mMyLocationOverlay.runOnFirstFix(this.centerAroundFix);
+        this.setGPSStatus();
+
+        //Initial Map Setting before Location is found
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                final GeoPoint  point = new GeoPoint(34.08145, -39.85007);
+                OSM_Map.this.mapView.getController().setZoom(3);
+                OSM_Map.this.mapView.getController().setCenter(point);
+            }
+        }, 100);
+
+
+
+
+        //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
+        //compassOverlay.enableCompass();
+        //mapView.getOverlays().add(compassOverlay);
+        this.mapView.invalidate();
+    }
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        this.disableMyLocation();
+    }
+
+
+    @Override
+    protected void onResume() {
+        //Initializing all the
+        super.onResume(); // Find out what this does? bar
+        this.online = this.sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+        this.basemap = this.sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+        this.hideInfoWindows();
+        this.setbasemapTiles(this.basemap);
+        this.mapView.setTileSource(this.baseTiles);
+        this.mapView.setUseDataConnection(this.online);
+        this.drawMarkers();
+        this.setGPSStatus();
+
+        this.mapView.invalidate();
+    }
+
+    //This function comes after the onCreate function
+    @Override
+    protected void onStart() {
+        // TODO Auto-generated method stub
+        super.onStart();
+        //myMapController.setZoom(4);
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        // TODO Auto-generated method stub
+        super.onStop();
+        this.disableMyLocation();
+    }
+
+    private void overlayMyLocationLayers(){
+        this.mapView.getOverlays().add(this.mMyLocationOverlay);
+        this.mMyLocationOverlay.setEnabled(true);
+        this.mMyLocationOverlay.enableMyLocation();
+        this.mMyLocationOverlay.enableFollowLocation();
+    }
+
+
+
     private void setbasemapTiles(final String basemap) {
         // TODO Auto-generated method stub
 
         if (basemap.equals("MAPNIK")){
-            baseTiles = TileSourceFactory.MAPNIK;
+            this.baseTiles = TileSourceFactory.MAPNIK;
         }else if (basemap.equals("CYCLEMAP")){
-            baseTiles = TileSourceFactory.CYCLEMAP;
+            this.baseTiles = TileSourceFactory.CYCLEMAP;
         }else if (basemap.equals("PUBLIC_TRANSPORT")){
-            baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
+            this.baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
         }else if(basemap.equals("MAPQUESTOSM")){
-            baseTiles = TileSourceFactory.MAPQUESTOSM;
+            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
         }else if(basemap.equals("MAPQUESTAERIAL")){
-            baseTiles = TileSourceFactory.MAPQUESTAERIAL;
+            this.baseTiles = TileSourceFactory.MAPQUESTAERIAL;
         }else{
-            baseTiles = TileSourceFactory.MAPQUESTOSM;
+            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
         }
     }
+    private void setGPSStatus(){
+        if(this.gpsStatus ==false){
+            this.gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+            this.upMyLocationOverlayLayers();
+            //enableMyLocation();
+            //zoomToMyLocation();
+            this.gpsStatus = true;
+        }else{
+            this.gps_button.setImageResource(R.drawable.ic_menu_mylocation);
+            this.disableMyLocation();
+            this.gpsStatus = false;
+        }
+    }
+    private void showGPSDisabledAlertToUser(){
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
+        .setCancelable(false)
+        .setPositiveButton("Enable GPS",
+                new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(final DialogInterface dialog, final int id){
+                // Intent callGPSSettingIntent = new Intent(
+                OSM_Map.this.startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                //startActivity(callGPSSettingIntent);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(final DialogInterface dialog, final int id){
+                dialog.cancel();
+            }
+        });
+        final AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
+
+
+    //This is going to be the listner for the devices locations
+
     private void showLayersDialog() {
         // TODO Auto-generated method stub
         //FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
         //View view=fl.inflate(self, R.layout.showlayers_layout, null);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
         alertDialog.setTitle("Select Offline Layer");
-        OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
+        this.OffilineOverlays = this.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
-        alertDialog.setSingleChoiceItems(OffilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
+        alertDialog.setSingleChoiceItems(this.OffilineOverlays,this.selected_layer,new  DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int item) {
                 //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
@@ -724,30 +700,30 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
                 switch(item){
                 case 0 :
-                    mapView.getOverlays().remove(mbTileOverlay);
-                    layerStatus =false;
+                    OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
+                    OSM_Map.this.layerStatus =false;
                     break;
                 default:
-                    mapView.getOverlays().remove(mbTileOverlay);
+                    OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
                     //String mbTileLocation = getMBTileFromItem(item);
-                    final String mbFilePath = getMBTileFromItem(item);
+                    final String mbFilePath = OSM_Map.this.getMBTileFromItem(item);
                     //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                     final File mbFile = new File(mbFilePath);
-                    mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
-                    mbTileOverlay = new TilesOverlay(mbprovider,OSM_Map.this);
-                    mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                    mapView.getOverlays().add(mbTileOverlay);
-                    drawMarkers();
-                    mapView.invalidate();
+                    OSM_Map.this.mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
+                    OSM_Map.this.mbTileOverlay = new TilesOverlay(OSM_Map.this.mbprovider,OSM_Map.this);
+                    OSM_Map.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+                    OSM_Map.this.mapView.getOverlays().add(OSM_Map.this.mbTileOverlay);
+                    OSM_Map.this.drawMarkers();
+                    OSM_Map.this.mapView.invalidate();
                 }
                 //This resets the map and sets the selected Layer
-                selected_layer =item;
+                OSM_Map.this.selected_layer =item;
                 dialog.dismiss();
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mapView.invalidate();
+                        OSM_Map.this.mapView.invalidate();
                     }
                 }, 400);
 
@@ -755,6 +731,30 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         });
         //alertDialog.setView(view);
         alertDialog.show();
+
+    }
+    private void upMyLocationOverlayLayers(){
+        final LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+            this.overlayMyLocationLayers();
+            //zoomToMyLocation();
+        }else{
+            this.showGPSDisabledAlertToUser();
+        }
+
+    }
+    private void zoomToMyLocation(){
+        if (this.mMyLocationOverlay.getMyLocation()!= null){
+            if (this.zoom_level ==3){
+                this.mapView.getController().setZoom(15);
+            }else{
+                this.mapView.getController().setZoom(this.zoom_level);
+            }
+            this.mapView.getController().setCenter(this.mMyLocationOverlay.getMyLocation());
+            //mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
+        }else{
+            this.mapView.getController().setZoom(this.zoom_level);
+        }
 
     }
 
