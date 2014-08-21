@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2009 University of Washington
- *
+ * Copyright (C) 2014 GeoODK
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  *
@@ -12,6 +11,11 @@
  * the License.
  */
 
+/**
+ * Widget for geoshape data type
+ *
+ * @author Jon Nordling (jonnordling@gmail.com)
+ */
 package com.geoodk.collect.android.widgets;
 
 import java.text.DecimalFormat;
