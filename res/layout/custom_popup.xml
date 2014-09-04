@@ -3,7 +3,7 @@
 	android:layout_width="200dp"
 	android:layout_height="200dp" 
 	android:orientation="vertical"
-	android:background="@android:color/darker_gray"
+	android:background="@android:color/white"
 	android:padding="8dp" >
 	<LinearLayout 
 		android:layout_width="fill_parent"

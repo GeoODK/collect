@@ -364,8 +364,14 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 		// TODO Auto-generated method stub
 		super.onPause();
 		disableMyLocation();
+		clearMapMarkers();
 	}
-	@Override
+	private void clearMapMarkers() {
+        this.mapView.getOverlays().clear();
+        this.markerListArray.clear();
+    }
+
+    @Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
@@ -455,24 +461,20 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     }
 
     public void changeInstanceLocation(final Marker mk) throws XmlPullParserException, IOException, ParserConfigurationException, SAXException, TransformerException{
-        final String url = ((CustomMarkerHelper)mk).getMarker_url();
-        final File xmlFile = new File(url);
-        final DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        final Document doc = docBuilder.parse(xmlFile);
-        final Node file_value = doc.getElementsByTagName(((CustomMarkerHelper)mk).getMarker_geoField()).item(0).getFirstChild();
-        final String temp = Double.toString((((CustomMarkerHelper)mk).getPosition().getLatitude()))+ " "+ Double.toString((((CustomMarkerHelper)mk).getPosition().getLongitude()))+ " 0.1 0.1";
-        final String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp);
-        file_value.setNodeValue(temp);
-        //String old_loc = Double.toString(lat_temp) +" " +Double.toString(lng_temp);
-        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        final Transformer transformer = transformerFactory.newTransformer();
-        final DOMSource source = new DOMSource(doc);
-        final StreamResult results = new StreamResult(xmlFile);
+        String url = ((CustomMarkerHelper) mk).getMarker_url();
+        File xmlFile = new File(url);
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.parse(xmlFile);
+        Node file_value = doc.getElementsByTagName(((CustomMarkerHelper) mk).getMarker_geoField()).item(0).getFirstChild();
+        String newLocation = Double.toString((((CustomMarkerHelper)mk).getPosition().getLatitude()))+ " "+ Double.toString((((CustomMarkerHelper)mk).getPosition().getLongitude()))+ " 0.1 0.1"; 
+        file_value.setNodeValue(newLocation);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        DOMSource source = new DOMSource(doc);
+        StreamResult results = new StreamResult(xmlFile.getPath());
         transformer.setOutputProperty(OutputKeys.INDENT,"yes");
         transformer.transform(source, results);
-        mapView.invalidate();
-
     }
 
 
