@@ -105,8 +105,8 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="vnd.android.cursor.item/vnd.odk.form" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.odk.instance" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.geoodk.form" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.geoodk.instance" />
             </intent-filter>
         </activity>
         <activity
@@ -122,7 +122,7 @@
 
             <category android:name="android.intent.category.DEFAULT" />
 
-            <data android:mimeType="vnd.android.cursor.dir/vnd.odk.instance" />
+            <data android:mimeType="vnd.android.cursor.dir/vnd.geoodk.instance" />
         </intent-filter>
 
         <activity
@@ -139,7 +139,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="vnd.android.cursor.dir/vnd.odk.form" />
+                <data android:mimeType="vnd.android.cursor.dir/vnd.geoodk.form" />
             </intent-filter>
         </activity>
         <activity

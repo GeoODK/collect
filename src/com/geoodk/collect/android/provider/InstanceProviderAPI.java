@@ -42,8 +42,8 @@ public final class InstanceProviderAPI {
         private InstanceColumns() {}
         
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/instances");
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.odk.instance";
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.odk.instance";
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.geoodk.instance";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.geoodk.instance";
 
         // These are the only things needed for an insert
         public static final String DISPLAY_NAME = "displayName";

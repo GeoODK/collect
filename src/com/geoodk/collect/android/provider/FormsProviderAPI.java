@@ -37,8 +37,8 @@ public final class FormsProviderAPI {
 
 
         public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/forms");
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.odk.form";
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.odk.form";
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.geoodk.form";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.geoodk.form";
 
         // These are the only things needed for an insert
         public static final String DISPLAY_NAME = "displayName";
