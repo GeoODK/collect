@@ -8,7 +8,7 @@
 		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 		CONDITIONS OF ANY KIND, either express or implied. See the License for
 		the specific language governing permissions and limitations under the
-		License.
+		License.
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
@@ -317,6 +317,6 @@
     <string name="record_geoshape">Record GeoShape</string>
     <string name="title_activity_geo_shape">GeoShapeActivity</string>
     <string name="geoodk_mainTitle">Data Collection &amp; Mapping</string>
-    
+    <string name="title_activity_geo_trace">GeoTraceActivity</string>
 
 </resources>

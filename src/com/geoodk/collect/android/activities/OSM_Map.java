@@ -54,8 +54,10 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.IRegisterReceiver;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -560,10 +562,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 OSM_Map.this.mapView.getController().setCenter(point);
             }
         }, 100);
-
-
-
-
+        
         //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
         //compassOverlay.enableCompass();
         //mapView.getOverlays().add(compassOverlay);
