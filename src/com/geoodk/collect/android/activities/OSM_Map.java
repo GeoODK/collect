@@ -98,6 +98,7 @@ import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import com.geoodk.collect.android.provider.InstanceProviderAPI;
 import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import com.geoodk.collect.android.spatial.CustomBaseLayers;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
@@ -601,8 +602,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //myMapController.setZoom(4);
     }
 
-
-
     @Override
     protected void onStop() {
         // TODO Auto-generated method stub
@@ -617,24 +616,9 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         this.mMyLocationOverlay.enableFollowLocation();
     }
 
-
-
     private void setbasemapTiles(final String basemap) {
         // TODO Auto-generated method stub
-
-        if (basemap.equals("MAPNIK")){
-            this.baseTiles = TileSourceFactory.MAPNIK;
-        }else if (basemap.equals("CYCLEMAP")){
-            this.baseTiles = TileSourceFactory.CYCLEMAP;
-        }else if (basemap.equals("PUBLIC_TRANSPORT")){
-            this.baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-        }else if(basemap.equals("MAPQUESTOSM")){
-            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
-        }else if(basemap.equals("MAPQUESTAERIAL")){
-            this.baseTiles = TileSourceFactory.MAPQUESTAERIAL;
-        }else{
-            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
-        }
+    	baseTiles = CustomBaseLayers.getTileSource(basemap);
     }
     private void setGPSStatus(){
         if(this.gpsStatus ==false){

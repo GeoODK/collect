@@ -50,6 +50,7 @@ import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.spatial.CustomBaseLayers;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
@@ -400,23 +401,10 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
             setResult(RESULT_OK, i);
         finish();
     }
-	private void setbasemapTiles(String basemap) {
-		// TODO Auto-generated method stub
-		
-		if (basemap.equals("MAPNIK")){
-			baseTiles = TileSourceFactory.MAPNIK;
-		}else if (basemap.equals("CYCLEMAP")){
-			baseTiles = TileSourceFactory.CYCLEMAP;
-		}else if (basemap.equals("PUBLIC_TRANSPORT")){
-			baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-		}else if(basemap.equals("MAPQUESTOSM")){
-			baseTiles = TileSourceFactory.MAPQUESTOSM;
-		}else if(basemap.equals("MAPQUESTAERIAL")){
-			baseTiles = TileSourceFactory.MAPQUESTAERIAL;
-		}else{
-			baseTiles = TileSourceFactory.MAPQUESTOSM;
-		}
-	}
+    private void setbasemapTiles(final String basemap) {
+        // TODO Auto-generated method stub
+    	baseTiles = CustomBaseLayers.getTileSource(basemap);
+    }
 	
 	private void update_polygon(){
 		pathOverlay.clearPath();
