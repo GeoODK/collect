@@ -98,10 +98,10 @@ import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import com.geoodk.collect.android.provider.InstanceProviderAPI;
 import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import com.geoodk.collect.android.spatial.CustomBaseLayers;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
+import com.geoodk.collect.android.spatial.MapHelper;
 
 public class OSM_Map extends Activity implements IRegisterReceiver{
     private MapView mapView;
@@ -618,7 +618,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
     private void setbasemapTiles(final String basemap) {
         // TODO Auto-generated method stub
-    	baseTiles = CustomBaseLayers.getTileSource(basemap);
+    	baseTiles = MapHelper.getTileSource(basemap);
     }
     private void setGPSStatus(){
         if(this.gpsStatus ==false){
