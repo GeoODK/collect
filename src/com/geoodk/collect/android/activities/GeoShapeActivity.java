@@ -51,6 +51,7 @@ import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
+//import com.geoodk.collect.android.spatial.CustomBaseLayers;
 import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
@@ -401,6 +402,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
             setResult(RESULT_OK, i);
         finish();
     }
+
 	private void setbasemapTiles(String basemap) {
 		// TODO Auto-generated method stub
 		
@@ -418,6 +420,12 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
             this.baseTiles = TileSourceFactory.MAPQUESTOSM;
         }
 	}
+
+    /*private void setbasemapTiles(final String basemap) {
+        // TODO Auto-generated method stub
+    	baseTiles = CustomBaseLayers.getTileSource(basemap);
+    }
+*/
 	
 	private void update_polygon(){
 		pathOverlay.clearPath();
