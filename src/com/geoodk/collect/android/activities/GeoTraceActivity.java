@@ -35,7 +35,7 @@ public class GeoTraceActivity extends Activity {
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
 		
-		setbasemapTiles(basemap);
+		baseTiles = MapHelper.getTileSource(basemap);
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		mapView = (MapView)findViewById(R.id.geotrace_mapview);
@@ -60,10 +60,6 @@ public class GeoTraceActivity extends Activity {
 		mapView.invalidate();
 	}
 	
-    private void setbasemapTiles(final String basemap) {
-        // TODO Auto-generated method stub
-    	baseTiles = MapHelper.getTileSource(basemap);
-    }
 
 	
 }

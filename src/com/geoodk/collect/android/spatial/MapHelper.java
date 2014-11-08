@@ -7,6 +7,7 @@ public class MapHelper {
 	
 	public static ITileSource getTileSource(String basemap) {
 		// TODO Auto-generated method stub
+		
 		ITileSource baseTiles;
         if (basemap.equals("MAPNIK")){
            baseTiles = TileSourceFactory.MAPNIK;

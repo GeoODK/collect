@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -36,27 +35,18 @@ import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
 import com.geoodk.collect.android.R;
-import com.geoodk.collect.android.R.layout;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
-//import com.geoodk.collect.android.spatial.CustomBaseLayers;
-import com.geoodk.collect.android.spatial.CustomMarkerHelper;
-import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -65,18 +55,15 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.LocationManager;
-import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.Toast;
+
 
 public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private MapView mapView;
@@ -122,7 +109,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
 		
-		setbasemapTiles(basemap);
+		baseTiles = MapHelper.getTileSource(basemap);
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		mapView = (MapView)findViewById(R.id.geoshape_mapview);
@@ -313,8 +300,8 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		// TODO Auto-generated method stub
 		super.onResume();
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPNIK");
-		setbasemapTiles(basemap);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		baseTiles = MapHelper.getTileSource(basemap);
 		mapView.setTileSource(baseTiles);
 		mapView.setUseDataConnection(online);
 		setGPSStatus();
@@ -402,11 +389,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
                 final_return_string);
             setResult(RESULT_OK, i);
         finish();
-    }
-
-    private void setbasemapTiles(final String basemap) {
-        // TODO Auto-generated method stub
-    	baseTiles = MapHelper.getTileSource(basemap);
     }
 
 	
