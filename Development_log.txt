@@ -2,7 +2,20 @@
 # Date: 10-18-2014
 # Author: Jon Nordling
 
-# GeoTraces
+# GeoTraces  
+//android:name=".activities.SplashScreenActivity"
+
+        <activity
+            android:name=".activities.SplashScreenActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Dialog" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
 ------------------------------------------------------------------
 # Date: 10-10/2014

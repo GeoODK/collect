@@ -87,6 +87,7 @@
             android:name=".activities.GeoODK"
             android:configChanges="orientation"
             android:label="@string/app_name" >
+                       
         </activity>
         <activity
             android:name=".activities.MainMenuActivity"
@@ -193,7 +194,7 @@
             android:name=".activities.SplashScreenActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Dialog" >
-            <intent-filter>
+             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -246,8 +247,9 @@
             android:label="@string/title_activity_geo_shape" >
         </activity>
         <activity
-            android:name="com.geoodk.collect.android.activities.GeoTraceActivity"
+            android:name=".activities.GeoTraceActivity"
             android:label="@string/title_activity_geo_trace" >
+            
         </activity>
     </application>
 

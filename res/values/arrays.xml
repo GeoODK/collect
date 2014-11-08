@@ -64,5 +64,6 @@
 	    name="basemap_entries">
 		<item>MAPQUESTOSM</item>
 		<item>MAPQUESTAERIAL</item>
+		<item>Moabi</item>
 	</string-array>
 </resources>

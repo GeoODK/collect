@@ -113,6 +113,8 @@ public class SplashScreenActivity extends Activity {
 
         // launch new activity and close splash screen
     	startActivity(new Intent(SplashScreenActivity.this, GeoODK.class));
+    	//Used when testing specific activity :)
+    	//startActivity(new Intent(SplashScreenActivity.this, GeoTraceActivity.class));
         //startActivity(new Intent(SplashScreenActivity.this, MainMenuActivity.class));
         finish();
     }

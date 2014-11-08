@@ -37,6 +37,7 @@ import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
@@ -403,19 +404,19 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private void setbasemapTiles(String basemap) {
 		// TODO Auto-generated method stub
 		
-		if (basemap.equals("MAPNIK")){
-			baseTiles = TileSourceFactory.MAPNIK;
-		}else if (basemap.equals("CYCLEMAP")){
-			baseTiles = TileSourceFactory.CYCLEMAP;
-		}else if (basemap.equals("PUBLIC_TRANSPORT")){
-			baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-		}else if(basemap.equals("MAPQUESTOSM")){
-			baseTiles = TileSourceFactory.MAPQUESTOSM;
-		}else if(basemap.equals("MAPQUESTAERIAL")){
-			baseTiles = TileSourceFactory.MAPQUESTAERIAL;
-		}else{
-			baseTiles = TileSourceFactory.MAPQUESTOSM;
-		}
+        if (basemap.equals("MAPNIK")){
+            this.baseTiles = TileSourceFactory.MAPNIK;
+        }else if (basemap.equals("CYCLEMAP")){
+            this.baseTiles = TileSourceFactory.CYCLEMAP;
+        }else if (basemap.equals("PUBLIC_TRANSPORT")){
+            this.baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
+        }else if(basemap.equals("MAPQUESTOSM")){
+            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
+        }else if(basemap.equals("MAPQUESTAERIAL")){
+            this.baseTiles = TileSourceFactory.MAPQUESTAERIAL;
+        }else{
+            this.baseTiles = TileSourceFactory.MAPQUESTOSM;
+        }
 	}
 	
 	private void update_polygon(){
