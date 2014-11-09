@@ -1,7 +1,12 @@
 package com.geoodk.collect.android.spatial;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+
+import com.geoodk.collect.android.application.Collect;
 
 public class MapHelper {
 	
@@ -24,5 +29,21 @@ public class MapHelper {
         }
         return baseTiles;
 	}
-
+    public static String[] getOfflineLayerList() {
+        // TODO Auto-generated method stub
+        final File files = new File(Collect.OFFLINE_LAYERS);
+        final ArrayList<String> results = new ArrayList<String>();
+        results.add("None");
+        final String[] overlay_folders =  files.list();
+        for(int i =0;i<overlay_folders.length;i++){
+            results.add(overlay_folders[i]);
+            //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
+        }
+        String[] finala = new String[results.size()];
+        finala = results.toArray(finala);
+        /*for(int j = 0;j<finala.length;j++){
+    		 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
+    	 }*/
+        return finala;
+    }
 }

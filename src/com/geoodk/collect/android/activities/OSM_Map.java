@@ -462,23 +462,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         return mbtilePath;
     }
 
-    private String[] getOfflineLayerList() {
-        // TODO Auto-generated method stub
-        final File files = new File(Collect.OFFLINE_LAYERS);
-        final ArrayList<String> results = new ArrayList<String>();
-        results.add("None");
-        final String[] overlay_folders =  files.list();
-        for(int i =0;i<overlay_folders.length;i++){
-            results.add(overlay_folders[i]);
-            //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
-        }
-        String[] finala = new String[results.size()];
-        finala = results.toArray(finala);
-        /*for(int j = 0;j<finala.length;j++){
-    		 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
-    	 }*/
-        return finala;
-    }
 
     public void hideInfoWindows(){
         final List<Overlay> overlays = mapView.getOverlays();
@@ -663,7 +646,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         //View view=fl.inflate(self, R.layout.showlayers_layout, null);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
         alertDialog.setTitle("Select Offline Layer");
-        this.OffilineOverlays = this.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
+        OffilineOverlays = MapHelper.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
         alertDialog.setSingleChoiceItems(this.OffilineOverlays,this.selected_layer,new  DialogInterface.OnClickListener() {
             @Override
