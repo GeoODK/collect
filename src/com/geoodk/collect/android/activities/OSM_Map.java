@@ -558,6 +558,12 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         // TODO Auto-generated method stub
         super.onPause();
         this.disableMyLocation();
+        clearMapMarkers();
+    }
+    
+    private void clearMapMarkers() {
+        mapView.getOverlays().clear();
+        markerListArray.clear();
     }
 
 
@@ -664,7 +670,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 default:
                     OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
                     //String mbTileLocation = getMBTileFromItem(item);
-                    final String mbFilePath = OSM_Map.this.getMBTileFromItem(item);
+                    final String mbFilePath = getMBTileFromItem(item);
                     //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                     final File mbFile = new File(mbFilePath);
                     OSM_Map.this.mbprovider = new MBTileProvider(OSM_Map.this, mbFile);

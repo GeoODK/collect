@@ -46,4 +46,20 @@ public class MapHelper {
     	 }*/
         return finala;
     }
+    /*private String getMBTileFromItem(final int item) {
+	    // TODO Auto-generated method stub
+	    final String foldername = OffilineOverlays[item];
+	    final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
+	    String mbtilePath;
+	    final File[] files = dir.listFiles(new FilenameFilter() {
+	        @Override
+	        public boolean accept(final File dir, final String name) {
+	            return name.toLowerCase().endsWith(".mbtiles");
+	        }
+	    });
+	    mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
+	    //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
+	
+	    return mbtilePath;
+    }*/
 }
