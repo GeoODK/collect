@@ -314,9 +314,10 @@
     <string name="oflinelayers_url">Ofline Layers Path</string>
     <string name="default_oflinelayers_url">OfflineLayers</string>
     <string name="change_oflinelayers_url">Change Offline Layer Location</string>
-    <string name="record_geoshape">Record GeoShape</string>
+    <string name="record_geoshape">Record Shape</string>
     <string name="title_activity_geo_shape">GeoShapeActivity</string>
     <string name="geoodk_mainTitle">Data Collection &amp; Mapping</string>
     <string name="title_activity_geo_trace">GeoTraceActivity</string>
+    <string name="view_shape">Edit Shape</string>
 
 </resources>

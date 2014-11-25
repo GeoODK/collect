@@ -60,8 +60,9 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 	public static final String ACCURACY_THRESHOLD = "accuracyThreshold";
 	public static final String READ_ONLY = "readOnly";
 	private final boolean mReadOnly;
-
-	private Button getShapeButton;
+	public static final String SHAPE_LOCATION = "gp";
+	private Button createShapeButton;
+	private Button viewShapeButton;
 
 	private TextView mStringAnswer;
 	private TextView mAnswerDisplay;
@@ -72,7 +73,8 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 		setOrientation(LinearLayout.VERTICAL);
 		TableLayout.LayoutParams params = new TableLayout.LayoutParams();
 		params.setMargins(7, 5, 7, 5);
-
+		mReadOnly = prompt.isReadOnly();
+		
 		mStringAnswer = new TextView(getContext());
 		mStringAnswer.setId(QuestionWidget.newUniqueId());
 
@@ -80,35 +82,58 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 		mAnswerDisplay.setId(QuestionWidget.newUniqueId());
 		mAnswerDisplay.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
 		mAnswerDisplay.setGravity(Gravity.CENTER);
-
-		// setup play button
-		getShapeButton = new Button(getContext());
-		getShapeButton.setId(QuestionWidget.newUniqueId());
-		getShapeButton.setText(getContext().getString(R.string.record_geoshape));
-		getShapeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
-		getShapeButton.setPadding(20, 20, 20, 20);
-		getShapeButton.setLayoutParams(params);
-				// finish complex layout
-				// control what gets shown with setVisibility(View.GONE)
-				//addView(mGetLocationButton);
-		mReadOnly = prompt.isReadOnly();
-
 		
-		//Toast.makeText(getContext(), temp+" ", Toast.LENGTH_LONG).show();
+		// setup view-edit shape button
+		/*viewShapeButton = new Button(getContext());
+		viewShapeButton.setId(QuestionWidget.newUniqueId());
+		viewShapeButton.setText(getContext().getString(R.string.view_shape));
+		viewShapeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+		viewShapeButton.setPadding(20, 20, 20, 20);
+		viewShapeButton.setLayoutParams(params);
 		
-		getShapeButton.setOnClickListener(new OnClickListener() {
+		viewShapeButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				
+			}
+		});*/
+		
+		
+		// setup play button
+		createShapeButton = new Button(getContext());
+		createShapeButton.setId(QuestionWidget.newUniqueId());
+		createShapeButton.setText(getContext().getString(R.string.record_geoshape));
+		createShapeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
+		createShapeButton.setPadding(20, 20, 20, 20);
+		createShapeButton.setLayoutParams(params);
+				// finish complex layout
+				// control what gets shown with setVisibility(View.GONE)
+				//addView(mGetLocationButton);
+		//mReadOnly = prompt.isReadOnly();
+
+		
+		//Toast.makeText(getContext(), temp+" ", Toast.LENGTH_LONG).show();
+		
+		createShapeButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Collect.getInstance().getFormController().setIndexWaitingForData(mPrompt.getIndex());
 				Intent i = null;
+				
 				i = new Intent(getContext(), GeoShapeActivity.class);
-				Collect.getInstance().getFormController()
-				.setIndexWaitingForData(mPrompt.getIndex());
+				String s = mStringAnswer.getText().toString();
+				if ( s.length() != 0 ) {
+					i.putExtra(SHAPE_LOCATION, s);
+				}
+				//((Activity) getContext()).startActivity(i);
 				((Activity) getContext()).startActivityForResult(i,FormEntryActivity.GEOSHAPE_CAPTURE);
 			}
 		});
-		addView(getShapeButton);
+		addView(createShapeButton);
 		addView(mAnswerDisplay);
 		
 		boolean dataAvailable = false;
@@ -121,6 +146,19 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 			//Toast.makeText(getContext(), "Nothing", Toast.LENGTH_LONG).show();
 		}
 		//addView(mStringAnswer);
+		
+		
+		updateButtonLabelsAndVisibility(dataAvailable);
+	}
+	
+	
+	private void updateButtonLabelsAndVisibility(boolean dataAvailable) {
+		if (dataAvailable == true){
+			// There is already a shape recorded
+			createShapeButton.setText(getContext().getString(R.string.view_shape));
+		}else{
+			createShapeButton.setText(getContext().getString(R.string.record_geoshape));
+		}
 	}
 
 	@Override

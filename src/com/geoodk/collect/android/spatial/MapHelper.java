@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 
 import com.geoodk.collect.android.application.Collect;
 
@@ -24,8 +25,12 @@ public class MapHelper {
             baseTiles = TileSourceFactory.MAPQUESTOSM;
         }else if(basemap.equals("MAPQUESTAERIAL")){
             baseTiles = TileSourceFactory.MAPQUESTAERIAL;
+        }else if(basemap.equals("Moabi_Baselayer")){
+            	String[] baseURL = new String[]{"http://tiles.osm.moabi.org/moabi_base/"}; 
+            	baseTiles = new XYTileSource("Moabli",null, 4, 17, 256, ".png", baseURL);
         }else{
             baseTiles = TileSourceFactory.MAPQUESTOSM;
+        	
         }
         return baseTiles;
 	}

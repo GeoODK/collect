@@ -47,6 +47,9 @@ import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
+import com.geoodk.collect.android.widgets.GeoPointWidget;
+import com.geoodk.collect.android.widgets.GeoShapeWidget;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -63,6 +66,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 
 public class GeoShapeActivity extends Activity implements IRegisterReceiver {
@@ -105,6 +109,10 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		//		.getDefaultSharedPreferences(this);
 		//PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
 		//sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		
+		
+		
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
@@ -202,7 +210,60 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
         mMyLocationOverlay.runOnFirstFix(centerAroundFix);
         setGPSStatus();
+        
+		Intent intent = getIntent();
+		if (intent != null && intent.getExtras() != null) {
+			
+			if ( intent.hasExtra(GeoShapeWidget.SHAPE_LOCATION) ) {
+				String s = intent.getStringExtra(GeoShapeWidget.SHAPE_LOCATION);
+				//Overlay Polygons and points passed in
+				overlayIntentPolygon(s);
+				//Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+			}
+		}
+        
 	    mapView.invalidate();
+	}
+	private void overlayIntentPolygon(String str){
+
+		clear_button.setVisibility(View.VISIBLE);
+		clear_button_test = true;
+	
+		//Populate map_markers array
+		String s = str.replace("; ",";");
+		String[] sa = s.split(";");
+		for (int i=0;i<(sa.length -1);i++){
+			int x = i;
+			String[] sp = sa[i].split(" ");
+			double gp[] = new double[4];
+			String lat = sp[0].replace(" ", "");
+			String lng = sp[1].replace(" ", "");
+			gp[0] = Double.valueOf(lat).doubleValue();
+			gp[1] = Double.valueOf(lng).doubleValue();
+			
+			Marker marker = new Marker(mapView);
+			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
+			marker.setPosition(point);
+			marker.setDraggable(true);
+			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			map_markers.add(marker);
+			
+			//if (i == (sa.length -2) ){
+				//pathOverlay.addPoint(map_markers.get(0).getPosition());
+			//}else{
+			pathOverlay.addPoint(marker.getPosition());
+			marker.setDraggable(true);
+			marker.setOnMarkerDragListener(draglistner);
+			mapView.getOverlays().add(marker);
+			//}
+			
+			 
+		}
+		polygon_button.callOnClick();
+		//polygon_connection= true;
+		mapView.getOverlays().remove(OverlayEventos);
+		//mapView.invalidate();
 	}
 	
 	private void setGPSStatus(){
