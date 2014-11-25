@@ -45,6 +45,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoPointWidget;
@@ -161,7 +162,8 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 				// TODO Auto-generated method stub
 				if (map_markers.size() != 0){
 					if (polygon_connection ==true){
-						clearFeatures();
+						//clearFeatures();
+						showClearDialog();
 					}else{
 						Marker c_mark = map_markers.get(map_markers.size()-1);
 						mapView.getOverlays().remove(c_mark);
@@ -396,12 +398,19 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		map_markers.clear();
 		pathOverlay.clearPath();
 		mapView.getOverlays().clear();
-		mapView.invalidate();
+		//clearMarkersOverlay();
 		polygon_button.setVisibility(View.VISIBLE);
 		clear_button.setVisibility(View.GONE);
+		if(gpsStatus ==true){
+			upMyLocationOverlayLayers();
+			
+		}
 		overlayMapLayerListner();
 		
+		mapView.invalidate();
+		
 	}
+	
 
 	private void showClearDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -521,11 +530,12 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 		}
 	};
+
 	private void showLayersDialog() {
 		// TODO Auto-generated method stub
 		//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
 		//View view=fl.inflate(self, R.layout.showlayers_layout, null);
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder(GeoShapeActivity.this);
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		alertDialog.setTitle("Select Offline Layer");
 		OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
 		//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
