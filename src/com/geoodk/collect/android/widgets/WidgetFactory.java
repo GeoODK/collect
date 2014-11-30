@@ -80,7 +80,7 @@ public class WidgetFactory {
                     	questionWidget = new GeoShapeWidget(context, fep);
                     	break;
                     case Constants.DATATYPE_GEOTRACE:
-                    	questionWidget = new GeoPointWidget(context, fep);
+                    	questionWidget = new GeoTraceWidget(context, fep);
                     	break;
                     case Constants.DATATYPE_BARCODE:
                         questionWidget = new BarcodeWidget(context, fep);

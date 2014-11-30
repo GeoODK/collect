@@ -146,11 +146,13 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 	public static final int BEARING_CAPTURE = 17;
     public static final int EX_GROUP_CAPTURE = 18;
     public static final int GEOSHAPE_CAPTURE = 19;
+    public static final int GEOTRACE_CAPTURE = 20;
 
 	// Extra returned from gp activity
 	public static final String LOCATION_RESULT = "LOCATION_RESULT";
 	public static final String BEARING_RESULT = "BEARING_RESULT";
 	public static final String GEOSHAPE_RESULTS ="GEOSHAPE_RESULTS";
+	public static final String GEOTRACE_RESULTS ="GEOTRACE_RESULTS";
 	
 	//public static final String LOCATION_SHAPE_RESULT = "LOCATION_SHAPE_RESULT";
 
@@ -709,6 +711,11 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 			//String ls = intent.getStringExtra(GEOSHAPE_RESULTS);
 			String gshr = intent.getStringExtra(GEOSHAPE_RESULTS);
 			((ODKView) mCurrentView).setBinaryData(gshr);
+			saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+			break;
+		case GEOTRACE_CAPTURE:
+			String traceExtra = intent.getStringExtra(GEOTRACE_RESULTS);
+			((ODKView) mCurrentView).setBinaryData(traceExtra);
 			saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
 			break;
 		case BEARING_CAPTURE:
