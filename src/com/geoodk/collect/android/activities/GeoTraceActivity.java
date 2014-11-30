@@ -58,7 +58,7 @@ public class GeoTraceActivity extends Activity {
 	private DefaultResourceProxyImpl resource_proxy;
 	private ITileSource baseTiles;
 	public MyLocationNewOverlay mMyLocationOverlay;
-	private ImageButton gps_button;
+	private ImageButton play_button;
 	private ProgressDialog progress;
 	
 	
@@ -130,14 +130,14 @@ public class GeoTraceActivity extends Activity {
         // To dismiss the dialog
         
         
-        /*gps_button = (ImageButton)findViewById(R.id.geotrace_gps_button);
+        play_button = (ImageButton)findViewById(R.id.geotrace_play_button);
         //This is the gps button and its functionality
-        gps_button.setOnClickListener(new View.OnClickListener() {
+        play_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-            	setGPSStatus();
+            	//setGPSStatus();
             }
-        });*/
+        });
         setGPSStatus();
 
 		mapView.invalidate();
