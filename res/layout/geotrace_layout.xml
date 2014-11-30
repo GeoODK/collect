@@ -9,7 +9,7 @@
 	    android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
 
-	<ImageButton
+	<!--  <ImageButton
 	    android:id="@+id/geotrace_gps_button"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -45,5 +45,5 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:padding="20dp"
-        android:src="@drawable/ic_menu_save" />
+        android:src="@drawable/ic_menu_save" />-->
 </RelativeLayout>

@@ -53,6 +53,7 @@ import com.geoodk.collect.android.widgets.GeoShapeWidget;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -89,6 +90,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private SharedPreferences sharedPreferences;
 	public Boolean layerStatus = false;
 	private int selected_layer= -1;
+	private ProgressDialog progress;
 	
 	private MBTileProvider mbprovider;
 	private TilesOverlay mbTileOverlay;
@@ -211,6 +213,12 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         imlp.setLocationUpdateMinTime(60000);
         mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
         mMyLocationOverlay.runOnFirstFix(centerAroundFix);
+        
+        progress = new ProgressDialog(this);
+        progress.setTitle("Loading Location");
+        progress.setMessage("Wait while loading...");
+        progress.show();
+        
         setGPSStatus();
         
 		Intent intent = getIntent();
@@ -289,6 +297,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
             mHandler.post(new Runnable() {
                 public void run() {
                     zoomToMyLocation();
+                    progress.dismiss();
                 }
             });
         }
