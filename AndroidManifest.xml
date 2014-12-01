@@ -248,6 +248,7 @@
         </activity>
         <activity
             android:name=".activities.GeoTraceActivity"
+            android:configChanges="orientation"
             android:label="@string/title_activity_geo_trace" >
             
         </activity>

@@ -20,8 +20,11 @@
 
 package com.geoodk.collect.android.activities;
 
+import java.util.ArrayList;
+
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -38,6 +41,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
@@ -48,6 +53,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -66,11 +72,17 @@ public class GeoTraceActivity extends Activity {
 	private ITileSource baseTiles;
 	public MyLocationNewOverlay mMyLocationOverlay;
 	private ImageButton play_button;
+	private Button manual_button;
 	private ProgressDialog progress;
 	private AlertDialog.Builder builder;
 	private LayoutInflater inflater;
 	private AlertDialog alert;
 	private View traceSettingsView;
+	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	
+	private Integer TRACE_MODE; // 0 manual, 1 is automatic
+	private String auto_time;
+	private String auto_time_scale;
 	
 	
 	@Override
@@ -102,6 +114,7 @@ public class GeoTraceActivity extends Activity {
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
+		disableMyLocation();
 	}
 
 	@Override
@@ -140,6 +153,16 @@ public class GeoTraceActivity extends Activity {
         progress.show();
         // To dismiss the dialog
         
+        manual_button = (Button)findViewById(R.id.manual_button);
+        manual_button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				addLocationMarker();
+				
+			}
+		});
         
         play_button = (ImageButton)findViewById(R.id.geotrace_play_button);
         //This is the gps button and its functionality
@@ -154,6 +177,7 @@ public class GeoTraceActivity extends Activity {
             	}else{
             		play_button.setImageResource(R.drawable.play_button);
             		play_check=false;
+            		stop_play();
             	}
             }
         });
@@ -259,10 +283,11 @@ public class GeoTraceActivity extends Activity {
     	//Toast.makeText(this, " ", Toast.LENGTH_LONG).show();
     	boolean checked = ((RadioButton) view).isChecked();
     	EditText time_number = (EditText) traceSettingsView.findViewById(R.id.trace_number);
-    	Spinner time_units = (Spinner) traceSettingsView.findViewById(R.id.planets_spinner);
+    	Spinner time_units = (Spinner) traceSettingsView.findViewById(R.id.trace_scale);
     	switch(view.getId()) {
-	        case R.id.radio_pirates:
+	        case R.id.trace_manual:
 	            if (checked){
+	            	TRACE_MODE = 0; 
 	            	time_number.setText("");
 	            	time_number.setVisibility(View.GONE);
 	            	time_units.setVisibility(View.GONE);
@@ -273,8 +298,9 @@ public class GeoTraceActivity extends Activity {
 	                // Pirates are the best
 	            	
 	            break;
-	        case R.id.radio_ninjas:
-	            if (checked){	          
+	        case R.id.trace_automatic:
+	            if (checked){	         
+	            	TRACE_MODE = 1; 
 	            	time_number.setVisibility(View.VISIBLE);
 	            	time_units.setVisibility(View.VISIBLE);
 	            	
@@ -295,25 +321,82 @@ public class GeoTraceActivity extends Activity {
     	
     	builder.setTitle("Configure GeoTrace Settings");
     	//builder.setMessage("Configure GeoTrace Settings");
+
     	builder.setView(traceSettingsView)
         // Add action buttons
                .setPositiveButton("Start", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int id) {
-                	   RadioGroup rg = (RadioGroup) findViewById(R.id.radio_group);
-                	   	
+                	   //auto_time_scale
+                	   	startGeoTrace();
                        // sign in the user ...
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        dialog.cancel();
+                       reset_trace_settings();
                    }
-               });    
+               })
+               .setOnCancelListener(new OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					// TODO Auto-generated method stub
+					reset_trace_settings();
+				}
+               });
+ 
     	
     	alert = builder.create();
         //alert.show();
        
+    }
+    
+    private void reset_trace_settings(){
+    	play_button.setImageResource(R.drawable.play_button);
+    	play_check=false;
+    	//manual_button.setVisibility(View.GONE);
+    }
+    
+    private void startGeoTrace(){
+       if (TRACE_MODE ==0){
+    	   //Manual Mode
+    	   /*Toast.makeText(this, "Manual Mode", Toast.LENGTH_LONG).show();*/
+    	   setupManualMode();
+       }else if (TRACE_MODE ==1){
+    	   //Automatic Mode
+    	   Spinner scale = (Spinner)traceSettingsView.findViewById(R.id.trace_scale);
+     	   EditText time = (EditText)traceSettingsView.findViewById(R.id.trace_number);
+     	   auto_time_scale= scale.getSelectedItem().toString();
+     	   auto_time = time.getText().toString();
+     	  Toast.makeText(this, " "+auto_time+" "+auto_time_scale+" ", Toast.LENGTH_LONG).show();
+       }else{
+    	   reset_trace_settings();
+       }
+
+    	
+    }
+    private void stop_play(){
+    	Toast.makeText(this, "Stopped", Toast.LENGTH_LONG).show();
+    	manual_button.setVisibility(View.GONE);
+    	
+    }
+    
+    private void setupManualMode(){
+    	manual_button.setVisibility(View.VISIBLE);
+    }
+    
+    private void addLocationMarker(){
+    	Toast.makeText(this, "Add Point", Toast.LENGTH_LONG).show();
+    	Marker marker = new Marker(mapView);
+    	marker.setPosition(mMyLocationOverlay.getMyLocation());
+    	marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+    	marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+    	map_markers.add(marker);
+    	mapView.getOverlays().add(marker);
+    	mapView.invalidate();
+    	
     }
 
     
