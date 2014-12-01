@@ -46,13 +46,20 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 
 public class GeoTraceActivity extends Activity {
 	public int zoom_level = 3;
 	public Boolean gpsStatus = true;
+	private Boolean play_check = false;
 	private MapView mapView;
 	private SharedPreferences sharedPreferences;
 	private DefaultResourceProxyImpl resource_proxy;
@@ -60,6 +67,10 @@ public class GeoTraceActivity extends Activity {
 	public MyLocationNewOverlay mMyLocationOverlay;
 	private ImageButton play_button;
 	private ProgressDialog progress;
+	private AlertDialog.Builder builder;
+	private LayoutInflater inflater;
+	private AlertDialog alert;
+	private View traceSettingsView;
 	
 	
 	@Override
@@ -136,8 +147,20 @@ public class GeoTraceActivity extends Activity {
             @Override
             public void onClick(final View v) {
             	//setGPSStatus();
+            	if (play_check==false){
+            		play_button.setImageResource(R.drawable.stop_button);
+            		alert.show();
+            		play_check=true;
+            	}else{
+            		play_button.setImageResource(R.drawable.play_button);
+            		play_check=false;
+            	}
             }
         });
+        
+        inflater = this.getLayoutInflater();
+        traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
+        buildDialog();
         setGPSStatus();
 
 		mapView.invalidate();
@@ -231,6 +254,68 @@ public class GeoTraceActivity extends Activity {
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
+    
+    public void setGeoTraceMode(View view){
+    	//Toast.makeText(this, " ", Toast.LENGTH_LONG).show();
+    	boolean checked = ((RadioButton) view).isChecked();
+    	EditText time_number = (EditText) traceSettingsView.findViewById(R.id.trace_number);
+    	Spinner time_units = (Spinner) traceSettingsView.findViewById(R.id.planets_spinner);
+    	switch(view.getId()) {
+	        case R.id.radio_pirates:
+	            if (checked){
+	            	time_number.setText("");
+	            	time_number.setVisibility(View.GONE);
+	            	time_units.setVisibility(View.GONE);
+	            	
+	            	time_number.invalidate();
+	            	time_units.invalidate();
+	            }
+	                // Pirates are the best
+	            	
+	            break;
+	        case R.id.radio_ninjas:
+	            if (checked){	          
+	            	time_number.setVisibility(View.VISIBLE);
+	            	time_units.setVisibility(View.VISIBLE);
+	            	
+	            	time_number.invalidate();
+	            	time_units.invalidate();
+	            }
+	            break;
+    	}
+
+    	//builder(RadioGroup)findViewById(R.id.radio_group);
+    	//RadioGroup rg = (RadioGroup) findViewById(R.id.radio_group);
+    	//int checked = rg.getCheckedRadioButtonId();
+    }
+    
+    
+    private void buildDialog(){
+    	builder = new AlertDialog.Builder(this);
+    	
+    	builder.setTitle("Configure GeoTrace Settings");
+    	//builder.setMessage("Configure GeoTrace Settings");
+    	builder.setView(traceSettingsView)
+        // Add action buttons
+               .setPositiveButton("Start", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int id) {
+                	   RadioGroup rg = (RadioGroup) findViewById(R.id.radio_group);
+                	   	
+                       // sign in the user ...
+                   }
+               })
+               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       dialog.cancel();
+                   }
+               });    
+    	
+    	alert = builder.create();
+        //alert.show();
+       
+    }
+
     
     
 
