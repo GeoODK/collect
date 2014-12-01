@@ -24,12 +24,15 @@ import java.util.ArrayList;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import com.geoodk.collect.android.R;
@@ -45,6 +48,10 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -64,7 +71,7 @@ import android.widget.Toast;
 
 public class GeoTraceActivity extends Activity {
 	public int zoom_level = 3;
-	public Boolean gpsStatus = true;
+	public Boolean gpsStatus = false;
 	private Boolean play_check = false;
 	private MapView mapView;
 	private SharedPreferences sharedPreferences;
@@ -78,7 +85,9 @@ public class GeoTraceActivity extends Activity {
 	private LayoutInflater inflater;
 	private AlertDialog alert;
 	private View traceSettingsView;
+	private PathOverlay pathOverlay;
 	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	private GeoPoint current_location;
 	
 	private Integer TRACE_MODE; // 0 manual, 1 is automatic
 	private String auto_time;
@@ -100,14 +109,19 @@ public class GeoTraceActivity extends Activity {
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-		setGPSStatus();
+		//setGPSStatus();
 		super.onResume();
+		//mMyLocationOverlay.enableMyLocation();
 	}
 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		//mMyLocationOverlay.enableMyLocation();
+		
+
+		
 	}
 
 	@Override
@@ -182,6 +196,7 @@ public class GeoTraceActivity extends Activity {
             }
         });
         
+        overlayMapLayerListner();
         inflater = this.getLayoutInflater();
         traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
         buildDialog();
@@ -189,6 +204,7 @@ public class GeoTraceActivity extends Activity {
 
 		mapView.invalidate();
 	}
+	
 	private void setGPSStatus(){
         if(gpsStatus ==false){
             //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
@@ -215,6 +231,8 @@ public class GeoTraceActivity extends Activity {
   private void upMyLocationOverlayLayers(){
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
+    		//locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1,
+    	      //      1, mLocationListener);
     		overlayMyLocationLayers();
     		//zoomToMyLocation();
     	}else{
@@ -222,12 +240,21 @@ public class GeoTraceActivity extends Activity {
     	}
 
     }
+	private void overlayMapLayerListner(){
+		pathOverlay= new PathOverlay(Color.RED, this);
+		Paint pPaint = pathOverlay.getPaint();
+	    pPaint.setStrokeWidth(5);
+	    mapView.getOverlays().add(pathOverlay);
+		mapView.invalidate();
+	}
 	
     private void overlayMyLocationLayers(){
         mapView.getOverlays().add(mMyLocationOverlay);
         mMyLocationOverlay.setEnabled(true);
         mMyLocationOverlay.enableMyLocation();
         mMyLocationOverlay.enableFollowLocation();
+        
+        
     }
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -390,14 +417,17 @@ public class GeoTraceActivity extends Activity {
     private void addLocationMarker(){
     	Toast.makeText(this, "Add Point", Toast.LENGTH_LONG).show();
     	Marker marker = new Marker(mapView);
+    	//marker.setPosition(current_location);
     	marker.setPosition(mMyLocationOverlay.getMyLocation());
     	marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
     	marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
     	map_markers.add(marker);
     	mapView.getOverlays().add(marker);
+    	pathOverlay.addPoint(marker.getPosition());
     	mapView.invalidate();
-    	
     }
+    
+ 
 
     
     
