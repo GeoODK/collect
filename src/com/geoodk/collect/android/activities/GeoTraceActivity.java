@@ -79,6 +79,8 @@ public class GeoTraceActivity extends Activity {
 	private ITileSource baseTiles;
 	public MyLocationNewOverlay mMyLocationOverlay;
 	private ImageButton play_button;
+	private ImageButton save_button;
+	private ImageButton polygon_button;
 	private Button manual_button;
 	private ProgressDialog progress;
 	private AlertDialog.Builder builder;
@@ -92,7 +94,7 @@ public class GeoTraceActivity extends Activity {
 	private Integer TRACE_MODE; // 0 manual, 1 is automatic
 	private String auto_time;
 	private String auto_time_scale;
-	
+	private Boolean inital_location_found = false;
 	
 	@Override
 	protected void onStart() {
@@ -164,8 +166,43 @@ public class GeoTraceActivity extends Activity {
         progress = new ProgressDialog(this);
         progress.setTitle("Loading Location");
         progress.setMessage("Wait while loading...");
+        progress.setOnCancelListener(new OnCancelListener() {
+			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				// TODO Auto-generated method stub
+				play_button.setImageResource(R.drawable.ic_menu_mylocation);
+			}
+		});
+        //progress.setCancelable(false);
         progress.show();
         // To dismiss the dialog
+        polygon_button = (ImageButton) findViewById(R.id.geotrace_polygon_button);
+        polygon_button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (map_markers.size()>2){
+					int p = map_markers.size();
+					map_markers.add(map_markers.get(0));
+					pathOverlay.addPoint(map_markers.get(0).getPosition());
+					mapView.invalidate();
+					polygon_button.setVisibility(View.GONE);
+				}
+				
+			}
+		});
+        save_button= (ImageButton) findViewById(R.id.geotrace_save);
+        save_button.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				saveGeoTrace();
+				
+			}
+		});
         
         manual_button = (Button)findViewById(R.id.manual_button);
         manual_button.setOnClickListener(new View.OnClickListener() {
@@ -185,9 +222,15 @@ public class GeoTraceActivity extends Activity {
             public void onClick(final View v) {
             	//setGPSStatus();
             	if (play_check==false){
-            		play_button.setImageResource(R.drawable.stop_button);
-            		alert.show();
-            		play_check=true;
+            		if (inital_location_found ==false){
+            			mMyLocationOverlay.runOnFirstFix(centerAroundFix);
+            			progress.show();
+            			
+            		}else{
+            			play_button.setImageResource(R.drawable.stop_button);
+            			alert.show();
+            			play_check=true;
+            		}
             	}else{
             		play_button.setImageResource(R.drawable.play_button);
             		play_check=false;
@@ -208,11 +251,14 @@ public class GeoTraceActivity extends Activity {
 	private void setGPSStatus(){
         if(gpsStatus ==false){
             //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+        	Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
             upMyLocationOverlayLayers();
+            
             //enableMyLocation();
             //zoomToMyLocation();
             gpsStatus = true;
         }else{
+        	Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
             //gps_button.setImageResource(R.drawable.ic_menu_mylocation);
             disableMyLocation();
             gpsStatus = false;
@@ -264,6 +310,7 @@ public class GeoTraceActivity extends Activity {
                 public void run() {
                     zoomToMyLocation();
                     progress.dismiss();
+                    play_button.setImageResource(R.drawable.play_button);
                 }
             });
         }
@@ -271,6 +318,7 @@ public class GeoTraceActivity extends Activity {
     
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
+    		inital_location_found = true;
     		if (zoom_level ==3){
     			mapView.getController().setZoom(15);
     		}else{
@@ -346,8 +394,8 @@ public class GeoTraceActivity extends Activity {
     private void buildDialog(){
     	builder = new AlertDialog.Builder(this);
     	
-    	builder.setTitle("Configure GeoTrace Settings");
-    	//builder.setMessage("Configure GeoTrace Settings");
+    	builder.setTitle("GeoTrace Instructions");
+    	builder.setMessage("Manual Mode, click Start to begin use the button to record points at your location");
 
     	builder.setView(traceSettingsView)
         // Add action buttons
@@ -387,17 +435,18 @@ public class GeoTraceActivity extends Activity {
     }
     
     private void startGeoTrace(){
+    	TRACE_MODE = 0; // this will change when automatic is implemented
        if (TRACE_MODE ==0){
     	   //Manual Mode
     	   /*Toast.makeText(this, "Manual Mode", Toast.LENGTH_LONG).show();*/
     	   setupManualMode();
        }else if (TRACE_MODE ==1){
     	   //Automatic Mode
-    	   Spinner scale = (Spinner)traceSettingsView.findViewById(R.id.trace_scale);
-     	   EditText time = (EditText)traceSettingsView.findViewById(R.id.trace_number);
-     	   auto_time_scale= scale.getSelectedItem().toString();
-     	   auto_time = time.getText().toString();
-     	  Toast.makeText(this, " "+auto_time+" "+auto_time_scale+" ", Toast.LENGTH_LONG).show();
+    	   //Spinner scale = (Spinner)traceSettingsView.findViewById(R.id.trace_scale);
+     	   //EditText time = (EditText)traceSettingsView.findViewById(R.id.trace_number);
+     	   //auto_time_scale= scale.getSelectedItem().toString();
+     	   //auto_time = time.getText().toString();
+     	  //Toast.makeText(this, " "+auto_time+" "+auto_time_scale+" ", Toast.LENGTH_LONG).show();
        }else{
     	   reset_trace_settings();
        }
@@ -405,8 +454,13 @@ public class GeoTraceActivity extends Activity {
     	
     }
     private void stop_play(){
-    	Toast.makeText(this, "Stopped", Toast.LENGTH_LONG).show();
+    	//Toast.makeText(this, "Stopped", Toast.LENGTH_LONG).show();
     	manual_button.setVisibility(View.GONE);
+    	play_button.setVisibility(View.GONE);
+    	save_button.setVisibility(View.VISIBLE);
+    	polygon_button.setVisibility(View.VISIBLE);
+    	
+    	
     	
     }
     
@@ -427,6 +481,10 @@ public class GeoTraceActivity extends Activity {
     	mapView.invalidate();
     }
     
+    private void saveGeoTrace(){
+    	Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
+    	finish();
+    }
  
 
     

@@ -12,13 +12,15 @@
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:onClick="setGeoTraceMode"
+	        android:checked="true"
 	        android:text="Manual"/>
 	    
 	    <RadioButton android:id="@+id/trace_automatic"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
+	        android:clickable="false"
 	        android:onClick="setGeoTraceMode"
-	        android:text="Automatic"/>
+	        android:text="Automatic (in development)"/>
     
 	</RadioGroup>
 	
