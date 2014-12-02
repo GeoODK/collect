@@ -38,6 +38,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MapHelper;
+import com.geoodk.collect.android.widgets.GeoShapeWidget;
+import com.geoodk.collect.android.widgets.GeoTraceWidget;
 
 
 import android.app.Activity;
@@ -238,6 +240,17 @@ public class GeoTraceActivity extends Activity {
             }
         });
         
+		Intent intent = getIntent();
+		if (intent != null && intent.getExtras() != null) {
+			
+			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
+				String s = intent.getStringExtra(GeoTraceWidget.TRACE_LOCATION);
+				//Overlay Polygons and points passed in
+				overlayIntentTrace(s);
+				//Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+			}
+		}
+        
         overlayMapLayerListner();
         inflater = this.getLayoutInflater();
         traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
@@ -245,6 +258,10 @@ public class GeoTraceActivity extends Activity {
         setGPSStatus();
 
 		mapView.invalidate();
+	}
+	
+	public void overlayIntentTrace(String s){
+		
 	}
 	
 	private void setGPSStatus(){
@@ -533,7 +550,6 @@ public class GeoTraceActivity extends Activity {
                 }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					// TODO Auto-generated method stub
