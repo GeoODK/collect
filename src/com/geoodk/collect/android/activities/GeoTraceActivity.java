@@ -42,6 +42,7 @@ import com.geoodk.collect.android.spatial.MapHelper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -89,11 +90,11 @@ public class GeoTraceActivity extends Activity {
 	private View traceSettingsView;
 	private PathOverlay pathOverlay;
 	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
-	private GeoPoint current_location;
-	
+	//private GeoPoint current_location;
+	private String final_return_string;
 	private Integer TRACE_MODE; // 0 manual, 1 is automatic
-	private String auto_time;
-	private String auto_time_scale;
+	//private String auto_time;
+	//private String auto_time_scale;
 	private Boolean inital_location_found = false;
 	
 	@Override
@@ -184,11 +185,9 @@ public class GeoTraceActivity extends Activity {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (map_markers.size()>2){
-					int p = map_markers.size();
-					map_markers.add(map_markers.get(0));
-					pathOverlay.addPoint(map_markers.get(0).getPosition());
-					mapView.invalidate();
-					polygon_button.setVisibility(View.GONE);
+					openPolygonDialog();
+				}else{
+					showPolyonErrorDialog();
 				}
 				
 			}
@@ -199,7 +198,7 @@ public class GeoTraceActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				saveGeoTrace();
+				saveConfirm();
 				
 			}
 		});
@@ -251,14 +250,14 @@ public class GeoTraceActivity extends Activity {
 	private void setGPSStatus(){
         if(gpsStatus ==false){
             //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-        	Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
+        	//Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
             upMyLocationOverlayLayers();
             
             //enableMyLocation();
             //zoomToMyLocation();
             gpsStatus = true;
         }else{
-        	Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
+        	//Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
             //gps_button.setImageResource(R.drawable.ic_menu_mylocation);
             disableMyLocation();
             gpsStatus = false;
@@ -366,7 +365,6 @@ public class GeoTraceActivity extends Activity {
 	            	time_number.setText("");
 	            	time_number.setVisibility(View.GONE);
 	            	time_units.setVisibility(View.GONE);
-	            	
 	            	time_number.invalidate();
 	            	time_units.invalidate();
 	            }
@@ -428,6 +426,36 @@ public class GeoTraceActivity extends Activity {
        
     }
     
+    private void openPolygonDialog(){
+    	Builder polygonBuilder = new AlertDialog.Builder(this);
+    	polygonBuilder.setTitle("Polygon Connector (Non-reversible)");
+    	polygonBuilder.setMessage("Select Yes to connect as polygon. For Polyline select cancel and just save");
+    	polygonBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				// TODO Auto-generated method stub
+				
+					map_markers.add(map_markers.get(0));
+					pathOverlay.addPoint(map_markers.get(0).getPosition());
+					mapView.invalidate();
+					polygon_button.setVisibility(View.GONE);
+				
+				
+			}
+		});
+    	polygonBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+    	AlertDialog aD = polygonBuilder.create();
+    	aD.show();
+    }
+    
     private void reset_trace_settings(){
     	play_button.setImageResource(R.drawable.play_button);
     	play_check=false;
@@ -482,13 +510,58 @@ public class GeoTraceActivity extends Activity {
     }
     
     private void saveGeoTrace(){
-    	Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
+    	//Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
+    	returnLocation();
     	finish();
     }
- 
-
-    
-    
-
+	private void showPolyonErrorDialog(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Must have at least 3 points to create Polygon")
+               .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                       // FIRE ZE MISSILES!
+                }
+               }).show();
+		
+	}
+	private void saveConfirm(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you are done?")
+               .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   saveGeoTrace();
+                }
+               })
+               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					
+				}
+			}).show();
+		
+	}
 	
+	private String generateReturnString() {
+		String temp_string = "";
+		for (int i = 0 ; i < map_markers.size();i++){
+			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
+			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
+			String alt ="0.0";
+			String acu = "0.0";
+			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
+		}
+		return temp_string;
+	}
+	
+    private void returnLocation(){
+    		final_return_string = generateReturnString();
+            Intent i = new Intent();
+            i.putExtra(
+                FormEntryActivity.GEOTRACE_RESULTS,
+                final_return_string);
+            setResult(RESULT_OK, i);
+        finish();
+    }
 }

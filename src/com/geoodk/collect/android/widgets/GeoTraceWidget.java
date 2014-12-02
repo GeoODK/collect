@@ -1,6 +1,11 @@
 package com.geoodk.collect.android.widgets;
 
+import java.util.ArrayList;
+
+import org.javarosa.core.model.data.GeoShapeData;
 import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.core.model.data.GeoShapeData.GeoShape;
 import org.javarosa.form.api.FormEntryPrompt;
 
 import com.geoodk.collect.android.R;
@@ -15,6 +20,7 @@ import android.content.Intent;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -85,6 +91,14 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 		addView(mAnswerDisplay);
 		
 		boolean dataAvailable = false;
+		String s = prompt.getAnswerText();
+		if (s != null && !s.equals("")) {
+			//Toast.makeText(getContext(), prompt.getAnswerText()+" ", Toast.LENGTH_LONG).show();
+			dataAvailable = true;
+			setBinaryData(s);
+		}else{
+			//Toast.makeText(getContext(), "Nothing", Toast.LENGTH_LONG).show();
+		}
 		updateButtonLabelsAndVisibility(dataAvailable);
 		
 	}
@@ -96,38 +110,78 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 	@Override
 	public void setBinaryData(Object answer) {
 		// TODO Auto-generated method stub
-		
+		String s = (String) answer.toString();
+		mStringAnswer.setText(s);
+		//mStringAnswer.setText(s);
+		mAnswerDisplay.setText(s);
+		Collect.getInstance().getFormController().setIndexWaitingForData(null);
 	}
 
 	@Override
 	public void cancelWaitingForBinaryData() {
 		// TODO Auto-generated method stub
-		
+		Collect.getInstance().getFormController().setIndexWaitingForData(null);
 	}
 
 	@Override
 	public boolean isWaitingForBinaryData() {
 		// TODO Auto-generated method stub
-		return false;
+		Boolean test = mPrompt.getIndex().equals(
+				Collect.getInstance().getFormController()
+				.getIndexWaitingForData());
+		//Toast.makeText(getContext(), test+" ", Toast.LENGTH_LONG).show();
+		return mPrompt.getIndex().equals(
+				Collect.getInstance().getFormController()
+				.getIndexWaitingForData());
 		
 	}
 
 	@Override
 	public IAnswerData getAnswer() {
 		// TODO Auto-generated method stub
-		return null;
+		GeoShapeData data = new GeoShapeData();
+		ArrayList<double[]> list = new ArrayList<double[]>();  
+		String s = mStringAnswer.getText().toString();
+		if (s == null || s.equals("")) {
+			return null;
+		} else {
+			try {
+				String[] sa = s.split(";");
+				for (int i=0;i<sa.length;i++){
+					String[] sp = sa[i].split(" ");
+					double gp[] = new double[4];
+					gp[0] = Double.valueOf(sp[0]).doubleValue();
+					gp[1] = Double.valueOf(sp[1]).doubleValue();
+					gp[2] = Double.valueOf(sp[2]).doubleValue();
+					gp[3] = Double.valueOf(sp[3]).doubleValue();
+					list.add(gp);
+				}
+				GeoShape shape = new GeoShape(list);
+				//return new GeoShapeData(shape);
+				return new StringData(s);
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}
 		
 	}
 
 	@Override
 	public void clearAnswer() {
 		// TODO Auto-generated method stub
+		mStringAnswer.setText(null);
+		mAnswerDisplay.setText(null);
 		
 	}
 
 	@Override
 	public void setFocus(Context context) {
 		// TODO Auto-generated method stub
+		InputMethodManager inputManager = (InputMethodManager) context
+				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.hideSoftInputFromWindow(this.getWindowToken(), 0);
 		
 	}
 
