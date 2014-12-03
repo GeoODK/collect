@@ -99,6 +99,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private ImageButton gps_button;
 	private String[] OffilineOverlays;
 	public MyLocationNewOverlay mMyLocationOverlay;
+	private Boolean data_loaded = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -224,8 +225,8 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         
 		Intent intent = getIntent();
 		if (intent != null && intent.getExtras() != null) {
-			
 			if ( intent.hasExtra(GeoShapeWidget.SHAPE_LOCATION) ) {
+				data_loaded =true;
 				String s = intent.getStringExtra(GeoShapeWidget.SHAPE_LOCATION);
 				//Overlay Polygons and points passed in
 				overlayIntentPolygon(s);
@@ -298,7 +299,12 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         public void run() {
             mHandler.post(new Runnable() {
                 public void run() {
-                    zoomToMyLocation();
+                	if (data_loaded ==false){
+                		zoomToMyLocation();
+                	}else{
+                		zoomToPoints();
+                	}
+                    //zoomToMyLocation();
                     progress.dismiss();
                 }
             });
@@ -380,6 +386,11 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		mapView.setUseDataConnection(online);
 		setGPSStatus();
 	}
+	
+	/*@Override
+	public void onBackPressed() {
+		saveGeoTrace();
+	}*/
 	
     @Override
 	protected void onPause() {
@@ -673,7 +684,26 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 				return false;
 			}
 		};
+		
+		private void zoomToPoints(){
+			mapView.getController().setZoom(15);
+			mapView.invalidate();
+			Handler handler=new Handler();
+			Runnable r = new Runnable(){
+			    public void run() {
+			    	GeoPoint c_marker = map_markers.get(0).getPosition();
+			    	mapView.getController().setCenter(c_marker);
+			    }
+			}; 
+			handler.post(r);
+			mapView.invalidate();
+			
+		}
 
-	
+	    /*private void saveGeoTrace(){
+	    	//Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
+	    	returnLocation();
+	    	finish();
+	    }*/
 	
 }
