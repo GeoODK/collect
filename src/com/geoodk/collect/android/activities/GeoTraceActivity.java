@@ -26,6 +26,7 @@ import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -141,6 +142,11 @@ public class GeoTraceActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 	}
+	
+	@Override
+	public void onBackPressed() {
+		saveGeoTrace();
+	}
 
 
 	@Override
@@ -170,7 +176,6 @@ public class GeoTraceActivity extends Activity {
         progress.setTitle("Loading Location");
         progress.setMessage("Wait while loading...");
         progress.setOnCancelListener(new OnCancelListener() {
-			
 			@Override
 			public void onCancel(DialogInterface dialog) {
 				// TODO Auto-generated method stub
@@ -178,7 +183,6 @@ public class GeoTraceActivity extends Activity {
 			}
 		});
         //progress.setCancelable(false);
-        progress.show();
         // To dismiss the dialog
         polygon_button = (ImageButton) findViewById(R.id.geotrace_polygon_button);
         polygon_button.setOnClickListener(new View.OnClickListener() {
@@ -239,28 +243,67 @@ public class GeoTraceActivity extends Activity {
             	}
             }
         });
-        
-		Intent intent = getIntent();
-		if (intent != null && intent.getExtras() != null) {
-			
-			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
-				String s = intent.getStringExtra(GeoTraceWidget.TRACE_LOCATION);
-				//Overlay Polygons and points passed in
-				overlayIntentTrace(s);
-				//Toast.makeText(this, s, Toast.LENGTH_LONG).show();
-			}
-		}
-        
-        overlayMapLayerListner();
+		overlayMapLayerListner();
         inflater = this.getLayoutInflater();
         traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
         buildDialog();
-        setGPSStatus();
+        
+		Intent intent = getIntent();
+		if (intent != null && intent.getExtras() != null) {
+			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
+				String s = intent.getStringExtra(GeoTraceWidget.TRACE_LOCATION);
+				play_button.setVisibility(View.GONE);
+				overlayIntentTrace(s);
+				zoomToPoints();
+			}
+		}else{
+			progress.show();
+	        setGPSStatus();
+		}
 
 		mapView.invalidate();
 	}
 	
-	public void overlayIntentTrace(String s){
+	public void overlayIntentTrace(String str){
+		String s = str.replace("; ",";");
+		String[] sa = s.split(";");
+		for (int i=0;i<(sa.length);i++){
+			int x = i;
+			String[] sp = sa[i].split(" ");
+			double gp[] = new double[4];
+			String lat = sp[0].replace(" ", "");
+			String lng = sp[1].replace(" ", "");
+			gp[0] = Double.valueOf(lat).doubleValue();
+			gp[1] = Double.valueOf(lng).doubleValue();
+			
+			Marker marker = new Marker(mapView);
+			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
+			marker.setPosition(point);
+			marker.setOnMarkerClickListener(nullmarkerlistner);
+			marker.setDraggable(true);
+			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			map_markers.add(marker);
+			
+			pathOverlay.addPoint(marker.getPosition());
+			mapView.getOverlays().add(marker);
+			
+		}
+		mapView.invalidate();
+		
+	}
+	private void zoomToPoints(){
+		mapView.getController().setZoom(15);
+		mapView.invalidate();
+		Handler handler=new Handler();
+		Runnable r = new Runnable(){
+		    public void run() {
+		    	GeoPoint c_marker = map_markers.get(0).getPosition();
+		    	mapView.getController().setCenter(c_marker);
+		    }
+		}; 
+		handler.post(r);
+		mapView.invalidate();
 		
 	}
 	
@@ -331,6 +374,7 @@ public class GeoTraceActivity extends Activity {
             });
         }
     };
+    
     
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
@@ -521,6 +565,7 @@ public class GeoTraceActivity extends Activity {
     	marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
     	marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
     	map_markers.add(marker);
+		marker.setOnMarkerClickListener(nullmarkerlistner);
     	mapView.getOverlays().add(marker);
     	pathOverlay.addPoint(marker.getPosition());
     	mapView.invalidate();
@@ -580,4 +625,12 @@ public class GeoTraceActivity extends Activity {
             setResult(RESULT_OK, i);
         finish();
     }
+    private OnMarkerClickListener nullmarkerlistner= new Marker.OnMarkerClickListener() {
+		
+		@Override
+		public boolean onMarkerClick(Marker arg0, MapView arg1) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	};
 }

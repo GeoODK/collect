@@ -29,6 +29,7 @@ import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -257,6 +258,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			marker.setDraggable(true);
 			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setOnMarkerClickListener(nullmarkerlistner);
 			map_markers.add(marker);
 			
 			//if (i == (sa.length -2) ){
@@ -493,6 +495,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			marker.setDraggable(true);
 			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setOnMarkerClickListener(nullmarkerlistner);
 			map_markers.add(marker);
 			marker.setDraggable(true);
 			marker.setOnMarkerDragListener(draglistner);
@@ -661,6 +664,15 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		 }*/
 		return finala;
 	}
+	 
+	    private OnMarkerClickListener nullmarkerlistner= new Marker.OnMarkerClickListener() {
+			
+			@Override
+			public boolean onMarkerClick(Marker arg0, MapView arg1) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		};
 
 	
 	
