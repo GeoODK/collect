@@ -85,6 +85,7 @@ public class GeoTraceActivity extends Activity {
 	private ImageButton play_button;
 	private ImageButton save_button;
 	private ImageButton polygon_button;
+	private ImageButton clear_button;
 	private Button manual_button;
 	private ProgressDialog progress;
 	private AlertDialog.Builder builder;
@@ -184,6 +185,18 @@ public class GeoTraceActivity extends Activity {
 		});
         //progress.setCancelable(false);
         // To dismiss the dialog
+        
+        clear_button= (ImageButton) findViewById(R.id.geotrace_clear_button);
+        clear_button.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				clearAndReturnEmpty();
+			}
+        	
+        });
+        
         polygon_button = (ImageButton) findViewById(R.id.geotrace_polygon_button);
         polygon_button.setOnClickListener(new View.OnClickListener() {
 			
@@ -253,6 +266,7 @@ public class GeoTraceActivity extends Activity {
 			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
 				String s = intent.getStringExtra(GeoTraceWidget.TRACE_LOCATION);
 				play_button.setVisibility(View.GONE);
+				clear_button.setVisibility(View.VISIBLE);
 				overlayIntentTrace(s);
 				zoomToPoints();
 			}
@@ -633,4 +647,15 @@ public class GeoTraceActivity extends Activity {
 			return false;
 		}
 	};
+	private void clearAndReturnEmpty(){
+		final_return_string = "";
+		Intent i = new Intent();
+		i.putExtra(
+                FormEntryActivity.GEOTRACE_RESULTS,
+                final_return_string);
+            setResult(RESULT_OK, i);
+        setResult(RESULT_OK, i);
+        finish();
+		
+	}
 }

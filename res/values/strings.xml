@@ -320,5 +320,6 @@
     <string name="title_activity_geo_trace">GeoTraceActivity</string>
     <string name="view_shape">Edit Shape</string>
     <string name="record_trace">Record GeoTrace</string>
+    <string name="view_trace">View GeoTrace</string>
 
 </resources>

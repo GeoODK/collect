@@ -95,6 +95,7 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 		if (s != null && !s.equals("")) {
 			//Toast.makeText(getContext(), prompt.getAnswerText()+" ", Toast.LENGTH_LONG).show();
 			dataAvailable = true;
+			createTraceButton.setText(getContext().getString(R.string.view_trace));
 			setBinaryData(s);
 		}else{
 			//Toast.makeText(getContext(), "Nothing", Toast.LENGTH_LONG).show();

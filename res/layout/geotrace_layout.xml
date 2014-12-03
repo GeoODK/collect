@@ -22,8 +22,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:visibility="gone"
-        android:padding="20dp"
+        android:padding="18dp"
         android:src="@drawable/polygon" />
+	<ImageButton
+        android:id="@+id/geotrace_clear_button"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:padding="18dp"
+        android:src="@drawable/sweep" />
 	 
       <Button 
             android:text="Record Location Point"
