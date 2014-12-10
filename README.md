@@ -1,10 +1,10 @@
 # GeoODK Collect
 =======
 
-This application is was derived from the [ODK Collect](www.opendatakit.org) application. 
+This application is was derived from the [ODK Collect](http://www.opendatakit.org) application. 
 The goal is to have the power of ODK data collection intergated with  map's and added spatial functionality
 
-The main site can be found here: [GeoODK Home](www.geoodk.com)
+The main site can be found here: [GeoODK Home](http://www.geoodk.com)
 
 =======
 ## Main functionality
