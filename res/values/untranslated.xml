@@ -12,7 +12,7 @@
 	<string translatable="false" name="protocol_odk_default">odk_default</string>
 	<string translatable="false" name="protocol_google">google</string>
 	<string translatable="false" name="protocol_other"></string>
-	<string translatable="false" name="default_server_url">http://moabi-collect.appspot.com</string>
+	<string translatable="false" name="default_server_url">http://geoodk-demo.appspot.com</string>
 	<string translatable="false" name="default_odk_formlist">/formList</string>
 	<string translatable="false" name="default_odk_submission">/submission</string>
     <item name="mapview" type="id"/>
