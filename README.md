@@ -5,6 +5,7 @@ This application is was derived from the [ODK Collect](http://www.opendatakit.or
 The goal is to have the power of ODK data collection intergated with  map's and added spatial functionality
 
 The main site can be found here: [GeoODK Home](http://www.geoodk.com)
+
 =======
 GeoODK Developemnt will be moving to [Android Studio](http://developer.android.com/tools/studio/index.html)
 
