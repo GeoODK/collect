@@ -7,7 +7,7 @@ The goal is to have the power of ODK data collection intergated with  map's and 
 The main site can be found here: [GeoODK Home](http://www.geoodk.com)
 
 =======
-## Important Update
+## Important Update (Jan-12-2015)
 GeoODK Developemnt will be moving to [Android Studio](http://developer.android.com/tools/studio/index.html)
 
 =======
