@@ -1,6 +1,5 @@
-# GeoODK Collect
+#GeoODK Collect
 =======
-
 
 This application is was derived from the [ODK Collect](http://www.opendatakit.org) application. 
 The goal is to have the power of ODK data collection intergated with  map's and added spatial functionality
