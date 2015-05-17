@@ -159,6 +159,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
     XmlPullParserFactory factory;
 
+    private AlertDialog mAlertDialog;
 
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
@@ -446,9 +447,15 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     }
 
     private String getMBTileFromItem(final int item) {
-        // TODO Auto-generated method stub
-        final String foldername = OffilineOverlays[item];
-        final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
+        final String folderName = OffilineOverlays[item];
+        final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+folderName);
+
+        if (dir.isFile()) {
+            // we already have a file
+            return dir.getAbsolutePath();
+        }
+
+        // search first mbtiles file in the directory
         String mbtilePath;
         final File[] files = dir.listFiles(new FilenameFilter() {
             @Override
@@ -456,8 +463,12 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 return name.toLowerCase().endsWith(".mbtiles");
             }
         });
-        mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
-        //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
+
+        if (files.length == 0) {
+            throw new RuntimeException(Collect.getInstance().getString(R.string.mbtiles_not_found, dir.getAbsolutePath()));
+        }
+        mbtilePath =Collect.OFFLINE_LAYERS+File.separator+folderName+File.separator+files[0].getName();
+        //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+folderName+files[0]);
 
         return mbtilePath;
     }
@@ -654,7 +665,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         alertDialog.setTitle("Select Offline Layer");
         OffilineOverlays = MapHelper.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
-        alertDialog.setSingleChoiceItems(this.OffilineOverlays,this.selected_layer,new  DialogInterface.OnClickListener() {
+        alertDialog.setSingleChoiceItems(this.OffilineOverlays, this.selected_layer, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int item) {
                 //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
@@ -662,27 +673,34 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 // of the selected item
                 //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
 
-                switch(item){
-                case 0 :
-                    OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
-                    OSM_Map.this.layerStatus =false;
-                    break;
-                default:
-                    OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
-                    //String mbTileLocation = getMBTileFromItem(item);
-                    final String mbFilePath = getMBTileFromItem(item);
-                    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
-                    final File mbFile = new File(mbFilePath);
-                    OSM_Map.this.mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
-                    OSM_Map.this.mbTileOverlay = new TilesOverlay(OSM_Map.this.mbprovider,OSM_Map.this);
-                    OSM_Map.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                    OSM_Map.this.mapView.getOverlays().add(OSM_Map.this.mbTileOverlay);
-                    OSM_Map.this.drawMarkers();
-                    OSM_Map.this.mapView.invalidate();
+                try {
+                    switch (item) {
+                        case 0:
+                            OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
+                            OSM_Map.this.layerStatus = false;
+                            break;
+                        default:
+                            OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
+                            //String mbTileLocation = getMBTileFromItem(item);
+
+                            final String mbFilePath = getMBTileFromItem(item);
+                            //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+                            final File mbFile = new File(mbFilePath);
+                            OSM_Map.this.mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
+                            OSM_Map.this.mbTileOverlay = new TilesOverlay(OSM_Map.this.mbprovider, OSM_Map.this);
+                            OSM_Map.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+                            OSM_Map.this.mapView.getOverlays().add(OSM_Map.this.mbTileOverlay);
+                            OSM_Map.this.drawMarkers();
+                            OSM_Map.this.mapView.invalidate();
+
+                    }
+                    //This resets the map and sets the selected Layer
+                    OSM_Map.this.selected_layer = item;
+                    dialog.dismiss();
+                } catch (RuntimeException e) {
+                    createErrorDialog(e.getMessage(), false);
+                    return;
                 }
-                //This resets the map and sets the selected Layer
-                OSM_Map.this.selected_layer =item;
-                dialog.dismiss();
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -722,5 +740,29 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
     }
 
+    private void createErrorDialog(String errorMsg, final boolean shouldExit) {
+        Collect.getInstance().getActivityLogger().logAction(this, "createErrorDialog", "show");
+
+        mAlertDialog = new AlertDialog.Builder(this).create();
+        mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
+        mAlertDialog.setMessage(errorMsg);
+        DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                switch (i) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        Collect.getInstance().getActivityLogger().logAction(this, "createErrorDialog",
+                                shouldExit ? "exitApplication" : "OK");
+                        if (shouldExit) {
+                            finish();
+                        }
+                        break;
+                }
+            }
+        };
+        mAlertDialog.setCancelable(false);
+        mAlertDialog.setButton(getString(R.string.ok), errorListener);
+        mAlertDialog.show();
+    }
 
 }
