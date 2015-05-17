@@ -467,8 +467,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         if (files.length == 0) {
             throw new RuntimeException(Collect.getInstance().getString(R.string.mbtiles_not_found, dir.getAbsolutePath()));
         }
-        mbtilePath =Collect.OFFLINE_LAYERS+File.separator+folderName+File.separator+files[0].getName();
-        //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+folderName+files[0]);
+        mbtilePath = files[0].getAbsolutePath();
 
         return mbtilePath;
     }
