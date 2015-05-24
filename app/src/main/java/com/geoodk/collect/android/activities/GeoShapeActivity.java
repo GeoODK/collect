@@ -68,12 +68,12 @@ import android.widget.ImageButton;
 
 public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private MapView mapView;
-	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	private ArrayList<Marker> map_markers = new ArrayList<>();
 	private PathOverlay pathOverlay;
 	private ITileSource baseTiles;
-	private DefaultResourceProxyImpl resource_proxy;
+	public DefaultResourceProxyImpl resource_proxy;
 	public int zoom_level = 3;
-	private static final int stroke_width = 5;
+	public static final int stroke_width = 5;
 	public String final_return_string;
 	private MapEventsOverlay OverlayEventos;
 	private boolean polygon_connection = false;
@@ -97,7 +97,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
@@ -114,13 +113,11 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		disableMyLocation();
 	}
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		disableMyLocation();
 	}
@@ -175,9 +172,8 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		clear_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				if (map_markers.size() != 0){
-					if (polygon_connection ==true){
+					if (polygon_connection){
 						//clearFeatures();
 						showClearDialog();
 					}else{
@@ -195,7 +191,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				showLayersDialog();
 				
 			}
@@ -250,11 +245,10 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	}
 
 	private void buildPolygon(){
-		if (polygon_connection ==true){
+		if (polygon_connection){
 			showClearDialog();
 		}else{
 			if (map_markers.size()>2){
-				int p = map_markers.size();
 				map_markers.add(map_markers.get(0));
 				pathOverlay.addPoint(map_markers.get(0).getPosition());
 				mapView.invalidate();
@@ -273,13 +267,14 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		String s = str.replace("; ",";");
 		String[] sa = s.split(";");
 		for (int i=0;i<(sa.length -1);i++){
-			int x = i;
 			String[] sp = sa[i].split(" ");
 			double gp[] = new double[4];
 			String lat = sp[0].replace(" ", "");
 			String lng = sp[1].replace(" ", "");
-			gp[0] = Double.valueOf(lat).doubleValue();
-			gp[1] = Double.valueOf(lng).doubleValue();
+            gp[0] = Double.parseDouble(lat);
+            gp[1] = Double.parseDouble(lng);
+//			gp[0] = Double.valueOf(lat).doubleValue();
+//			gp[1] = Double.valueOf(lng).doubleValue();
 			Marker marker = new Marker(mapView);
 			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
 			marker.setPosition(point);
@@ -399,7 +394,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceive);
 		pathOverlay= new PathOverlay(Color.RED, this);
 		Paint pPaint = pathOverlay.getPaint();
-	    pPaint.setStrokeWidth(5);
+	    pPaint.setStrokeWidth(stroke_width);
 	    mapView.getOverlays().add(pathOverlay);
 		mapView.getOverlays().add(OverlayEventos);
 		mapView.invalidate();
@@ -413,7 +408,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		//clearMarkersOverlay();
 		polygon_button.setVisibility(View.VISIBLE);
 		clear_button.setVisibility(View.GONE);
-		if(gpsStatus ==true){
+		if(gpsStatus){
 			upMyLocationOverlayLayers();
 			
 		}
@@ -484,10 +479,9 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private MapEventsReceiver mReceive = new MapEventsReceiver() {
 		@Override
 		public boolean longPressHelper(GeoPoint point) {
-			// TODO Auto-generated method stub
 			//Toast.makeText(GeoShapeActivity.this, point.getLatitude()+" ", Toast.LENGTH_LONG).show();
 			//map_points.add(point);
-			if (clear_button_test ==false){
+			if (!clear_button_test){
 				clear_button.setVisibility(View.VISIBLE);
 				clear_button_test = true;
 			}			
@@ -508,7 +502,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 
 		@Override
 		public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	};
@@ -533,7 +526,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		}
 		@Override
 		public void onMarkerDragEnd(Marker arg0) {
-			// TODO Auto-generated method stub
 			update_polygon();
 			
 		}
@@ -545,7 +537,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	};
 
 	private void showLayersDialog() {
-		// TODO Auto-generated method stub
 		//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
 		//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -600,7 +591,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	
 	private void updateMapOverLayOrder(){
 		List<Overlay> overlays = mapView.getOverlays();
-		if (layerStatus =true){
+		if (layerStatus){
 			mapView.getOverlays().remove(mbTileOverlay);
 			mapView.getOverlays().remove(pathOverlay);
 			mapView.getOverlays().add(mbTileOverlay);
@@ -634,7 +625,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	}
 	
 	private String getMBTileFromItem(int item) {
-		// TODO Auto-generated method stub
 		String foldername = OffilineOverlays[item];
 		File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
 		String mbtilePath;
@@ -649,15 +639,17 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		return mbtilePath;
 	}
 	 private String[] getOfflineLayerList() {
-		// TODO Auto-generated method stub
 		 File files = new File(Collect.OFFLINE_LAYERS);
-		 ArrayList<String> results = new ArrayList<String>();
+		 ArrayList<String> results = new ArrayList<>();
 		 results.add("None");
-		 String[] overlay_folders =  files.list();
-		 for(int i =0;i<overlay_folders.length;i++){
-			 results.add(overlay_folders[i]);
-			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
-		 }
+//		 String[] overlay_folders =  files.list();
+         for(String folder : files.list()){
+             results.add(folder);
+         }
+//		 for(int i =0;i<overlay_folders.length;i++){
+//			 results.add(overlay_folders[i]);
+//			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
+//		 }
 		 String[] finala = new String[results.size()]; 
 		 finala = results.toArray(finala);
 		 /*for(int j = 0;j<finala.length;j++){
@@ -670,7 +662,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 			@Override
 			public boolean onMarkerClick(Marker arg0, MapView arg1) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		};
