@@ -73,6 +73,7 @@
         android:icon="@drawable/notes2"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:debuggable="true"
         android:theme="@style/Collect" >
         <provider
             android:name=".provider.FormsProvider"

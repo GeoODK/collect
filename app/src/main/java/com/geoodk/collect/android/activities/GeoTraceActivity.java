@@ -118,6 +118,12 @@ public class GeoTraceActivity extends Activity {
 		// TODO Auto-generated method stub
 		//setGPSStatus();
 		super.onResume();
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		baseTiles = MapHelper.getTileSource(basemap);
+		mapView.setTileSource(baseTiles);
+		mapView.setUseDataConnection(online);
+		setGPSStatus();
 		//mMyLocationOverlay.enableMyLocation();
 	}
 
@@ -271,8 +277,9 @@ public class GeoTraceActivity extends Activity {
 				zoomToPoints();
 			}
 		}else{
+			setGPSStatus();
 			progress.show();
-	        setGPSStatus();
+
 		}
 
 		mapView.invalidate();
@@ -578,6 +585,7 @@ public class GeoTraceActivity extends Activity {
     	marker.setPosition(mMyLocationOverlay.getMyLocation());
     	marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
     	marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+		marker.setDraggable(true);
     	map_markers.add(marker);
 		marker.setOnMarkerClickListener(nullmarkerlistner);
     	mapView.getOverlays().add(marker);
