@@ -23,14 +23,9 @@ package com.geoodk.collect.android.activities;
 import java.util.ArrayList;
 
 import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
-import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.PathOverlay;
@@ -39,7 +34,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MapHelper;
-import com.geoodk.collect.android.widgets.GeoShapeWidget;
 import com.geoodk.collect.android.widgets.GeoTraceWidget;
 
 
@@ -49,13 +43,10 @@ import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -68,32 +59,40 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.util.Log;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.*;
 
 
 public class GeoTraceActivity extends Activity {
+	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+	private ScheduledFuture beeperHandle;
 	public int zoom_level = 3;
-	public Boolean gpsStatus = false;
+	public Boolean gpsStatus = true;
 	private Boolean play_check = false;
 	private MapView mapView;
 	private SharedPreferences sharedPreferences;
-	private DefaultResourceProxyImpl resource_proxy;
+	public DefaultResourceProxyImpl resource_proxy;
 	private ITileSource baseTiles;
 	public MyLocationNewOverlay mMyLocationOverlay;
 	private ImageButton play_button;
 	private ImageButton save_button;
-	private ImageButton polygon_button;
-	private ImageButton clear_button;
+	public ImageButton polygon_button;
+	public ImageButton clear_button;
 	private Button manual_button;
 	private ProgressDialog progress;
-	private AlertDialog.Builder builder;
-	private LayoutInflater inflater;
+	public AlertDialog.Builder builder;
+	public LayoutInflater inflater;
 	private AlertDialog alert;
 	private View traceSettingsView;
 	private PathOverlay pathOverlay;
-	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	private ArrayList<Marker> map_markers = new ArrayList<>();
 	//private GeoPoint current_location;
 	private String final_return_string;
 	private Integer TRACE_MODE; // 0 manual, 1 is automatic
@@ -103,19 +102,16 @@ public class GeoTraceActivity extends Activity {
 	
 	@Override
 	protected void onStart() {
-		// TODO Auto-generated method stub
 		super.onStart();
 	}
 
 	@Override
 	protected void onRestart() {
-		// TODO Auto-generated method stub
 		super.onRestart();
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		//setGPSStatus();
 		super.onResume();
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
@@ -129,24 +125,19 @@ public class GeoTraceActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		//mMyLocationOverlay.enableMyLocation();
-		
-
 		
 	}
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		disableMyLocation();
 	}
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 	}
 	
@@ -159,8 +150,9 @@ public class GeoTraceActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.geotrace_layout);
-		setTitle("GeoTrace"); // Setting title of the action
+		setTitle(getString(R.string.geotrace_title)); // Setting title of the action
 		
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
@@ -185,7 +177,6 @@ public class GeoTraceActivity extends Activity {
         progress.setOnCancelListener(new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
-				// TODO Auto-generated method stub
 				play_button.setImageResource(R.drawable.ic_menu_mylocation);
 			}
 		});
@@ -197,7 +188,6 @@ public class GeoTraceActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				clearAndReturnEmpty();
 			}
         	
@@ -208,7 +198,6 @@ public class GeoTraceActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				if (map_markers.size()>2){
 					openPolygonDialog();
 				}else{
@@ -222,7 +211,6 @@ public class GeoTraceActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				saveConfirm();
 				
 			}
@@ -230,10 +218,8 @@ public class GeoTraceActivity extends Activity {
         
         manual_button = (Button)findViewById(R.id.manual_button);
         manual_button.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				addLocationMarker();
 				
 			}
@@ -245,8 +231,8 @@ public class GeoTraceActivity extends Activity {
             @Override
             public void onClick(final View v) {
             	//setGPSStatus();
-            	if (play_check==false){
-            		if (inital_location_found ==false){
+            	if (!play_check){
+            		if (!inital_location_found){
             			mMyLocationOverlay.runOnFirstFix(centerAroundFix);
             			progress.show();
             			
@@ -284,19 +270,39 @@ public class GeoTraceActivity extends Activity {
 
 		mapView.invalidate();
 	}
+
+	public void beepForAnHour() {
+
+		 beeperHandle =scheduler.scheduleAtFixedRate(new Runnable() {
+			@Override
+			public void run() {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						//GeoTraceActivity.this.addLocationMarker();
+						addLocationMarker();
+					}
+				});
+
+			}
+		}, 10, 10, TimeUnit.SECONDS);
+		//beeperHandle.cancel(true);
+
+
+	}
+
+
 	
 	public void overlayIntentTrace(String str){
 		String s = str.replace("; ",";");
 		String[] sa = s.split(";");
 		for (int i=0;i<(sa.length);i++){
-			int x = i;
 			String[] sp = sa[i].split(" ");
 			double gp[] = new double[4];
 			String lat = sp[0].replace(" ", "");
 			String lng = sp[1].replace(" ", "");
-			gp[0] = Double.valueOf(lat).doubleValue();
-			gp[1] = Double.valueOf(lng).doubleValue();
-			
+			gp[0] = Double.parseDouble(lat);
+			gp[1] = Double.parseDouble(lng);
 			Marker marker = new Marker(mapView);
 			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
 			marker.setPosition(point);
@@ -329,20 +335,20 @@ public class GeoTraceActivity extends Activity {
 	}
 	
 	private void setGPSStatus(){
-        if(gpsStatus ==false){
-            //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-        	//Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
+//        if(!gpsStatus){
+//            //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+//        	//Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
             upMyLocationOverlayLayers();
             
             //enableMyLocation();
             //zoomToMyLocation();
             gpsStatus = true;
-        }else{
-        	//Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
-            //gps_button.setImageResource(R.drawable.ic_menu_mylocation);
-            disableMyLocation();
-            gpsStatus = false;
-        }
+//        }else{
+//        	//Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
+//            //gps_button.setImageResource(R.drawable.ic_menu_mylocation);
+//            disableMyLocation();
+//            gpsStatus = false;
+//        }
     }
 	
     private void disableMyLocation(){
@@ -497,7 +503,6 @@ public class GeoTraceActivity extends Activity {
 				
 				@Override
 				public void onCancel(DialogInterface dialog) {
-					// TODO Auto-generated method stub
 					reset_trace_settings();
 				}
                });
@@ -516,7 +521,6 @@ public class GeoTraceActivity extends Activity {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				// TODO Auto-generated method stub
 				
 					map_markers.add(map_markers.get(0));
 					pathOverlay.addPoint(map_markers.get(0).getPosition());
@@ -527,10 +531,9 @@ public class GeoTraceActivity extends Activity {
 			}
 		});
     	polygonBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			
+
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -576,6 +579,7 @@ public class GeoTraceActivity extends Activity {
     
     private void setupManualMode(){
     	manual_button.setVisibility(View.VISIBLE);
+		beepForAnHour();
     }
     
     private void addLocationMarker(){
@@ -619,7 +623,6 @@ public class GeoTraceActivity extends Activity {
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
 					
 				}
 			}).show();
@@ -651,7 +654,6 @@ public class GeoTraceActivity extends Activity {
 		
 		@Override
 		public boolean onMarkerClick(Marker arg0, MapView arg1) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	};

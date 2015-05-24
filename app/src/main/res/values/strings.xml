@@ -327,5 +327,6 @@
     <string name="record_trace">Record GeoTrace</string>
     <string name="view_trace">View GeoTrace</string>
     <string name="geoshape_title">GeoShape</string>
+    <string name="geotrace_title">GeoTrace</string>
 
 </resources>
