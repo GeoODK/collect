@@ -126,7 +126,7 @@ public class GeoTraceActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		//mMyLocationOverlay.enableMyLocation();
+		mMyLocationOverlay.enableMyLocation();
 		
 	}
 
@@ -245,6 +245,8 @@ public class GeoTraceActivity extends Activity {
             		play_button.setImageResource(R.drawable.play_button);
             		play_check=false;
             		stop_play();
+					beeperHandle.cancel(true);
+					disableMyLocation();
             	}
             }
         });
@@ -335,20 +337,8 @@ public class GeoTraceActivity extends Activity {
 	}
 	
 	private void setGPSStatus(){
-//        if(!gpsStatus){
-//            //gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-//        	//Toast.makeText(this, " GPS FALSE", Toast.LENGTH_LONG).show();
-            upMyLocationOverlayLayers();
-            
-            //enableMyLocation();
-            //zoomToMyLocation();
-            gpsStatus = true;
-//        }else{
-//        	//Toast.makeText(this, " GPS True", Toast.LENGTH_LONG).show();
-//            //gps_button.setImageResource(R.drawable.ic_menu_mylocation);
-//            disableMyLocation();
-//            gpsStatus = false;
-//        }
+		upMyLocationOverlayLayers();
+		gpsStatus = true;
     }
 	
     private void disableMyLocation(){
