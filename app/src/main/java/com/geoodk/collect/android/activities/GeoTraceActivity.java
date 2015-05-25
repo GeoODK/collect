@@ -30,13 +30,10 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoTraceWidget;
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -577,10 +574,15 @@ public class GeoTraceActivity extends Activity {
     	Marker marker = new Marker(mapView);
     	//marker.setPosition(current_location);
     	marker.setPosition(mMyLocationOverlay.getMyLocation());
-    	marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
-    	marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+		Float last_know_acuracy = mMyLocationOverlay.getMyLocationProvider().getLastKnownLocation().getAccuracy();
+		mMyLocationOverlay.getMyLocationProvider().getLastKnownLocation().getAccuracy();
+		marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+		marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 		marker.setDraggable(true);
+		//Place holder to Accuracy
+		marker.setSubDescription(Float.toString(last_know_acuracy));
     	map_markers.add(marker);
+
 		marker.setOnMarkerClickListener(nullmarkerlistner);
     	mapView.getOverlays().add(marker);
     	pathOverlay.addPoint(marker.getPosition());
@@ -624,8 +626,9 @@ public class GeoTraceActivity extends Activity {
 		for (int i = 0 ; i < map_markers.size();i++){
 			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
 			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
-			String alt ="0.0";
-			String acu = "0.0";
+			String alt = Double.toString(map_markers.get(i).getPosition().getAltitude());
+			String acu = map_markers.get(i).getSubDescription();
+			//String acu = "0.0";
 			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
 		}
 		return temp_string;
