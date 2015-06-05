@@ -31,6 +31,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.exception.EncryptionException;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoTraceWidget;
@@ -69,7 +70,8 @@ import static java.util.concurrent.TimeUnit.*;
 
 public class GeoTraceActivity extends Activity {
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-	private ScheduledFuture beeperHandle;
+	//private ScheduledFuture beeperHandle;
+	private ScheduledFuture schedulerHandler;
 	public int zoom_level = 3;
 	public Boolean gpsStatus = true;
 	private Boolean play_check = false;
@@ -90,12 +92,11 @@ public class GeoTraceActivity extends Activity {
 	private View traceSettingsView;
 	private PathOverlay pathOverlay;
 	private ArrayList<Marker> map_markers = new ArrayList<>();
-	//private GeoPoint current_location;
 	private String final_return_string;
 	private Integer TRACE_MODE; // 0 manual, 1 is automatic
-	//private String auto_time;
-	//private String auto_time_scale;
 	private Boolean inital_location_found = false;
+	private	EditText time_number;
+	private Spinner time_units;
 	
 	@Override
 	protected void onStart() {
@@ -137,7 +138,7 @@ public class GeoTraceActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		saveGeoTrace();
@@ -150,13 +151,13 @@ public class GeoTraceActivity extends Activity {
 
 		setContentView(R.layout.geotrace_layout);
 		setTitle(getString(R.string.geotrace_title)); // Setting title of the action
-		
+
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-		
+
 		baseTiles = MapHelper.getTileSource(basemap);
-		
+
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 		mapView = (MapView)findViewById(R.id.geotrace_mapview);
 		mapView.setTileSource(baseTiles);
@@ -164,10 +165,10 @@ public class GeoTraceActivity extends Activity {
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(online);
 		mapView.getController().setZoom(zoom_level);
-		
+
 		mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
         mMyLocationOverlay.runOnFirstFix(centerAroundFix);
-        
+
         progress = new ProgressDialog(this);
         progress.setTitle("Loading Location");
         progress.setMessage("Wait while loading...");
@@ -179,7 +180,7 @@ public class GeoTraceActivity extends Activity {
 		});
         //progress.setCancelable(false);
         // To dismiss the dialog
-        
+
         clear_button= (ImageButton) findViewById(R.id.geotrace_clear_button);
         clear_button.setOnClickListener(new View.OnClickListener() {
 
@@ -187,12 +188,12 @@ public class GeoTraceActivity extends Activity {
 			public void onClick(View v) {
 				clearAndReturnEmpty();
 			}
-        	
+
         });
-        
+
         polygon_button = (ImageButton) findViewById(R.id.geotrace_polygon_button);
         polygon_button.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				if (map_markers.size()>2){
@@ -200,28 +201,28 @@ public class GeoTraceActivity extends Activity {
 				}else{
 					showPolyonErrorDialog();
 				}
-				
+
 			}
 		});
         save_button= (ImageButton) findViewById(R.id.geotrace_save);
         save_button.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				saveConfirm();
-				
+
 			}
 		});
-        
+
         manual_button = (Button)findViewById(R.id.manual_button);
         manual_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				addLocationMarker();
-				
+
 			}
 		});
-        
+
         play_button = (ImageButton)findViewById(R.id.geotrace_play_button);
         //This is the gps button and its functionality
         play_button.setOnClickListener(new View.OnClickListener() {
@@ -232,7 +233,7 @@ public class GeoTraceActivity extends Activity {
             		if (!inital_location_found){
             			mMyLocationOverlay.runOnFirstFix(centerAroundFix);
             			progress.show();
-            			
+
             		}else{
             			play_button.setImageResource(R.drawable.stop_button);
             			alert.show();
@@ -242,7 +243,13 @@ public class GeoTraceActivity extends Activity {
             		play_button.setImageResource(R.drawable.play_button);
             		play_check=false;
             		stop_play();
-					beeperHandle.cancel(true);
+                    try{
+                        schedulerHandler.cancel(trye);
+                    }catch (Exception e){
+                        // Do nothing
+                    }
+                    //beeperHandle.cancel(true);
+
 					disableMyLocation();
             	}
             }
@@ -251,7 +258,7 @@ public class GeoTraceActivity extends Activity {
         inflater = this.getLayoutInflater();
         traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
         buildDialog();
-        
+
 		Intent intent = getIntent();
 		if (intent != null && intent.getExtras() != null) {
 			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
@@ -269,29 +276,49 @@ public class GeoTraceActivity extends Activity {
 
 		mapView.invalidate();
 	}
+	// Rename this
 
-	public void beepForAnHour() {
+//	public void beepForAnHour() {
+//
+//		 beeperHandle =scheduler.scheduleAtFixedRate(new Runnable() {
+//			@Override
+//			public void run() {
+//				runOnUiThread(new Runnable() {
+//					@Override
+//					public void run() {
+//						//GeoTraceActivity.this.addLocationMarker();
+//						addLocationMarker();
+//					}
+//				});
+//
+//			}
+//		}, 10, 10, TimeUnit.SECONDS);
+//
+//		//beeperHandle.cancel(true);
+//
+//
+//	}
+	/*
+		This functions
+	*/
 
-		 beeperHandle =scheduler.scheduleAtFixedRate(new Runnable() {
+	public void setGeoTraceScheuler(long delay, TimeUnit units){
+		schedulerHandler = scheduler.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						//GeoTraceActivity.this.addLocationMarker();
 						addLocationMarker();
 					}
 				});
-
 			}
-		}, 10, 10, TimeUnit.SECONDS);
-		//beeperHandle.cancel(true);
-
+		},delay, delay, units);
 
 	}
 
 
-	
+
 	public void overlayIntentTrace(String str){
 		String s = str.replace("; ",";");
 		String[] sa = s.split(";");
@@ -300,23 +327,27 @@ public class GeoTraceActivity extends Activity {
 			double gp[] = new double[4];
 			String lat = sp[0].replace(" ", "");
 			String lng = sp[1].replace(" ", "");
+			String altStr = sp[2].replace(" ", "");
+			String acu = sp[3].replace(" ", "");
 			gp[0] = Double.parseDouble(lat);
 			gp[1] = Double.parseDouble(lng);
+			Integer alt = Integer.parseInt(altStr);
 			Marker marker = new Marker(mapView);
-			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
+			marker.setSubDescription(acu);
+			GeoPoint point = new GeoPoint(gp[0], gp[1]);
+			point.setAltitude(alt);
 			marker.setPosition(point);
 			marker.setOnMarkerClickListener(nullmarkerlistner);
 			marker.setDraggable(true);
 			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 			map_markers.add(marker);
-			
 			pathOverlay.addPoint(marker.getPosition());
 			mapView.getOverlays().add(marker);
-			
+
 		}
 		mapView.invalidate();
-		
+
 	}
 	private void zoomToPoints(){
 		mapView.getController().setZoom(15);
@@ -327,17 +358,17 @@ public class GeoTraceActivity extends Activity {
 		    	GeoPoint c_marker = map_markers.get(0).getPosition();
 		    	mapView.getController().setCenter(c_marker);
 		    }
-		}; 
+		};
 		handler.post(r);
 		mapView.invalidate();
-		
+
 	}
-	
+
 	private void setGPSStatus(){
 		upMyLocationOverlayLayers();
 		gpsStatus = true;
     }
-	
+
     private void disableMyLocation(){
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
@@ -366,7 +397,7 @@ public class GeoTraceActivity extends Activity {
 	    mapView.getOverlays().add(pathOverlay);
 		mapView.invalidate();
 	}
-	
+
     private void overlayMyLocationLayers(){
         mapView.getOverlays().add(mMyLocationOverlay);
         mMyLocationOverlay.setEnabled(true);
@@ -429,7 +460,6 @@ public class GeoTraceActivity extends Activity {
     }
     
     public void setGeoTraceMode(View view){
-    	//Toast.makeText(this, " ", Toast.LENGTH_LONG).show();
     	boolean checked = ((RadioButton) view).isChecked();
     	EditText time_number = (EditText) traceSettingsView.findViewById(R.id.trace_number);
     	Spinner time_units = (Spinner) traceSettingsView.findViewById(R.id.trace_scale);
@@ -535,7 +565,7 @@ public class GeoTraceActivity extends Activity {
     }
     
     private void startGeoTrace(){
-    	TRACE_MODE = 0; // this will change when automatic is implemented
+    	//TRACE_MODE = 0; // this will change when automatic is implemented
        if (TRACE_MODE ==0){
     	   //Manual Mode
     	   /*Toast.makeText(this, "Manual Mode", Toast.LENGTH_LONG).show();*/
@@ -566,8 +596,13 @@ public class GeoTraceActivity extends Activity {
     
     private void setupManualMode(){
     	manual_button.setVisibility(View.VISIBLE);
-		beepForAnHour();
+		//beepForAnHour();
+		setGeoTraceScheuler(10,TimeUnit.MINUTES);
+
     }
+	private void setupAutomaticMode(){
+
+	}
     
     private void addLocationMarker(){
     	Toast.makeText(this, "Add Point", Toast.LENGTH_LONG).show();
@@ -626,9 +661,9 @@ public class GeoTraceActivity extends Activity {
 		for (int i = 0 ; i < map_markers.size();i++){
 			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
 			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
-			String alt = Double.toString(map_markers.get(i).getPosition().getAltitude());
+			String alt = Integer.toString(map_markers.get(i).getPosition().getAltitude());
 			String acu = map_markers.get(i).getSubDescription();
-			//String acu = "0.0";
+			//String acu = "0.0";`
 			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
 		}
 		return temp_string;
