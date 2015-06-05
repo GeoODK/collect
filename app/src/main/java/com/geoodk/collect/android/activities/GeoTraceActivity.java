@@ -244,7 +244,7 @@ public class GeoTraceActivity extends Activity {
             		play_check=false;
             		stop_play();
                     try{
-                        schedulerHandler.cancel(trye);
+                        schedulerHandler.cancel(true);
                     }catch (Exception e){
                         // Do nothing
                     }
