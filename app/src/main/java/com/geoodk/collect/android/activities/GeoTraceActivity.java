@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 GeoODK
+ * Copyright (C) 2015 GeoODK
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -31,7 +31,6 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
-import com.geoodk.collect.android.exception.EncryptionException;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoTraceWidget;
@@ -57,15 +56,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.util.Log;
+
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import static java.util.concurrent.TimeUnit.*;
+
 
 
 public class GeoTraceActivity extends Activity {
@@ -97,6 +97,7 @@ public class GeoTraceActivity extends Activity {
 	private Boolean inital_location_found = false;
 	private	EditText time_number;
 	private Spinner time_units;
+	private Spinner time_delay;
 	
 	@Override
 	protected void onStart() {
@@ -299,7 +300,7 @@ public class GeoTraceActivity extends Activity {
 //
 //	}
 	/*
-		This functions
+		This functions handels the delay and the Runable for
 	*/
 
 	public void setGeoTraceScheuler(long delay, TimeUnit units){
@@ -458,31 +459,32 @@ public class GeoTraceActivity extends Activity {
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
-    
+    //This happens on click of the play button
     public void setGeoTraceMode(View view){
     	boolean checked = ((RadioButton) view).isChecked();
-    	EditText time_number = (EditText) traceSettingsView.findViewById(R.id.trace_number);
-    	Spinner time_units = (Spinner) traceSettingsView.findViewById(R.id.trace_scale);
+		time_delay = (Spinner) traceSettingsView.findViewById(R.id.trace_delay);
+//    	time_number = (EditText) traceSettingsView.findViewById(R.id.trace_number);
+    	time_units = (Spinner) traceSettingsView.findViewById(R.id.trace_scale);
     	switch(view.getId()) {
 	        case R.id.trace_manual:
 	            if (checked){
-	            	TRACE_MODE = 0; 
-	            	time_number.setText("");
+	            	TRACE_MODE = 0;
 	            	time_number.setVisibility(View.GONE);
 	            	time_units.setVisibility(View.GONE);
+					time_delay.setVisibility(View.GONE);
 	            	time_number.invalidate();
+					time_delay.invalidate();
 	            	time_units.invalidate();
 	            }
-	                // Pirates are the best
-	            	
 	            break;
 	        case R.id.trace_automatic:
 	            if (checked){	         
 	            	TRACE_MODE = 1; 
-	            	time_number.setVisibility(View.VISIBLE);
+	            	//time_number.setVisibility(View.VISIBLE);
 	            	time_units.setVisibility(View.VISIBLE);
-	            	
-	            	time_number.invalidate();
+					time_delay.setVisibility(View.VISIBLE);
+	            	//time_number.invalidate();
+					time_delay.invalidate();
 	            	time_units.invalidate();
 	            }
 	            break;
@@ -565,13 +567,19 @@ public class GeoTraceActivity extends Activity {
     }
     
     private void startGeoTrace(){
-    	//TRACE_MODE = 0; // this will change when automatic is implemented
+		RadioGroup rb = (RadioGroup) traceSettingsView.findViewById(R.id.radio_group);
+		int radioButtonID = rb.getCheckedRadioButtonId();
+		View radioButton = rb.findViewById(radioButtonID);
+		int idx = rb.indexOfChild(radioButton);
+    	TRACE_MODE = idx; // this will change when automatic is implemented
        if (TRACE_MODE ==0){
     	   //Manual Mode
     	   /*Toast.makeText(this, "Manual Mode", Toast.LENGTH_LONG).show();*/
     	   setupManualMode();
        }else if (TRACE_MODE ==1){
+		   Toast.makeText(this, "Mode: Automatic", Toast.LENGTH_LONG).show();
     	   //Automatic Mode
+		   setupAutomaticMode();
     	   //Spinner scale = (Spinner)traceSettingsView.findViewById(R.id.trace_scale);
      	   //EditText time = (EditText)traceSettingsView.findViewById(R.id.trace_number);
      	   //auto_time_scale= scale.getSelectedItem().toString();
@@ -596,12 +604,22 @@ public class GeoTraceActivity extends Activity {
     
     private void setupManualMode(){
     	manual_button.setVisibility(View.VISIBLE);
-		//beepForAnHour();
-		setGeoTraceScheuler(10,TimeUnit.MINUTES);
+		//setGeoTraceScheuler(10,TimeUnit.MINUTES);
 
     }
 	private void setupAutomaticMode(){
-
+		manual_button.setVisibility(View.VISIBLE);
+		String delay = time_delay.getSelectedItem().toString();
+		String units = time_units.getSelectedItem().toString();
+		TimeUnit time_units_value;
+		if (units =="Minutes"){
+			time_units_value = TimeUnit.MINUTES;
+		}else{
+			//in Seconds
+			time_units_value = TimeUnit.SECONDS;
+		}
+		Long time_delay = Long.parseLong(delay);
+		setGeoTraceScheuler(time_delay,time_units_value);
 	}
     
     private void addLocationMarker(){

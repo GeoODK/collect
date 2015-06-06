@@ -33,6 +33,16 @@
     android:text="200"
     android:inputType="number"
     android:imeActionLabel="Label" />
+
+    <Spinner
+    android:id="@+id/trace_delay"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:entryValues="@array/delay_scale"
+    android:entries="@array/delay_scale"
+    android:visibility="gone"
+
+        />
 	
 	<Spinner
     android:id="@+id/trace_scale"
