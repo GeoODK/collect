@@ -328,5 +328,13 @@
     <string name="view_trace">View GeoTrace</string>
     <string name="geoshape_title">GeoShape</string>
     <string name="geotrace_title">GeoTrace</string>
+    <string name="enable_gps">Enable GPS</string>
+    <string name="enable_gps_message">"GPS is disabled in your device. Would you like to enable it?"</string>
+    <string name="geotrace_instruction">"GeoTrace Instructions"</string>
+    <string name="geotrace_instruction_message">"Select Mode: Automatic mode or Manual Mode"</string>
+    <string name="start">Start</string>
+    <string name="polygon_conection_title">"Polygon Connector (Non-reversible)"</string>
+    <string name="polygon_conection_message">"Select Yes to connect as polygon. For Polyline select cancel and just save"</string>
+    <string name="yes">Yes</string>
 
 </resources>

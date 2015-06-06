@@ -171,8 +171,8 @@ public class GeoTraceActivity extends Activity {
         mMyLocationOverlay.runOnFirstFix(centerAroundFix);
 
         progress = new ProgressDialog(this);
-        progress.setTitle("Loading Location");
-        progress.setMessage("Wait while loading...");
+        progress.setTitle(getString(R.string.getting_location));
+        progress.setMessage(getString(R.string.please_wait_long));
         progress.setOnCancelListener(new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -277,28 +277,7 @@ public class GeoTraceActivity extends Activity {
 
 		mapView.invalidate();
 	}
-	// Rename this
 
-//	public void beepForAnHour() {
-//
-//		 beeperHandle =scheduler.scheduleAtFixedRate(new Runnable() {
-//			@Override
-//			public void run() {
-//				runOnUiThread(new Runnable() {
-//					@Override
-//					public void run() {
-//						//GeoTraceActivity.this.addLocationMarker();
-//						addLocationMarker();
-//					}
-//				});
-//
-//			}
-//		}, 10, 10, TimeUnit.SECONDS);
-//
-//		//beeperHandle.cancel(true);
-//
-//
-//	}
 	/*
 		This functions handels the delay and the Runable for
 	*/
@@ -443,9 +422,9 @@ public class GeoTraceActivity extends Activity {
     
     private void showGPSDisabledAlertToUser(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("GPS is disabled in your device. Would you like to enable it?")
+        alertDialogBuilder.setMessage(getString(R.string.enable_gps_message))
         .setCancelable(false)
-        .setPositiveButton("Enable GPS",
+        .setPositiveButton(getString(R.string.enable_gps),
                 new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int id){
                // Intent callGPSSettingIntent = new Intent(
@@ -453,7 +432,7 @@ public class GeoTraceActivity extends Activity {
                 //startActivity(callGPSSettingIntent);
             }
         });
-        alertDialogBuilder.setNegativeButton("Cancel",
+        alertDialogBuilder.setNegativeButton(getString(R.string.cancel),
                 new DialogInterface.OnClickListener(){
             public void onClick(DialogInterface dialog, int id){
                 dialog.cancel();
@@ -492,42 +471,36 @@ public class GeoTraceActivity extends Activity {
 	            }
 	            break;
     	}
-
-    	//builder(RadioGroup)findViewById(R.id.radio_group);
-    	//RadioGroup rg = (RadioGroup) findViewById(R.id.radio_group);
-    	//int checked = rg.getCheckedRadioButtonId();
     }
     
     
     private void buildDialog(){
     	builder = new AlertDialog.Builder(this);
     	
-    	builder.setTitle("GeoTrace Instructions");
-    	builder.setMessage("Manual Mode, click Start to begin use the button to record points at your location");
+    	builder.setTitle(getString(R.string.geotrace_instruction));
+    	builder.setMessage(getString(R.string.geotrace_instruction_message));
 
     	builder.setView(traceSettingsView)
         // Add action buttons
-               .setPositiveButton("Start", new DialogInterface.OnClickListener() {
+               .setPositiveButton(getString(R.string.start), new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int id) {
-                	   //auto_time_scale
                 	   	startGeoTrace();
-                       // sign in the user ...
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                       dialog.cancel();
-                       reset_trace_settings();
-                   }
-               })
+				   public void onClick(DialogInterface dialog, int id) {
+					   dialog.cancel();
+					   reset_trace_settings();
+				   }
+			   })
                .setOnCancelListener(new OnCancelListener() {
-				
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					reset_trace_settings();
-				}
-               });
+
+				   @Override
+				   public void onCancel(DialogInterface dialog) {
+					   reset_trace_settings();
+				   }
+			   });
  
     	
     	alert = builder.create();
@@ -537,9 +510,9 @@ public class GeoTraceActivity extends Activity {
     
     private void openPolygonDialog(){
     	Builder polygonBuilder = new AlertDialog.Builder(this);
-    	polygonBuilder.setTitle("Polygon Connector (Non-reversible)");
-    	polygonBuilder.setMessage("Select Yes to connect as polygon. For Polyline select cancel and just save");
-    	polygonBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+    	polygonBuilder.setTitle(getString(R.string.polygon_conection_title));
+    	polygonBuilder.setMessage(getString(R.string.polygon_conection_message));
+    	polygonBuilder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
