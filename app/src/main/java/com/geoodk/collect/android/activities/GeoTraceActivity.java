@@ -326,17 +326,20 @@ public class GeoTraceActivity extends Activity {
 		for (int i=0;i<(sa.length);i++){
 			String[] sp = sa[i].split(" ");
 			double gp[] = new double[4];
+
 			String lat = sp[0].replace(" ", "");
 			String lng = sp[1].replace(" ", "");
 			String altStr = sp[2].replace(" ", "");
 			String acu = sp[3].replace(" ", "");
+
 			gp[0] = Double.parseDouble(lat);
 			gp[1] = Double.parseDouble(lng);
-			Integer alt = Integer.parseInt(altStr);
+
+			Double alt = Double.parseDouble(altStr);
 			Marker marker = new Marker(mapView);
 			marker.setSubDescription(acu);
 			GeoPoint point = new GeoPoint(gp[0], gp[1]);
-			point.setAltitude(alt);
+			point.setAltitude(alt.intValue());
 			marker.setPosition(point);
 			marker.setOnMarkerClickListener(nullmarkerlistner);
 			marker.setDraggable(true);
@@ -683,6 +686,7 @@ public class GeoTraceActivity extends Activity {
 			String acu = map_markers.get(i).getSubDescription();
 			//String acu = "0.0";`
 			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
+			String something = "";
 		}
 		return temp_string;
 	}
