@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -322,6 +323,7 @@ public class GeoTraceActivity extends Activity {
 			marker.setPosition(point);
 			marker.setOnMarkerClickListener(nullmarkerlistner);
 			marker.setDraggable(true);
+			marker.setOnMarkerDragListener(draglistner);
 			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 			map_markers.add(marker);
@@ -529,7 +531,7 @@ public class GeoTraceActivity extends Activity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
-				
+
 			}
 		});
     	AlertDialog aD = polygonBuilder.create();
@@ -595,7 +597,7 @@ public class GeoTraceActivity extends Activity {
 			time_units_value = TimeUnit.SECONDS;
 		}
 		Long time_delay = Long.parseLong(delay);
-		setGeoTraceScheuler(time_delay,time_units_value);
+		setGeoTraceScheuler(time_delay, time_units_value);
 	}
     
     private void addLocationMarker(){
@@ -608,6 +610,7 @@ public class GeoTraceActivity extends Activity {
 		marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 		marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 		marker.setDraggable(true);
+		marker.setOnMarkerDragListener(draglistner);
 		//Place holder to Accuracy
 		marker.setSubDescription(Float.toString(last_know_acuracy));
     	map_markers.add(marker);
@@ -627,10 +630,10 @@ public class GeoTraceActivity extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Must have at least 3 points to create Polygon")
                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                       // FIRE ZE MISSILES!
-                }
-               }).show();
+				   public void onClick(DialogInterface dialog, int id) {
+					   // FIRE ZE MISSILES!
+				   }
+			   }).show();
 		
 	}
 	private void saveConfirm(){
@@ -657,9 +660,7 @@ public class GeoTraceActivity extends Activity {
 			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
 			String alt = Integer.toString(map_markers.get(i).getPosition().getAltitude());
 			String acu = map_markers.get(i).getSubDescription();
-			//String acu = "0.0";`
 			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
-			String something = "";
 		}
 		return temp_string;
 	}
@@ -668,8 +669,8 @@ public class GeoTraceActivity extends Activity {
     		final_return_string = generateReturnString();
             Intent i = new Intent();
             i.putExtra(
-                FormEntryActivity.GEOTRACE_RESULTS,
-                final_return_string);
+					FormEntryActivity.GEOTRACE_RESULTS,
+					final_return_string);
             setResult(RESULT_OK, i);
         finish();
     }
@@ -691,4 +692,31 @@ public class GeoTraceActivity extends Activity {
         finish();
 		
 	}
+	private void update_polygon(){
+		pathOverlay.clearPath();
+		for (int i =0;i<map_markers.size();i++){
+			pathOverlay.addPoint(map_markers.get(i).getPosition());
+		}
+		mapView.invalidate();
+	}
+
+
+
+	private OnMarkerDragListener draglistner = new Marker.OnMarkerDragListener(){
+		@Override
+		public void onMarkerDragStart(Marker marker) {
+
+		}
+		@Override
+		public void onMarkerDragEnd(Marker arg0) {
+			update_polygon();
+
+		}
+		@Override
+		public void onMarkerDrag(Marker marker) {
+			update_polygon();
+
+		}
+
+	} ;
 }

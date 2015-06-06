@@ -525,7 +525,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 		}
 		@Override
-		public void onMarkerDragEnd(Marker arg0) {
+		public void onMarkerDragEnd(Marker marker) {
 			update_polygon();
 			
 		}
