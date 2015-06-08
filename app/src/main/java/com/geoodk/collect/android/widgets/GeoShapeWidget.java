@@ -203,7 +203,7 @@ public class GeoShapeWidget extends QuestionWidget implements IBinaryWidget {
 			try {
 				String[] sa = s.split(";");
 				for (int i=0;i<sa.length;i++){
-					String[] sp = sa[i].split(" ");
+					String[] sp = sa[i].trim().split(" ");
 					double gp[] = new double[4];
 					gp[0] = Double.valueOf(sp[0]).doubleValue();
 					gp[1] = Double.valueOf(sp[1]).doubleValue();
