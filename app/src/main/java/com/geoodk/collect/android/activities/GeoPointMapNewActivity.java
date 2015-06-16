@@ -45,6 +45,7 @@ import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoShapeWidget;
 
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -132,9 +133,9 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 			for the activity
 
 		  */
-		setContentView(R.layout.geo_shape_layout);
-		setTitle(getString(R.string.geoshape_title)); // Setting title of the action
-		return_button = (ImageButton) findViewById(R.id.geoshape_Button);
+		setContentView(R.layout.geopointmapnew_layout);
+		setTitle(getString(R.string.geopoint_title)); // Setting title of the action
+		return_button = (ImageButton) findViewById(R.id.geopoint_button);
 		polygon_button = (ImageButton) findViewById(R.id.polygon_button);
 		clear_button = (ImageButton) findViewById(R.id.clear_button);
 
@@ -150,12 +151,15 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		baseTiles = MapHelper.getTileSource(basemap);
 
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
-		mapView = (MapView)findViewById(R.id.geoshape_mapview);
+		mapView = (MapView)findViewById(R.id.geopoint_mapview);
 		mapView.setTileSource(baseTiles);
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(online);
 		mapView.setMapListener(mapViewListner);
+
+		IMapController mapController = mapView.getController();
+		mapController.setZoom(9);
 
 		overlayPointPathListner();
 
@@ -189,7 +193,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 				}
 			}
 		});
-        ImageButton layers_button = (ImageButton)findViewById(R.id.geoShape_layers_button);
+        ImageButton layers_button = (ImageButton)findViewById(R.id.geopoint_layers_button);
         layers_button.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -199,7 +203,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 			}
 		});
 
-        gps_button = (ImageButton)findViewById(R.id.geoshape_gps_button);
+        gps_button = (ImageButton)findViewById(R.id.geopoint_gps_button);
         gps_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

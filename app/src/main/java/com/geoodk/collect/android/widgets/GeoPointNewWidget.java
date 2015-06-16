@@ -185,7 +185,7 @@ public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 		// finish complex layout
 		// control what gets shown with setVisibility(View.GONE)
 		addView(mGetLocationButton);
-		addView(mViewButton);
+		//addView(mViewButton);
 		addView(mAnswerDisplay);
 
 		// figure out what text and buttons to enable or to show...
@@ -323,16 +323,17 @@ public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 	public void setOnLongClickListener(OnLongClickListener l) {
 		/*
 		mViewButton.setOnLongClickListener(l);
+		*/
 		mGetLocationButton.setOnLongClickListener(l);
 		mStringAnswer.setOnLongClickListener(l);
 		mAnswerDisplay.setOnLongClickListener(l);
-		*/
+
 	}
 
 	@Override
 	public void cancelLongPress() {
 		super.cancelLongPress();
-		mViewButton.cancelLongPress();
+		//mViewButton.cancelLongPress();
 		mGetLocationButton.cancelLongPress();
 		mStringAnswer.cancelLongPress();
 		mAnswerDisplay.cancelLongPress();
