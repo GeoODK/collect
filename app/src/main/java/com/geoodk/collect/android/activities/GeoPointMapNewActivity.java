@@ -50,6 +50,7 @@ import com.geoodk.collect.android.utilities.InfoLogger;
 import com.geoodk.collect.android.widgets.GeoPointNewWidget;
 
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
