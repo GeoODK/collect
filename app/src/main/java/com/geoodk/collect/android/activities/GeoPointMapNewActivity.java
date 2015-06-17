@@ -42,6 +42,7 @@ import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
+import com.geoodk.collect.android.widgets.GeoPointNewWidget;
 import com.geoodk.collect.android.widgets.GeoShapeWidget;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -156,13 +157,10 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		mapView.setMultiTouchControls(true);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(online);
+		mapView.getController().setZoom(zoom_level);
 		mapView.setMapListener(mapViewListner);
 
-		IMapController mapController = mapView.getController();
-		mapController.setZoom(9);
-
 		overlayPointPathListner();
-
 
 		return_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -195,11 +193,9 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		});
         ImageButton layers_button = (ImageButton)findViewById(R.id.geopoint_layers_button);
         layers_button.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				showLayersDialog();
-
 			}
 		});
 
@@ -215,38 +211,39 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
         imlp.setLocationUpdateMinDistance(1000);
         imlp.setLocationUpdateMinTime(60000);
+
         mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
         mMyLocationOverlay.runOnFirstFix(centerAroundFix);
 
         progress = new ProgressDialog(this);
-        progress.setTitle("Loading Location");
-        progress.setMessage("Wait while loading...");
-
+		progress.setTitle(getString(R.string.getting_location));
+		progress.setMessage(getString(R.string.please_wait_long));
 
 		Intent intent = getIntent();
 		if (intent != null && intent.getExtras() != null) {
-			if ( intent.hasExtra(GeoShapeWidget.SHAPE_LOCATION) ) {
-				data_loaded =true;
-				String s = intent.getStringExtra(GeoShapeWidget.SHAPE_LOCATION);
+			if ( intent.hasExtra(GeoPointNewWidget.POINT_LOCATION) ) {
+				data_loaded = true;
+				String s = intent.getStringExtra(GeoPointNewWidget.POINT_LOCATION);
+                // TODO: restore this logic but for Point
+                /*
 				overlayIntentPolygon(s);
 				zoomToCentroid();
+				*/
 			}
 		}else{
-
 			final Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
 				public void run() {
 					//Do something after 100ms
-					GeoPoint  point = new GeoPoint(34.08145, -39.85007);
+					GeoPoint point = new GeoPoint(34.08145, -39.85007);
 					mapView.getController().setZoom(3);
 					mapView.getController().setCenter(point);
 				}
 			}, 100);
-
-			setGPSStatus();
-			progress.show();
-
 		}
+
+		setGPSStatus();
+		progress.show();
 
 	    mapView.invalidate();
 	}
@@ -299,8 +296,12 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		mapView.getOverlays().remove(OverlayEventos);
 	}
 
+    /**
+     * Depending on gpsStatus var, change gps-button icon
+     * and enables|disables MyLocationOverlayLayers
+     */
 	private void setGPSStatus(){
-        if(gpsStatus ==false){
+        if(gpsStatus == false){
             gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
             upMyLocationOverlayLayers();
             //enableMyLocation();
@@ -339,15 +340,19 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             }
         });
         alertDialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                dialog.cancel();
-            }
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
         });
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
 
+    /**
+     * If GPS Hardware is enabled enables MyLocationOverlay (that also starts map-pan for following location)
+     * Else show GPS-is-disabled Alert
+     */
     private void upMyLocationOverlayLayers(){
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
@@ -359,12 +364,17 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
     }
 
+    /**
+     * Enables MyLocationOverlay, starts "follow location"
+     * and adds MyLocationOverlay to MapView overlays.
+     */
     private void overlayMyLocationLayers(){
         mapView.getOverlays().add(mMyLocationOverlay);
         mMyLocationOverlay.setEnabled(true);
         mMyLocationOverlay.enableMyLocation();
         mMyLocationOverlay.enableFollowLocation();
     }
+
     private void zoomToMyLocation(){
     	if (mMyLocationOverlay.getMyLocation()!= null){
     		if (zoom_level ==3){
@@ -379,13 +389,14 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     	}
 
     }
+
     private void disableMyLocation(){
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
         	mMyLocationOverlay.setEnabled(false);
         	mMyLocationOverlay.disableFollowLocation();
         	mMyLocationOverlay.disableMyLocation();
-        	gpsStatus =false;
+        	gpsStatus = false;
     	}
     }
 

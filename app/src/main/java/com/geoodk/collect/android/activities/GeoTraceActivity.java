@@ -235,7 +235,6 @@ public class GeoTraceActivity extends Activity {
             		if (!inital_location_found){
             			mMyLocationOverlay.runOnFirstFix(centerAroundFix);
             			progress.show();
-
             		}else{
             			play_button.setImageResource(R.drawable.stop_button);
             			alert.show();

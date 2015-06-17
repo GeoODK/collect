@@ -51,7 +51,7 @@ import android.widget.Toast;
 public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 	public static final String ACCURACY_THRESHOLD = "accuracyThreshold";
 	public static final String READ_ONLY = "readOnly";
-	public static final String SHAPE_LOCATION = "gp";
+	public static final String POINT_LOCATION = "gp";
 
 	public static final double DEFAULT_LOCATION_ACCURACY = 5.0;
 
@@ -172,7 +172,7 @@ public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 					gp[2] = Double.valueOf(sa[2]).doubleValue();
 					gp[3] = Double.valueOf(sa[3]).doubleValue();
                     */
-					i.putExtra(SHAPE_LOCATION, s);
+					i.putExtra(GeoPointNewWidget.POINT_LOCATION, s);
 				}
 
 				i.putExtra(READ_ONLY, mReadOnly);
