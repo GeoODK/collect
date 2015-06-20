@@ -46,4 +46,13 @@
         android:layout_alignParentRight="true"
         android:padding="20dp"
         android:src="@drawable/ic_menu_save" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GPS accuracy\nfor fix is: XX.X\nCurrent is: YY.YY"
+        android:id="@+id/textViewTargetAccuracy"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal" />
 </RelativeLayout>

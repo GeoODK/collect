@@ -22,10 +22,7 @@ import org.javarosa.form.api.FormEntryPrompt;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.activities.FormEntryActivity;
-import com.geoodk.collect.android.activities.GeoPointActivity;
-import com.geoodk.collect.android.activities.GeoPointMapActivity;
 import com.geoodk.collect.android.activities.GeoPointMapNewActivity;
-import com.geoodk.collect.android.activities.GeoPointMapActivitySdk7;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.utilities.CompatibilityUtils;
 
@@ -40,7 +37,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * GeoPointWidget is the widget that allows the user to get GPS readings.
@@ -53,7 +49,7 @@ public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 	public static final String READ_ONLY = "readOnly";
 	public static final String POINT_LOCATION = "gp";
 
-	public static final double DEFAULT_LOCATION_ACCURACY = 5.0;
+	public static final double UNSET_LOCATION_ACCURACY = Double.POSITIVE_INFINITY;
 
 	private Button mGetLocationButton;
 	private TextView mAnswerDisplay;
@@ -76,7 +72,7 @@ public class GeoPointNewWidget extends QuestionWidget implements IBinaryWidget {
 		if ( acc != null && acc.length() != 0 ) {
 			mAccuracyThreshold = Double.parseDouble(acc);
 		} else {
-			mAccuracyThreshold = DEFAULT_LOCATION_ACCURACY;
+			mAccuracyThreshold = UNSET_LOCATION_ACCURACY;
 		}
 
         setMap(context, prompt);

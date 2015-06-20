@@ -23,10 +23,12 @@ package com.geoodk.collect.android.activities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -36,12 +38,14 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
+import com.geoodk.collect.android.utilities.InfoLogger;
 import com.geoodk.collect.android.widgets.GeoPointNewWidget;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -59,6 +63,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.TilesOverlay;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
@@ -69,7 +74,6 @@ import java.util.List;
 
 public class GeoPointMapNewActivity extends Activity implements IRegisterReceiver {
 	private MapView mapView;
-	//private PathOverlay pathOverlay; // Holds the line connecting markers
 	private ITileSource baseTiles;
 	public DefaultResourceProxyImpl resource_proxy;
 	public int zoom_level = 3;
@@ -77,7 +81,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	public String final_return_string;
 	private MapEventsOverlay overlayEventos;
 	private ImageButton clear_button;
-	private ImageButton return_button;
+	private ImageButton save_button;
 	private ImageButton polygon_button;
 	private SharedPreferences sharedPreferences;
 	public Boolean layerStatus = false;
@@ -92,15 +96,18 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	public MyLocationNewOverlay mMyLocationOverlay;
 	public Boolean data_loaded = false;
 
-    public final String LOCATION_MARKER_LAT = "LOCATION_MARKER_LAT";
-    public final String LOCATION_MARKER_LON = "LOCATION_MARKER_LON";
-	public final String CURRENT_MODE = "CURRENT_MODE";
-	public final String MODE_MANUAL = "MANUAL";
-	public final String MODE_AUTO = "AUTO";
+    public final static String LOCATION_MARKER_LAT = "LOCATION_MARKER_LAT";
+    public final static String LOCATION_MARKER_LON = "LOCATION_MARKER_LON";
+	public final static String CURRENT_MODE = "CURRENT_MODE";
+	public final static String MODE_MANUAL = "MANUAL";
+	public final static String MODE_AUTO = "AUTO";
 	public String currentMode = MODE_AUTO;
+	public double targetAccuracy = GeoPointNewWidget.UNSET_LOCATION_ACCURACY;
 	public Marker locationMarker;
+    public TextView textViewTargetAccuracy;
+    private Drawable locationMarkerIcon;
 
-	@Override
+    @Override
 	protected void onResume() {
 		super.onResume();
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
@@ -119,6 +126,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             savedInstanceState.putDouble(LOCATION_MARKER_LAT, lat);
             savedInstanceState.putDouble(LOCATION_MARKER_LON, lon);
 			savedInstanceState.putCharSequence(CURRENT_MODE, currentMode);
+			savedInstanceState.putDouble(GeoPointNewWidget.ACCURACY_THRESHOLD, targetAccuracy);
         }
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -141,92 +149,97 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-		//Setting Content  & initiating the main button id for the activity
+        //Setting Content & initiating the main button id for the activity
 
-		setContentView(R.layout.geopointmapnew_layout);
-		setTitle(getString(R.string.geopoint_title)); // Setting title of the action
-		return_button = (ImageButton) findViewById(R.id.geopoint_button);
+        setContentView(R.layout.geopointmapnew_layout);
+        setTitle(getString(R.string.geopoint_title)); // Setting title of the action
+        save_button = (ImageButton) findViewById(R.id.geopoint_button);
         // TODO : remove stuff about polygon button
-		polygon_button = (ImageButton) findViewById(R.id.polygon_button);
+        polygon_button = (ImageButton) findViewById(R.id.polygon_button);
         polygon_button.setVisibility(View.GONE);
-		clear_button = (ImageButton) findViewById(R.id.clear_button);
+        clear_button = (ImageButton) findViewById(R.id.clear_button);
+        // The text view on top of map for displaying current GPS accuracy and Target Accuracy from XForm accuracyThreshold
+        textViewTargetAccuracy = ((TextView) findViewById(R.id.textViewTargetAccuracy));
 
-		//Defining the System prefereces from the mapSetting
+        //Defining the System prefereces from the mapSetting
 
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String baeMap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-		baseTiles = MapHelper.getTileSource(baeMap);
-		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+        String baeMap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+        baseTiles = MapHelper.getTileSource(baeMap);
+        resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 
-		mapView = (MapView)findViewById(R.id.geopoint_mapview);
-		mapView.setTileSource(baseTiles);
-		mapView.setMultiTouchControls(true);
-		mapView.setBuiltInZoomControls(true);
-		mapView.setUseDataConnection(online);
-		mapView.getController().setZoom(zoom_level);
-		mapView.setMapListener(mapViewListner);
+        mapView = (MapView) findViewById(R.id.geopoint_mapview);
+        mapView.setTileSource(baseTiles);
+        mapView.setMultiTouchControls(true);
+        mapView.setBuiltInZoomControls(true);
+        mapView.setUseDataConnection(online);
+        mapView.getController().setZoom(zoom_level);
+        mapView.setMapListener(mapViewListner);
 
         // Use eventual data from saved state to restore position of marker
         if (savedInstanceState != null) {
             double lat = savedInstanceState.getDouble(LOCATION_MARKER_LAT);
             double lon = savedInstanceState.getDouble(LOCATION_MARKER_LON);
-			currentMode = savedInstanceState.getString(CURRENT_MODE);
+            currentMode = savedInstanceState.getString(CURRENT_MODE);
+            targetAccuracy = savedInstanceState.getDouble(GeoPointNewWidget.ACCURACY_THRESHOLD);
             refreshClearButtonVisibility();
             GeoPoint point = new GeoPoint(lat, lon);
             repositionLocationMarkerAt(point);
         }
 
         // Register a listener for catching touch events and forwarding them to receiver for handling
-		setupOverlayPointListner();
+        setupOverlayPointListner();
 
-		return_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				returnLocation();
-			}
-		});
-
-		clear_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				currentMode = MODE_AUTO;
-                resetLocationPointAtCurrentPosition();
-			}
-		});
-
-        ImageButton layers_button = (ImageButton)findViewById(R.id.geopoint_layers_button);
-        layers_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showLayersDialog();
-			}
-		});
-
-        gps_button = (ImageButton)findViewById(R.id.geopoint_gps_button);
-        gps_button.setOnClickListener(new View.OnClickListener() {
+        save_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(final View v) {
-            	setGPSStatus();
+            public void onClick(View v) {
+                returnLocation();
             }
         });
 
-        mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
-        //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
-        mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
+        clear_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentMode = MODE_AUTO;
+                resetLocationPointAtCurrentPosition();
+            }
+        });
 
-        progress = new ProgressDialog(this);
-		progress.setTitle(getString(R.string.getting_location));
-		progress.setMessage(getString(R.string.please_wait_long));
+        ImageButton layers_button = (ImageButton) findViewById(R.id.geopoint_layers_button);
+        layers_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLayersDialog();
+            }
+        });
 
-		Intent intent = getIntent();
-		if (intent != null && intent.getExtras() != null) {
+        gps_button = (ImageButton) findViewById(R.id.geopoint_gps_button);
+        gps_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                setGPSStatus();
+            }
+        });
+
+        // Use a custom GpsLocationProvider for controlling dispatched LocationChange events basing on their location accuracy
+        // Controlling accracy is from XForm accuracyThreshold or, if null, from default as specified in GeoPointNewWidget.UNSET_LOCATION_ACCURACY
+        CustomGpsMyLocationProvider gpsLocationProvider = new CustomGpsMyLocationProvider(this);
+
+        mMyLocationOverlay = new MyLocationNewOverlay(this, gpsLocationProvider, mapView);
+
+
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            //Retrieve target accuracy from calling intent (GeopointNewWidget)ACCURACY_THRESHOLD
+            if ( intent.hasExtra(GeoPointNewWidget.ACCURACY_THRESHOLD) ) {
+                targetAccuracy = intent.getDoubleExtra(GeoPointNewWidget.ACCURACY_THRESHOLD, GeoPointNewWidget.UNSET_LOCATION_ACCURACY);
+            }
 			if ( intent.hasExtra(GeoPointNewWidget.POINT_LOCATION) ) {
 				data_loaded = true;
 				String s = intent.getStringExtra(GeoPointNewWidget.POINT_LOCATION);
-                // TODO: restore this logic but for Point
 				overlayIntentPoint(s);
 				zoomToCentroid();
 			}
@@ -242,11 +255,78 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 			}, 100);
 		}
 
-		setGPSStatus();
-		progress.show();
+        //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
+        mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
 
-	    mapView.invalidate();
+		this.setGPSStatus();
+
+        progress = new ProgressDialog(this);
+        // Ptogress dialog is shown just if user specified accuracyThreshold in their XForm
+        if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY ) {
+            progress.setTitle(getString(R.string.getting_location));
+            progress.setMessage(buildProgressMessage(mMyLocationOverlay, targetAccuracy));
+            progress.show();
+        }
+
+        // Set TextView for informin about current accuracy
+        this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider());
+
+        mapView.invalidate();
 	}
+
+    /**
+     * Set the drawable for che locationMarker
+     * @param icon
+     */
+    private void setCurrentMarkerIcon(Drawable icon) {
+        locationMarkerIcon = icon;
+    }
+
+    /**
+     * Update text view "textViewTargetAccuracy" with current GPS Accuracy
+     * @param customGpsLocationProvider
+     */
+    protected void updateTextViewTargetAccuracy(CustomGpsMyLocationProvider customGpsLocationProvider) {
+        CustomGpsMyLocationProvider cGPSLP = ((CustomGpsMyLocationProvider) customGpsLocationProvider);
+        if(targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+            textViewTargetAccuracy.setTextColor(Color.rgb(54,120,0));
+            textViewTargetAccuracy.setText(
+                    "Current GPS Accuracy: " + cGPSLP.getCurrentAccuracyAsIntString() + " m");
+
+        } else { // User asked for a specific accuracyThreshold
+            if(cGPSLP.getCurrentAccuracy() <= targetAccuracy) {
+                // Accuracy is good: use green
+                textViewTargetAccuracy.setTextColor(Color.rgb(54, 120, 0));
+            } else {
+                // Accuracy is bad: use red
+                textViewTargetAccuracy.setTextColor(Color.rgb(230, 0, 0));
+            }
+            textViewTargetAccuracy.setText(
+                    "GPS Accuracy\nfor fix is: " + Double.toString(targetAccuracy) + " m" +
+                    "\nCurrent is: " + cGPSLP.getCurrentAccuracyAsIntString() + " m");
+        }
+    }
+
+    /**
+     * Create the message to keep updated the progress dialgo while ser is  waiting for icreasing GPS accuracy
+     * @param mMyLocationOverlay
+     * @param targetAccuracy
+     * @return String message
+     */
+    private String buildProgressMessage(MyLocationNewOverlay mMyLocationOverlay, double targetAccuracy) {
+
+        String message = "";
+        String accuracyString = ((CustomGpsMyLocationProvider) mMyLocationOverlay.getMyLocationProvider()).getCurrentAccuracyAsIntString();
+        if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+            message = "Target Accuracy: " + Double.toString(targetAccuracy) + " m\n" +
+                    "Current Accuracy: " + accuracyString + " m\n" +
+                    //getString(R.string.please_wait_long);
+                    "\n >> Wait for automatic capture.\n >> Tap ouside dialog for manual.";
+        } else {
+            message = "Current Accuracy: " + accuracyString + " m";
+        }
+        return message;
+    }
 
     /*
 	private void buildPolygon(){
@@ -343,8 +423,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
     /**
-     * This runnable performs zooming to location and dismisses progress dialog
-     * and is run just on first fix hence takes care if locationMarker already exists from savedInstanceState
+     * This runnable performs zooming to location and is run just on first fix hence
+     * checks if locationMarker already exists from savedInstanceState
      */
     private Runnable centerAroundFixAndDisplayLocMarker = new Runnable() {
         public void run() {
@@ -359,7 +439,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                         //LocationMarker is already on map from SavedInstanceState so:
 						refreshClearButtonVisibility();
                     }
-                    progress.dismiss();
                 }
             });
         }
@@ -376,7 +455,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		locationMarker = new Marker(mapView);
 		locationMarker.setPosition(point);
 		locationMarker.setDraggable(true);
-		locationMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+		locationMarker.setIcon(locationMarkerIcon);
 		locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 		locationMarker.setOnMarkerDragListener(draglistner);
 		mapView.getOverlays().add(locationMarker);
@@ -550,17 +629,42 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
 
     /**
-     * Retrunrs a string in the form of "45.932 9.245 0.0 0.0" - without any other trailin or leading char.
+     * Using the locationMarker as source of data, this method builds and retrunrs a string in the form of
+     * "45.932 9.245 0.0 0.0" - without any other trailin or leading char.
+     * Returns null if no locationMarcker exists or if user asked for specific accuracyThreshold but this not met by current GPS fix
      * @return String
      */
 	private String generateReturnString() {
-		String temp_string = "";
-        String lat = Double.toString(locationMarker.getPosition().getLatitude());
-        String lng = Double.toString(locationMarker.getPosition().getLongitude());
-        String alt ="0.0";
-        String acu = "0.0";
-        temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu;
-		return temp_string;
+        if (locationMarker != null) {
+            double currentAccuracy = ((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider()).getCurrentAccuracy();
+            String temp_string = "";
+            // User did not ask for a specific accuracyThreshold: return data from locationMarker
+            if(targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                String lat = Double.toString(locationMarker.getPosition().getLatitude());
+                String lng = Double.toString(locationMarker.getPosition().getLongitude());
+                String alt = "0.0";
+                String acu = "0.0";
+                temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
+            } else
+            // User asked for a specific accuracyThreshold
+            {
+                // Accuracy is good
+                if (currentAccuracy <= targetAccuracy) {
+                    String lat = Double.toString(locationMarker.getPosition().getLatitude());
+                    String lng = Double.toString(locationMarker.getPosition().getLongitude());
+                    String alt = "0.0";
+                    String acu = "0.0";
+                    temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
+                } else
+                // Accuracy is not enough
+                {
+                    return null;
+                }
+            }
+            return temp_string;
+        } else {
+            return null;
+        }
 	}
 
     /**
@@ -816,5 +920,99 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         mapView.invalidate();
 
     }
+
+
+
+    /**
+     * Build a Custom GpsMyLocationProvider to catch location changes that do not satisfy
+     * required positioning accuracy
+     */
+    class CustomGpsMyLocationProvider extends GpsMyLocationProvider {
+
+        Context context;
+        double currentAccuracy = 500.0;
+
+        public CustomGpsMyLocationProvider(android.content.Context context) {
+            super(context);
+            this.context = context;
+        }
+        /**
+         * Return accuracy of last location change
+         * @return double Accuracy
+         */
+        public double getCurrentAccuracy() {
+            return currentAccuracy;
+        }
+
+        /**
+         * Returns current accuracy, usually a very long double like 39.7748394399,
+         * as something like "39.0"
+         * @return
+         */
+        public String getCurrentAccuracyAsIntString() {
+            int accInt = (int) (this.getCurrentAccuracy() + 0.5);
+            String accuracyString = Integer.toString(accInt) + ".0";
+            return accuracyString;
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            //GeoPointNewWidget.UNSET_LOCATION_ACCURACY
+            if (location != null) {
+
+                // Update accuracy
+                currentAccuracy = location.getAccuracy();
+
+                // User requested a specific accuracyThreshold in his XForm
+                if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                    // Catch location changes that have not user desired accuracy
+                    if (location.getAccuracy() <= targetAccuracy) {
+                        // Use GREEN marker: current accuracy is equal/lower than minimum expected
+                        locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker);
+                        setCurrentMarkerIcon(locationMarkerIcon);
+                        if (progress.isShowing()) {
+                            progress.dismiss();
+                        }
+                        InfoLogger.geolog("GeoPointMapNewActivity: " + System.currentTimeMillis() + " onLocationChanged" + " acc: " + location.getAccuracy());
+                    } else {
+                        // Use RED marker
+                        locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker_red);
+                        setCurrentMarkerIcon(locationMarkerIcon);
+                        // If location accuracy is not enough eventually udate progress dialog, log event
+                        if (progress.isShowing()) {
+                            String message = ((GeoPointMapNewActivity) this.context).buildProgressMessage(((GeoPointMapNewActivity) this.context).mMyLocationOverlay, targetAccuracy);
+                            progress.setMessage(message);
+                        }
+                        InfoLogger.geolog("GeoPointMapNewActivity: " + System.currentTimeMillis() + " onLocationChanged" + " acc: " + location.getAccuracy());
+                    }
+
+                    // In case of Automatic mode locationMarker placement
+                    if (((GeoPointMapNewActivity) this.context).currentMode == GeoPointMapNewActivity.MODE_AUTO)
+                        ((GeoPointMapNewActivity) this.context).repositionLocationMarkerAt(new GeoPoint(location.getLatitude(), location.getLongitude()));
+
+                }
+                // User did not request for a specific accuracyThreshold in his XForm
+                else {
+                    // Use GREEN marker
+                    locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker);
+                    setCurrentMarkerIcon(locationMarkerIcon);
+                    InfoLogger.geolog("GeoPointMapNewActivity: " + System.currentTimeMillis() + " onLocationChanged" + " acc: " + location.getAccuracy());
+                }
+
+                // Update text view, placed at top of Map, for displaying current GPS accuracy
+                ((GeoPointMapNewActivity) context).updateTextViewTargetAccuracy(this);
+
+                // Whatever accuracy is, forward event: this will trgger also
+                // mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
+                super.onLocationChanged(location);
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+            super.onStatusChanged(provider, status, extras);
+        }
+    }
+
 
 }
