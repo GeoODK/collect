@@ -69,16 +69,13 @@ import java.util.List;
 
 public class GeoPointMapNewActivity extends Activity implements IRegisterReceiver {
 	private MapView mapView;
-	private ArrayList<Marker> map_markers = new ArrayList<>();
 	//private PathOverlay pathOverlay; // Holds the line connecting markers
 	private ITileSource baseTiles;
 	public DefaultResourceProxyImpl resource_proxy;
 	public int zoom_level = 3;
 	public static final int stroke_width = 5;
 	public String final_return_string;
-	private MapEventsOverlay OverlayEventos;
-	private boolean polygon_connection = false;
-	private boolean clear_button_test = false;
+	private MapEventsOverlay overlayEventos;
 	private ImageButton clear_button;
 	private ImageButton return_button;
 	private ImageButton polygon_button;
@@ -91,12 +88,16 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	private TilesOverlay mbTileOverlay;
 	public Boolean gpsStatus = true;
 	private ImageButton gps_button;
-	private String[] OffilineOverlays;
+	private String[] offilineOverlays;
 	public MyLocationNewOverlay mMyLocationOverlay;
 	public Boolean data_loaded = false;
 
     public final String LOCATION_MARKER_LAT = "LOCATION_MARKER_LAT";
     public final String LOCATION_MARKER_LON = "LOCATION_MARKER_LON";
+	public final String CURRENT_MODE = "CURRENT_MODE";
+	public final String MODE_MANUAL = "MANUAL";
+	public final String MODE_AUTO = "AUTO";
+	public String currentMode = MODE_AUTO;
 	public Marker locationMarker;
 
 	@Override
@@ -111,12 +112,13 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
     @Override
      public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save the user's current locationMarker
+        // Save the user's current locationMarker if any
         if (locationMarker != null){
             double lat = locationMarker.getPosition().getLatitude();
             double lon = locationMarker.getPosition().getLongitude();
             savedInstanceState.putDouble(LOCATION_MARKER_LAT, lat);
             savedInstanceState.putDouble(LOCATION_MARKER_LON, lon);
+			savedInstanceState.putCharSequence(CURRENT_MODE, currentMode);
         }
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
@@ -140,11 +142,9 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		/*
-			Setting Content  & initiating the main button id
-			for the activity
 
-		  */
+		//Setting Content  & initiating the main button id for the activity
+
 		setContentView(R.layout.geopointmapnew_layout);
 		setTitle(getString(R.string.geopoint_title)); // Setting title of the action
 		return_button = (ImageButton) findViewById(R.id.geopoint_button);
@@ -153,10 +153,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         polygon_button.setVisibility(View.GONE);
 		clear_button = (ImageButton) findViewById(R.id.clear_button);
 
-		/*
-			Defining the System prefereces from the mapSetting
-
-		  */
+		//Defining the System prefereces from the mapSetting
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
@@ -174,14 +171,16 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
         // Use eventual data from saved state to restore position of marker
         if (savedInstanceState != null) {
-            // Restore value of members from saved state
             double lat = savedInstanceState.getDouble(LOCATION_MARKER_LAT);
             double lon = savedInstanceState.getDouble(LOCATION_MARKER_LON);
+			currentMode = savedInstanceState.getString(CURRENT_MODE);
+            refreshClearButtonVisibility();
             GeoPoint point = new GeoPoint(lat, lon);
             repositionLocationMarkerAt(point);
         }
 
-		overlayPointPathListner();
+        // Register a listener for catching touch events and forwarding them to receiver for handling
+		setupOverlayPointListner();
 
 		return_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -189,34 +188,15 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 				returnLocation();
 			}
 		});
-        /*
-		polygon_button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				//buildPolygon();
-			}
-		});
-		*/
+
 		clear_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				currentMode = MODE_AUTO;
                 resetLocationPointAtCurrentPosition();
-                /*
-				if (map_markers.size() != 0){
-					if (polygon_connection){
-						clearFeatures();
-						showClearDialog();
-					}else{
-						Marker c_mark = map_markers.get(map_markers.size()-1);
-						mapView.getOverlays().remove(c_mark);
-						map_markers.remove(map_markers.size() - 1);
-						update_polygon();
-						mapView.invalidate();
-					}
-				}
-				*/
 			}
 		});
+
         ImageButton layers_button = (ImageButton)findViewById(R.id.geopoint_layers_button);
         layers_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -233,15 +213,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             }
         });
 
-		/*
-        GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
-        imlp.setLocationUpdateMinDistance(1000);
-        imlp.setLocationUpdateMinTime(60000);
-        */
-
         mMyLocationOverlay = new MyLocationNewOverlay(this, mapView);
-        //Sets executing a runnable for zooming to location and dismissing progress dialog
-        // on first fix.
+        //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
         mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
 
         progress = new ProgressDialog(this);
@@ -254,10 +227,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 				data_loaded = true;
 				String s = intent.getStringExtra(GeoPointNewWidget.POINT_LOCATION);
                 // TODO: restore this logic but for Point
-                /*
-				overlayIntentPolygon(s);
+				overlayIntentPoint(s);
 				zoomToCentroid();
-				*/
 			}
 		}else{
 			final Handler handler = new Handler();
@@ -288,7 +259,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 				mapView.invalidate();
 				polygon_connection= true;
 				polygon_button.setVisibility(View.GONE);
-				mapView.getOverlays().remove(OverlayEventos);
+				mapView.getOverlays().remove(overlayEventos);
 			}else{
 				showPolyonErrorDialog();
 			}
@@ -296,7 +267,31 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
     */
 
+    /**
+     * Pareses a GeoPoint string representation back to a GeoPoint then to a Marker for finally adding the latter to MapView
+     * @param geoPointAsString
+     */
+    private void overlayIntentPoint(String geoPointAsString) {
+        String[] sp = geoPointAsString.split(" ");
+        double gp[] = new double[4];
+        String lat = sp[0].replace(" ", "");
+        String lng = sp[1].replace(" ", "");
+        gp[0] = Double.parseDouble(lat);
+        gp[1] = Double.parseDouble(lng);
+        GeoPoint point = new GeoPoint(gp[0], gp[1]);
+        currentMode = MODE_MANUAL;
+        refreshClearButtonVisibility();
+        repositionLocationMarkerAt(point);
+        /*
+        locationMarker.setPosition(point);
+        locationMarker.setDraggable(true);
+        locationMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
+        locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        locationMarker.setOnMarkerClickListener(nullmarkerlistner);
+        */
+    }
 
+    /*
 	private void overlayIntentPolygon(String str){
 		clear_button.setVisibility(View.VISIBLE);
 		clear_button_test = true;
@@ -325,8 +320,9 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 			mapView.getOverlays().add(marker);
 		}
 		//buildPolygon();
-		mapView.getOverlays().remove(OverlayEventos);
+		mapView.getOverlays().remove(overlayEventos);
 	}
+    */
 
     /**
      * Depending on gpsStatus var, change gps-button icon
@@ -336,8 +332,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         if(gpsStatus == false){
             gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
             upMyLocationOverlayLayers();
-            //enableMyLocation();
-			//zoomToMyLocation();
             gpsStatus = true;
         }else{
             gps_button.setImageResource(R.drawable.ic_menu_mylocation);
@@ -358,10 +352,12 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                 public void run() {
 					zoomToMyLocation();
                     if (locationMarker == null) {
+                        currentMode = MODE_AUTO;
+                        refreshClearButtonVisibility();
                         resetLocationPointAtCurrentPosition();
                     } else {
                         //LocationMarker is already on map from SavedInstanceState so:
-                        clear_button.setVisibility(View.VISIBLE);
+						refreshClearButtonVisibility();
                     }
                     progress.dismiss();
                 }
@@ -369,25 +365,21 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         }
     };
 
+
 	/**
 	 * Put the LocationMarker on map at provided GeoPoint:
 	 * the marker that holds the location that will be used to define the GeoPoint
+     * @param GeoPoint point
 	 */
 	private void repositionLocationMarkerAt(GeoPoint point){
-        //GeoPoint point = mMyLocationOverlay.getMyLocation();
         mapView.getOverlays().remove(locationMarker);
 		locationMarker = new Marker(mapView);
 		locationMarker.setPosition(point);
 		locationMarker.setDraggable(true);
 		locationMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
 		locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-		//locationMarker.setOnMarkerClickListener(nullmarkerlistner);
-        // TODO : following line is useless since there is no neet to keep track of multiple markers
-		map_markers.add(locationMarker);
-		//locationMarker.setDraggable(true);
 		locationMarker.setOnMarkerDragListener(draglistner);
 		mapView.getOverlays().add(locationMarker);
-		//pathOverlay.addPoint(marker.getPosition());
 		mapView.invalidate();
 	}
 
@@ -493,18 +485,21 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		finish();
 	}
 
-
-	private void overlayPointPathListner(){
-		OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceiver);
+    /**
+     * Create a MapEventOverlay and add it to MapView,
+     * defining a receiver of the caught events
+     */
+	private void setupOverlayPointListner(){
+		overlayEventos = new MapEventsOverlay(getBaseContext(), mReceiver);
 		//pathOverlay= new PathOverlay(Color.RED, this);
 		//Paint pPaint = pathOverlay.getPaint();
 	    //pPaint.setStrokeWidth(stroke_width);
 	    //mapView.getOverlays().add(pathOverlay);
-		mapView.getOverlays().add(OverlayEventos);
+		mapView.getOverlays().add(overlayEventos);
 		mapView.invalidate();
 	}
 
-
+    /*
 	private void clearFeatures(){
 		polygon_connection = false;
 		clear_button_test = false;
@@ -518,13 +513,13 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 			upMyLocationOverlayLayers();
 
 		}
-		overlayPointPathListner();
+		setupOverlayPointListner();
 
 		mapView.invalidate();
-
 	}
+	*/
 
-
+    /*
 	private void showClearDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Polygon already created. Would you like to CLEAR the feature?")
@@ -540,37 +535,38 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
                    }
                }).show();
-
 	}
+    */
+
+
 	private void showPolyonErrorDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Must have at least 3 points to create Polygon")
                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                       // FIRE ZE MISSILES!
                 }
                }).show();
 
 	}
+
+    /**
+     * Retrunrs a string in the form of "45.932 9.245 0.0 0.0" - without any other trailin or leading char.
+     * @return String
+     */
 	private String generateReturnString() {
 		String temp_string = "";
-        /*
-		for (int i = 0 ; i < map_markers.size();i++){
-			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
-			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
-			String alt ="0.0";
-			String acu = "0.0";
-			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
-		}
-		*/
         String lat = Double.toString(locationMarker.getPosition().getLatitude());
         String lng = Double.toString(locationMarker.getPosition().getLongitude());
         String alt ="0.0";
         String acu = "0.0";
-        temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
+        temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu;
 		return temp_string;
 	}
 
+    /**
+     * Finishes the current Activity by returning the acquired GeoPoint in te for of a string,
+     * as created by <@link>generateReturnString()</@link> method.
+     */
     private void returnLocation(){
     		final_return_string = generateReturnString();
             Intent i = new Intent();
@@ -591,31 +587,16 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
 	*/
 
-
+    /**
+     * This event receiver handles long-presses on Map and fires placing of LocationMarker
+     * as well as setting of marker mode placement to MANUAL and clear_button visibility refresh.
+     */
     private MapEventsReceiver mReceiver = new MapEventsReceiver() {
         @Override
         public boolean longPressHelper(GeoPoint point) {
-            //Toast.makeText(GeoShapeActivity.this, point.getLatitude()+" ", Toast.LENGTH_LONG).show();
-            //map_points.add(point);
-            //if (!clear_button_test){
-            //    clear_button.setVisibility(View.VISIBLE);
-            //    clear_button_test = true;
-            //}
-            clear_button.setVisibility(View.VISIBLE);
+			currentMode = MODE_MANUAL;
+			refreshClearButtonVisibility();
             repositionLocationMarkerAt(point);
-            /*
-            Marker marker = new Marker(mapView);
-            marker.setPosition(point);
-            marker.setDraggable(true);
-            marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setOnMarkerClickListener(nullmarkerlistner);
-            marker.setOnMarkerDragListener(draglistner);
-            map_markers.add(marker);
-            mapView.getOverlays().add(marker);
-            //pathOverlay.addPoint(marker.getPosition());
-            mapView.invalidate();
-            */
             return false;
         }
 
@@ -626,7 +607,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     };
 
     /**
-     * This listener retrieves zoom levelew
+     * This listener retrieves zoom levelew and sotres it in zom_level field
      */
 	private MapListener mapViewListner = new MapListener() {
 		@Override
@@ -638,33 +619,45 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		public boolean onScroll(ScrollEvent arg0) {
 			return false;
 		}
-
 	};
 
+    /**
+     * This Listener handles map marker dragging event, setting marker placement to MANUAL
+     * and refresching clear_button visibility.
+     */
 	private OnMarkerDragListener draglistner = new OnMarkerDragListener() {
 		@Override
-		public void onMarkerDragStart(Marker marker) {
-
-		}
+		public void onMarkerDragStart(Marker marker) {}
 		@Override
 		public void onMarkerDragEnd(Marker marker) {
-			//update_polygon();
-            clear_button.setVisibility(View.VISIBLE);
+			currentMode = MODE_MANUAL;
+			refreshClearButtonVisibility();
 		}
 		@Override
-		public void onMarkerDrag(Marker marker) {
-			//update_polygon();
-		}
+		public void onMarkerDrag(Marker marker) {}
 	};
+
+	/**
+	 * Refresh visibility of clear_button depending on current point placement mode:
+	 *  AUTO = from GPS
+	 *  MANUAL = from map-LongPress or Marker Drag
+	 */
+	private void refreshClearButtonVisibility() {
+		if (currentMode == MODE_AUTO) {
+			clear_button.setVisibility(View.GONE);
+		} else if ( currentMode == MODE_MANUAL) {
+			clear_button.setVisibility(View.VISIBLE);
+		}
+	}
 
 	private void showLayersDialog() {
 		//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
 		//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		alertDialog.setTitle("Select Offline Layer");
-		OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
+		offilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
 		//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
-		alertDialog.setSingleChoiceItems(OffilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
+		alertDialog.setSingleChoiceItems(offilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
                public void onClick(DialogInterface dialog, int item) {
             	   //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
                   // The 'which' argument contains the index position
@@ -746,7 +739,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	}
 
 	private String getMBTileFromItem(int item) {
-		String foldername = OffilineOverlays[item];
+		String foldername = offilineOverlays[item];
 		File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
 		String mbtilePath;
 		File[] files = dir.listFiles(new FilenameFilter() {
@@ -779,49 +772,49 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		return finala;
 	}
 
-	    private OnMarkerClickListener nullmarkerlistner= new OnMarkerClickListener() {
-			
-			@Override
-			public boolean onMarkerClick(Marker arg0, MapView arg1) {
-				return false;
-			}
-		};
-		
-		private void zoomToCentroid(){
+    private OnMarkerClickListener nullmarkerlistner= new OnMarkerClickListener() {
 
-			/*
-				Calculate Centroid of Polygon
+        @Override
+        public boolean onMarkerClick(Marker arg0, MapView arg1) {
+            return false;
+        }
+    };
 
-			 */
+    private void zoomToCentroid(){
 
-			//----- This should be hard coded but based on the extent of the points
-			mapView.getController().setZoom(15);
-			//-----
+        //Calculate Centroid of between current location and current LocationMarker
 
-			mapView.invalidate();
-			Handler handler=new Handler();
-			Runnable r = new Runnable(){
-			    public void run() {
-					Integer size  = map_markers.size();
-					Double x_value = 0.0;
-					Double y_value = 0.0;
-					for(int i=0; i<size; i++){
-						GeoPoint temp_marker = map_markers.get(i).getPosition();
-						Double x_marker = temp_marker.getLatitude();
-						Double y_marker = temp_marker.getLongitude();
-						x_value += x_marker;
-						y_value += y_marker;
-					}
-					Double x_cord = x_value/size;
-					Double y_cord = y_value/size;
-					GeoPoint centroid = new GeoPoint(x_cord,y_cord);
-			    	mapView.getController().setCenter(centroid);
-			    }
-			};
-			handler.post(r);
-			mapView.invalidate();
-			
-		}
+        //----- This should be hard coded but based on the extent of the points
+        mapView.getController().setZoom(15);
+        //-----
 
-	
+        mapView.invalidate();
+        Handler handler=new Handler();
+        Runnable r = new Runnable(){
+            public void run() {
+                double x_value = 0.0;
+                double y_value = 0.0;
+                GeoPoint lmPoint = locationMarker.getPosition();
+                double x_marker = lmPoint.getLatitude();
+                double y_marker = lmPoint.getLongitude();
+                x_value += x_marker;
+                y_value += y_marker;
+                GeoPoint currentLocationPoint = mMyLocationOverlay.getMyLocation();
+                if (currentLocationPoint != null) {
+                    double x_marker2 = currentLocationPoint.getLatitude();
+                    double y_marker2 = currentLocationPoint.getLongitude();
+                    x_value += x_marker2;
+                    y_value += y_marker2;
+                    x_value = x_value / 2;
+                    y_value = y_value / 2;
+                }
+                GeoPoint centroid = new GeoPoint(x_value,y_value);
+                mapView.getController().setCenter(centroid);
+            }
+        };
+        handler.post(r);
+        mapView.invalidate();
+
+    }
+
 }
