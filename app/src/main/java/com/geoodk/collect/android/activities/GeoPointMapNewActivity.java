@@ -39,6 +39,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
@@ -106,6 +107,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	public Marker locationMarker;
     public TextView textViewTargetAccuracy;
     private Drawable locationMarkerIcon;
+    public Drawable markerRed;
+    public Drawable markerGreen;
 
     @Override
 	protected void onResume() {
@@ -179,6 +182,11 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         mapView.getController().setZoom(zoom_level);
         mapView.setMapListener(mapViewListner);
 
+        // Set default icon for locationMarker
+        locationMarkerIcon = getResources().getDrawable(R.drawable.map_marker);
+        markerRed = getResources().getDrawable(R.drawable.map_marker_red);
+        markerGreen = getResources().getDrawable(R.drawable.map_marker);
+
         // Use eventual data from saved state to restore position of marker
         if (savedInstanceState != null) {
             double lat = savedInstanceState.getDouble(LOCATION_MARKER_LAT);
@@ -197,14 +205,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             @Override
             public void onClick(View v) {
                 returnLocation();
-            }
-        });
-
-        clear_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                currentMode = MODE_AUTO;
-                resetLocationPointAtCurrentPosition();
             }
         });
 
@@ -260,6 +260,19 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
 		this.setGPSStatus();
 
+        clear_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // If no accuracyThreshold is set, fire plain clearing point logic
+                if (targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY ) {
+                    currentMode = MODE_AUTO;
+                    resetLocationPointAtCurrentPosition();
+                } else {
+                    showClearDialog();
+                }
+            }
+        });
+
         progress = new ProgressDialog(this);
         // Ptogress dialog is shown just if user specified accuracyThreshold in their XForm
         if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY ) {
@@ -302,8 +315,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                 textViewTargetAccuracy.setTextColor(Color.rgb(230, 0, 0));
             }
             textViewTargetAccuracy.setText(
-                    "GPS Accuracy\nfor fix is: " + Double.toString(targetAccuracy) + " m" +
-                    "\nCurrent is: " + cGPSLP.getCurrentAccuracyAsIntString() + " m");
+                    "Target GPS accuracy: " + Double.toString(targetAccuracy) + " m" +
+                    "\nCurrent GPS accuracy: " + cGPSLP.getCurrentAccuracyAsIntString() + " m");
         }
     }
 
@@ -328,25 +341,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         return message;
     }
 
-    /*
-	private void buildPolygon(){
-		if (polygon_connection){
-			showClearDialog();
-		}else{
-			if (map_markers.size()>2){
-				map_markers.add(map_markers.get(0));
-				//pathOverlay.addPoint(map_markers.get(0).getPosition());
-				mapView.invalidate();
-				polygon_connection= true;
-				polygon_button.setVisibility(View.GONE);
-				mapView.getOverlays().remove(overlayEventos);
-			}else{
-				showPolyonErrorDialog();
-			}
-		}
-	}
-    */
-
     /**
      * Pareses a GeoPoint string representation back to a GeoPoint then to a Marker for finally adding the latter to MapView
      * @param geoPointAsString
@@ -362,47 +356,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         currentMode = MODE_MANUAL;
         refreshClearButtonVisibility();
         repositionLocationMarkerAt(point);
-        /*
-        locationMarker.setPosition(point);
-        locationMarker.setDraggable(true);
-        locationMarker.setIcon(getResources().getDrawable(R.drawable.map_marker));
-        locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        locationMarker.setOnMarkerClickListener(nullmarkerlistner);
-        */
-    }
-
-    /*
-	private void overlayIntentPolygon(String str){
-		clear_button.setVisibility(View.VISIBLE);
-		clear_button_test = true;
-		String s = str.replace("; ",";");
-		String[] sa = s.split(";");
-		for (int i=0;i<(sa.length -1);i++){
-			String[] sp = sa[i].split(" ");
-			double gp[] = new double[4];
-			String lat = sp[0].replace(" ", "");
-			String lng = sp[1].replace(" ", "");
-            gp[0] = Double.parseDouble(lat);
-            gp[1] = Double.parseDouble(lng);
-//			gp[0] = Double.valueOf(lat).doubleValue();
-//			gp[1] = Double.valueOf(lng).doubleValue();
-			Marker marker = new Marker(mapView);
-			GeoPoint point = new GeoPoint(gp[0], gp[1]);
-			marker.setPosition(point);
-			marker.setDraggable(true);
-			marker.setIcon(getResources().getDrawable(R.drawable.map_marker));
-			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-			marker.setOnMarkerClickListener(nullmarkerlistner);
-			map_markers.add(marker);
-			//pathOverlay.addPoint(marker.getPosition());
-			marker.setDraggable(true);
-			marker.setOnMarkerDragListener(draglistner);
-			mapView.getOverlays().add(marker);
-		}
-		//buildPolygon();
-		mapView.getOverlays().remove(overlayEventos);
-	}
-    */
+     }
 
     /**
      * Depending on gpsStatus var, change gps-button icon
@@ -447,18 +401,23 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
 	/**
 	 * Put the LocationMarker on map at provided GeoPoint:
-	 * the marker that holds the location that will be used to define the GeoPoint
+	 * the marker that holds the location that will be used to define the GeoPoint.
+     * If a null point is provided, just last LocationMareker is delted but no new is created.
      * @param GeoPoint point
 	 */
 	private void repositionLocationMarkerAt(GeoPoint point){
         mapView.getOverlays().remove(locationMarker);
-		locationMarker = new Marker(mapView);
-		locationMarker.setPosition(point);
-		locationMarker.setDraggable(true);
-		locationMarker.setIcon(locationMarkerIcon);
-		locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-		locationMarker.setOnMarkerDragListener(draglistner);
-		mapView.getOverlays().add(locationMarker);
+        if (point != null) {
+            locationMarker = new Marker(mapView);
+            locationMarker.setPosition(point);
+            locationMarker.setDraggable(true);
+            locationMarker.setIcon(locationMarkerIcon);
+            locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            locationMarker.setOnMarkerDragListener(draglistner);
+            mapView.getOverlays().add(locationMarker);
+        } else {
+            Toast.makeText(this, "No GPS position to use for new Marker!",Toast.LENGTH_LONG).show();
+        }
 		mapView.invalidate();
 	}
 
@@ -470,10 +429,17 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
      * - hiding the clear_button (if vsible)
      */
     private void resetLocationPointAtCurrentPosition() {
+        // Attempt to reset to current location
         GeoPoint point = mMyLocationOverlay.getMyLocation();
         if (point == null) {
+            // Since no current location exist, attempt with last known location
             Location location = mMyLocationOverlay.getLastFix();
-            point = new GeoPoint(location.getLatitude(), location.getLongitude());
+            if (location != null) {
+                point = new GeoPoint(location.getLatitude(), location.getLongitude());
+            } else {
+                // Since no current nor last-know location exist, default to nowhere!
+                point = null;
+            }
         }
         repositionLocationMarkerAt(point);
         clear_button.setVisibility(View.GONE);
@@ -570,63 +536,31 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
      */
 	private void setupOverlayPointListner(){
 		overlayEventos = new MapEventsOverlay(getBaseContext(), mReceiver);
-		//pathOverlay= new PathOverlay(Color.RED, this);
-		//Paint pPaint = pathOverlay.getPaint();
-	    //pPaint.setStrokeWidth(stroke_width);
-	    //mapView.getOverlays().add(pathOverlay);
 		mapView.getOverlays().add(overlayEventos);
 		mapView.invalidate();
 	}
 
-    /*
-	private void clearFeatures(){
-		polygon_connection = false;
-		clear_button_test = false;
-		map_markers.clear();
-		//pathOverlay.clearPath();
-		mapView.getOverlays().clear();
-		//clearMarkersOverlay();
-		polygon_button.setVisibility(View.VISIBLE);
-		clear_button.setVisibility(View.GONE);
-		if(gpsStatus){
-			upMyLocationOverlayLayers();
 
-		}
-		setupOverlayPointListner();
-
-		mapView.invalidate();
-	}
-	*/
-
-    /*
+    /**
+     * Clear High-accuracy point.
+     * The method is used just when accuracyThreshold is set in user XForm.
+     */
 	private void showClearDialog(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Polygon already created. Would you like to CLEAR the feature?")
+        builder.setMessage("High-Accuracy GPS point already created. Would you like to CLEAR the feature?")
                .setPositiveButton("CLEAR", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
-                       // FIRE ZE MISSILES!
-                	   clearFeatures();
+                       currentMode = MODE_AUTO;
+                       resetLocationPointAtCurrentPosition();
                    }
                })
                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // User cancelled the dialog
-
                    }
                }).show();
 	}
-    */
 
-
-	private void showPolyonErrorDialog(){
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Must have at least 3 points to create Polygon")
-               .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                }
-               }).show();
-
-	}
 
     /**
      * Using the locationMarker as source of data, this method builds and retrunrs a string in the form of
@@ -638,7 +572,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         if (locationMarker != null) {
             double currentAccuracy = ((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider()).getCurrentAccuracy();
             String temp_string = "";
-            // User did not ask for a specific accuracyThreshold: return data from locationMarker
+            // User did not ask for a specific accuracyThreshold: return any data from locationMarker
             if(targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
                 String lat = Double.toString(locationMarker.getPosition().getLatitude());
                 String lng = Double.toString(locationMarker.getPosition().getLongitude());
@@ -648,6 +582,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             } else
             // User asked for a specific accuracyThreshold
             {
+                //ENABLE MANUAL MODE WITH accuracyThreshold
+                /*
                 // Accuracy is good
                 if (currentAccuracy <= targetAccuracy) {
                     String lat = Double.toString(locationMarker.getPosition().getLatitude());
@@ -658,6 +594,19 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                 } else
                 // Accuracy is not enough
                 {
+                    return null;
+                }
+                */
+
+                //DISABLE MANUAL MODE WITH accuracyThreshold
+                if (currentMode == MODE_AUTO) {
+                    String lat = Double.toString(locationMarker.getPosition().getLatitude());
+                    String lng = Double.toString(locationMarker.getPosition().getLongitude());
+                    String alt = "0.0";
+                    String acu = "0.0";
+                    temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
+                } else if (currentMode == MODE_MANUAL) {
+                    Toast.makeText(this, "Manual points cannot be created if accuracyThreshold is set!", Toast.LENGTH_LONG).show();
                     return null;
                 }
             }
@@ -681,16 +630,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         finish();
     }
 
-    /*
-	private void update_polygon(){
-		pathOverlay.clearPath();
-		for (int i =0;i<map_markers.size();i++){
-			pathOverlay.addPoint(map_markers.get(i).getPosition());
-		}
-		mapView.invalidate();
-	}
-	*/
-
     /**
      * This event receiver handles long-presses on Map and fires placing of LocationMarker
      * as well as setting of marker mode placement to MANUAL and clear_button visibility refresh.
@@ -698,10 +637,18 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     private MapEventsReceiver mReceiver = new MapEventsReceiver() {
         @Override
         public boolean longPressHelper(GeoPoint point) {
-			currentMode = MODE_MANUAL;
-			refreshClearButtonVisibility();
-            repositionLocationMarkerAt(point);
-            return false;
+            if (targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                currentMode = MODE_MANUAL;
+                refreshClearButtonVisibility();
+                repositionLocationMarkerAt(point);
+                return false;
+            }
+            //
+            else {
+                Toast.makeText(GeoPointMapNewActivity.this,
+                        "Manual points cannot be created if accuracyThreshold is set!", Toast.LENGTH_LONG).show();
+                return false;
+            }
         }
 
         @Override
@@ -725,20 +672,44 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		}
 	};
 
+    public GeoPoint locationMarkerBeforeDragPoint;
     /**
      * This Listener handles map marker dragging event, setting marker placement to MANUAL
      * and refresching clear_button visibility.
      */
 	private OnMarkerDragListener draglistner = new OnMarkerDragListener() {
 		@Override
-		public void onMarkerDragStart(Marker marker) {}
+		public void onMarkerDragStart(Marker marker) {
+            //Store orginal position of marker for restoring if manual mode is forbidden due to accuracyThreshold
+            locationMarkerBeforeDragPoint = locationMarker.getPosition();
+            if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                // If accuracyThreshold is set, make marker red as soon as is dragged
+                marker.setImage(markerRed);
+                mapView.invalidate();
+            }
+        }
 		@Override
 		public void onMarkerDragEnd(Marker marker) {
-			currentMode = MODE_MANUAL;
-			refreshClearButtonVisibility();
+            if (targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                // No accuracyThreshold : switch to manual mode
+                currentMode = MODE_MANUAL;
+                refreshClearButtonVisibility();
+            } else {
+                // accuracyThreshold is set : restore locatinMarcker at original position
+                GeoPointMapNewActivity.this.repositionLocationMarkerAt(locationMarkerBeforeDragPoint);
+                // Restore marker green color as it is restored at original location
+                locationMarker.setImage(markerGreen);
+                Toast.makeText(GeoPointMapNewActivity.this, "Manual points cannot be created if accuracyThreshold is set!", Toast.LENGTH_LONG).show();
+            }
 		}
 		@Override
-		public void onMarkerDrag(Marker marker) {}
+		public void onMarkerDrag(Marker marker) {
+            if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
+                // If accuracyThreshold is set, make marker red as soon as is dragged
+                marker.setImage(markerRed);
+                mapView.invalidate();
+            }
+        }
 	};
 
 	/**
@@ -763,10 +734,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
 		alertDialog.setSingleChoiceItems(offilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
                public void onClick(DialogInterface dialog, int item) {
-            	   //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
-                  // The 'which' argument contains the index position
-                   // of the selected item
-		           //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
 
 		            switch(item){
 		            case 0 :
@@ -968,7 +935,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                     // Catch location changes that have not user desired accuracy
                     if (location.getAccuracy() <= targetAccuracy) {
                         // Use GREEN marker: current accuracy is equal/lower than minimum expected
-                        locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker);
+                        locationMarkerIcon = markerGreen;
                         setCurrentMarkerIcon(locationMarkerIcon);
                         if (progress.isShowing()) {
                             progress.dismiss();
@@ -976,7 +943,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                         InfoLogger.geolog("GeoPointMapNewActivity: " + System.currentTimeMillis() + " onLocationChanged" + " acc: " + location.getAccuracy());
                     } else {
                         // Use RED marker
-                        locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker_red);
+                        locationMarkerIcon = markerRed;
                         setCurrentMarkerIcon(locationMarkerIcon);
                         // If location accuracy is not enough eventually udate progress dialog, log event
                         if (progress.isShowing()) {
@@ -994,7 +961,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                 // User did not request for a specific accuracyThreshold in his XForm
                 else {
                     // Use GREEN marker
-                    locationMarkerIcon = context.getResources().getDrawable(R.drawable.map_marker);
+                    locationMarkerIcon = markerGreen;
                     setCurrentMarkerIcon(locationMarkerIcon);
                     InfoLogger.geolog("GeoPointMapNewActivity: " + System.currentTimeMillis() + " onLocationChanged" + " acc: " + location.getAccuracy());
                 }
