@@ -141,19 +141,7 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 			return null;
 		} else {
 			try {
-<<<<<<< HEAD
-//				String[] sa = s.split(";");
-//				for (int i=0;i<sa.length;i++){
-//					String[] sp = sa[i].split(" ");
-//					double gp[] = new double[4];
-//					gp[0] = Double.parseDouble(sp[0]);
-//					gp[1] = Double.parseDouble(sp[1]);
-//					gp[2] = Double.parseDouble(sp[2]);
-//					gp[3] = Double.parseDouble(sp[3]);
-//					list.add(gp);
-//				}
 
-=======
 				String[] sa = s.split(";");
 				for (int i=0;i<sa.length;i++){
 					String[] sp = sa[i].trim().split(" ");
@@ -162,11 +150,11 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 					gp[1] = Double.valueOf(sp[1]).doubleValue();
 					gp[2] = Double.valueOf(sp[2]).doubleValue();
 					gp[3] = Double.valueOf(sp[3]).doubleValue();
-					list.add(gp);
+					//list.add(gp);
 				}
-				GeoShape shape = new GeoShape(list);
+				//GeoShape shape = new GeoShape(list);
 				//return new GeoShapeData(shape);
->>>>>>> master
+
 				return new StringData(s);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
