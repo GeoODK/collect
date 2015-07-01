@@ -20,19 +20,26 @@
 
 package com.geoodk.collect.android.activities;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
+import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.PathOverlay;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
 import com.geoodk.collect.android.widgets.GeoTraceWidget;
 import android.app.Activity;
@@ -62,6 +69,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -69,7 +77,7 @@ import java.util.concurrent.TimeUnit;
 
 
 
-public class GeoTraceActivity extends Activity {
+public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 	//private ScheduledFuture beeperHandle;
 	private ScheduledFuture schedulerHandler;
@@ -99,6 +107,12 @@ public class GeoTraceActivity extends Activity {
 	private	EditText time_number;
 	private Spinner time_units;
 	private Spinner time_delay;
+
+    private TilesOverlay mbTileOverlay;
+    private String[] OffilineOverlays;
+    public Boolean layerStatus = false;
+    private int selected_layer= -1;
+    private MBTileProvider mbprovider;
 	
 	@Override
 	protected void onStart() {
@@ -120,7 +134,6 @@ public class GeoTraceActivity extends Activity {
 		mapView.setTileSource(baseTiles);
 		mapView.setUseDataConnection(online);
 		setGPSStatus();
-		//mMyLocationOverlay.enableMyLocation();
 	}
 
 	@Override
@@ -182,6 +195,16 @@ public class GeoTraceActivity extends Activity {
 		});
         //progress.setCancelable(false);
         // To dismiss the dialog
+
+        ImageButton layers_button = (ImageButton)findViewById(R.id.geoShape_layers_button);
+        layers_button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                showLayersDialog();
+
+            }
+        });
 
         clear_button= (ImageButton) findViewById(R.id.geotrace_clear_button);
         clear_button.setOnClickListener(new View.OnClickListener() {
@@ -426,19 +449,19 @@ public class GeoTraceActivity extends Activity {
         alertDialogBuilder.setMessage(getString(R.string.enable_gps_message))
         .setCancelable(false)
         .setPositiveButton(getString(R.string.enable_gps),
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-               // Intent callGPSSettingIntent = new Intent(
-                startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-                //startActivity(callGPSSettingIntent);
-            }
-        });
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Intent callGPSSettingIntent = new Intent(
+                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                        //startActivity(callGPSSettingIntent);
+                    }
+                });
         alertDialogBuilder.setNegativeButton(getString(R.string.cancel),
-                new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int id){
-                dialog.cancel();
-            }
-        });
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
     }
@@ -452,10 +475,10 @@ public class GeoTraceActivity extends Activity {
 	        case R.id.trace_manual:
 	            if (checked){
 	            	TRACE_MODE = 0;
-	            	time_number.setVisibility(View.GONE);
+	            	//time_number.setVisibility(View.GONE);
 	            	time_units.setVisibility(View.GONE);
 					time_delay.setVisibility(View.GONE);
-	            	time_number.invalidate();
+	            	//time_number.invalidate();
 					time_delay.invalidate();
 	            	time_units.invalidate();
 	            }
@@ -497,11 +520,11 @@ public class GeoTraceActivity extends Activity {
 			   })
                .setOnCancelListener(new OnCancelListener() {
 
-				   @Override
-				   public void onCancel(DialogInterface dialog) {
-					   reset_trace_settings();
-				   }
-			   });
+                   @Override
+                   public void onCancel(DialogInterface dialog) {
+                       reset_trace_settings();
+                   }
+               });
  
     	
     	alert = builder.create();
@@ -718,4 +741,132 @@ public class GeoTraceActivity extends Activity {
 		}
 
 	} ;
+
+
+
+    private void showLayersDialog() {
+        //FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
+        //View view=fl.inflate(self, R.layout.showlayers_layout, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Select Offline Layer");
+        OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
+        //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
+        alertDialog.setSingleChoiceItems(OffilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
+                // The 'which' argument contains the index position
+                // of the selected item
+                //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
+
+                switch(item){
+                    case 0 :
+                        mapView.getOverlays().remove(mbTileOverlay);
+                        layerStatus =false;
+                        //updateMapOverLayOrder();
+                        break;
+                    default:
+                        layerStatus = true;
+                        mapView.getOverlays().remove(mbTileOverlay);
+                        //String mbTileLocation = getMBTileFromItem(item);
+                        String mbFilePath = getMBTileFromItem(item);
+                        //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+                        File mbFile = new File(mbFilePath);
+                        mbprovider = new MBTileProvider(GeoTraceActivity.this, mbFile);
+                        mbTileOverlay = new TilesOverlay(mbprovider,GeoTraceActivity.this);
+                        mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+                        //updateMapOverLayOrder();
+                        mapView.getOverlays().add(mbTileOverlay);
+                        updateMapOverLayOrder();
+                        mapView.invalidate();
+                }
+                //This resets the map and sets the selected Layer
+                selected_layer =item;
+                dialog.dismiss();
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mapView.invalidate();
+                    }
+                }, 400);
+
+            }
+        });
+        //alertDialog.setView(view);
+        alertDialog.show();
+
+    }
+
+    private String[] getOfflineLayerList() {
+        File files = new File(Collect.OFFLINE_LAYERS);
+        ArrayList<String> results = new ArrayList<>();
+        results.add("None");
+//		 String[] overlay_folders =  files.list();
+        for(String folder : files.list()){
+            results.add(folder);
+        }
+//		 for(int i =0;i<overlay_folders.length;i++){
+//			 results.add(overlay_folders[i]);
+//			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
+//		 }
+        String[] finala = new String[results.size()];
+        finala = results.toArray(finala);
+		 /*for(int j = 0;j<finala.length;j++){
+			 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
+		 }*/
+        return finala;
+    }
+
+    private String getMBTileFromItem(int item) {
+        String foldername = OffilineOverlays[item];
+        File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
+        String mbtilePath;
+        File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".mbtiles");
+            }
+        });
+        mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
+        //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
+
+        return mbtilePath;
+    }
+
+
+
+    private void updateMapOverLayOrder(){
+        List<Overlay> overlays = mapView.getOverlays();
+        if (layerStatus){
+            mapView.getOverlays().remove(mbTileOverlay);
+            mapView.getOverlays().remove(pathOverlay);
+            mapView.getOverlays().add(mbTileOverlay);
+            mapView.getOverlays().add(pathOverlay);
+
+        }
+        for (Overlay overlay : overlays){
+            //Class x = overlay.getClass();
+            final Overlay o = overlay;
+            if (overlay.getClass() == Marker.class){
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        mapView.getOverlays().remove(o);
+                        mapView.invalidate();
+                    }
+                }, 100);
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        mapView.getOverlays().add(o);
+                        mapView.invalidate();
+                    }
+                }, 100);
+                //mapView.getOverlays().remove(overlay);
+                //mapView.getOverlays().add(overlay);
+
+            }
+        }
+        mapView.invalidate();
+
+    }
+
 }
