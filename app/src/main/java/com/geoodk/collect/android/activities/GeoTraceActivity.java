@@ -753,30 +753,26 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
         alertDialog.setSingleChoiceItems(OffilineOverlays,selected_layer,new  DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
-                // The 'which' argument contains the index position
-                // of the selected item
-                //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
-
                 switch(item){
                     case 0 :
                         mapView.getOverlays().remove(mbTileOverlay);
                         layerStatus =false;
-                        //updateMapOverLayOrder();
+                        // Reset max zoom level to max level of baseMap tile layer
+                        int baseMapMaxZoomLevel = baseTiles.getMaximumZoomLevel();
+                        mapView.setMaxZoomLevel(baseMapMaxZoomLevel);
                         break;
                     default:
                         layerStatus = true;
                         mapView.getOverlays().remove(mbTileOverlay);
-                        //String mbTileLocation = getMBTileFromItem(item);
                         String mbFilePath = getMBTileFromItem(item);
-                        //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                         File mbFile = new File(mbFilePath);
                         mbprovider = new MBTileProvider(GeoTraceActivity.this, mbFile);
+                        int newMaxZoomLevel = mbprovider.getMaximumZoomLevel();
                         mbTileOverlay = new TilesOverlay(mbprovider,GeoTraceActivity.this);
                         mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                        //updateMapOverLayOrder();
                         mapView.getOverlays().add(mbTileOverlay);
                         updateMapOverLayOrder();
+                        mapView.setMaxZoomLevel(newMaxZoomLevel);
                         mapView.invalidate();
                 }
                 //This resets the map and sets the selected Layer
