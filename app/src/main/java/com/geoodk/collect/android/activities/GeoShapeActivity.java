@@ -143,7 +143,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-
 		baseTiles = MapHelper.getTileSource(basemap);
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
