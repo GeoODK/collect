@@ -67,7 +67,16 @@
 	</string-array>
 	
 	<string-array name="time_scale">
-        <item>seconds</item>
-		<item>minutes</item>
+        <item>Seconds</item>
+		<item>Minutes</item>
     </string-array>
+
+	<string-array name="delay_scale">
+		<item>1</item>
+		<item>5</item>
+		<item>10</item>
+		<item>20</item>
+		<item>30</item>
+	</string-array>
+
 </resources>

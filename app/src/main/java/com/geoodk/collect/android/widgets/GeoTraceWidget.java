@@ -60,8 +60,6 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 		mAnswerDisplay.setId(QuestionWidget.newUniqueId());
 		mAnswerDisplay.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
 		mAnswerDisplay.setGravity(Gravity.CENTER);
-		// TODO Auto-generated constructor stub
-		
 		createTraceButton = new Button(getContext());
 		createTraceButton.setId(QuestionWidget.newUniqueId());
 		createTraceButton.setText(getContext().getString(R.string.record_trace));
@@ -73,7 +71,6 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Collect.getInstance().getFormController().setIndexWaitingForData(mPrompt.getIndex());
 				Intent i = null;
 				i = new Intent(getContext(), GeoTraceActivity.class);
@@ -110,8 +107,7 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 
 	@Override
 	public void setBinaryData(Object answer) {
-		// TODO Auto-generated method stub
-		String s = (String) answer.toString();
+		String s = answer.toString();
 		mStringAnswer.setText(s);
 		//mStringAnswer.setText(s);
 		mAnswerDisplay.setText(s);
@@ -139,9 +135,7 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 
 	@Override
 	public IAnswerData getAnswer() {
-		// TODO Auto-generated method stub
-		GeoShapeData data = new GeoShapeData();
-		ArrayList<double[]> list = new ArrayList<double[]>();  
+		ArrayList<double[]> list = new ArrayList<double[]>();
 		String s = mStringAnswer.getText().toString();
 		if (s == null || s.equals("")) {
 			return null;
@@ -155,13 +149,12 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 					gp[1] = Double.valueOf(sp[1]).doubleValue();
 					gp[2] = Double.valueOf(sp[2]).doubleValue();
 					gp[3] = Double.valueOf(sp[3]).doubleValue();
-					list.add(gp);
+					//list.add(gp);
 				}
-				GeoShape shape = new GeoShape(list);
+				//GeoShape shape = new GeoShape(list);
 				//return new GeoShapeData(shape);
 				return new StringData(s);
 			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}

@@ -1,4 +1,6 @@
 #GeoODK Collect
+Version 2.0
+
 =======
 Need to convert you geoshape/geotrace or geopoint data, check out [GeoConverter Blog](http://blog.geoodk.com/posts/convert-geoshape-geotrace-geopoint-to-shapefile)
 
@@ -31,6 +33,7 @@ GeoODK Developemnt will be moving to [Android Studio](http://developer.android.c
 The Developers Group, form technical conversations
 * [Developers Group](https://groups.google.com/forum/#!forum/geoodk-developers)
 * [Community Group](https://groups.google.com/forum/#!forum/geoodk-community)
+
 
 =======
 

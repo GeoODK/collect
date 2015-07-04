@@ -74,7 +74,8 @@ public class WidgetFactory {
                     	}
                         break;
                     case Constants.DATATYPE_GEOPOINT:
-                        questionWidget = new GeoPointWidget(context, fep);
+                        //questionWidget = new GeoPointWidget(context, fep);
+                        questionWidget = new GeoPointNewWidget(context, fep);
                         break;
                     case Constants.DATATYPE_GEOSHAPE:
                     	questionWidget = new GeoShapeWidget(context, fep);

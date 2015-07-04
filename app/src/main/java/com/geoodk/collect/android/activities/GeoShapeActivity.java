@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 GeoODK
+ * Copyright (C) 2015 GeoODK
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
@@ -46,12 +45,9 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
-import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
-import com.geoodk.collect.android.widgets.GeoPointWidget;
 import com.geoodk.collect.android.widgets.GeoShapeWidget;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -61,7 +57,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.LocationManager;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -69,18 +64,16 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 
 public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private MapView mapView;
-	private ArrayList<GeoPoint> map_points =new ArrayList<GeoPoint>();
-	private ArrayList<Marker> map_markers = new ArrayList<Marker>();
+	private ArrayList<Marker> map_markers = new ArrayList<>();
 	private PathOverlay pathOverlay;
 	private ITileSource baseTiles;
-	private DefaultResourceProxyImpl resource_proxy;
+	public DefaultResourceProxyImpl resource_proxy;
 	public int zoom_level = 3;
-	private static final int stroke_width = 5;
+	public static final int stroke_width = 5;
 	public String final_return_string;
 	private MapEventsOverlay OverlayEventos;
 	private boolean polygon_connection = false;
@@ -99,29 +92,57 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private ImageButton gps_button;
 	private String[] OffilineOverlays;
 	public MyLocationNewOverlay mMyLocationOverlay;
-	private Boolean data_loaded = false;
-	
+	public Boolean data_loaded = false;
+
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		baseTiles = MapHelper.getTileSource(basemap);
+		mapView.setTileSource(baseTiles);
+		mapView.setUseDataConnection(online);
+		setGPSStatus();
+	}
+
+	@Override
+	public void onBackPressed() {
+		saveGeoShape();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		disableMyLocation();
+	}
+	@Override
+	protected void onStop() {
+		super.onStop();
+		disableMyLocation();
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		/*
+			Setting Content  & initiating the main button id
+			for the activity
+
+		  */
 		setContentView(R.layout.geo_shape_layout);
-		setTitle("GeoShape"); // Setting title of the action
+		setTitle(getString(R.string.geoshape_title)); // Setting title of the action
 		return_button = (ImageButton) findViewById(R.id.geoshape_Button);
 		polygon_button = (ImageButton) findViewById(R.id.polygon_button);
 		clear_button = (ImageButton) findViewById(R.id.clear_button);
-		//Map Settings
-		//SharedPreferences sharedPreferences = PreferenceManager
-		//		.getDefaultSharedPreferences(this);
-		//PreferenceManager.setDefaultValues(this, R.xml.map_preferences, false);
-		//sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-		
-		
-		
-		
+
+		/*
+			Defining the System prefereces from the mapSetting
+
+		  */
+
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-		
 		baseTiles = MapHelper.getTileSource(basemap);
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
@@ -131,9 +152,10 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		mapView.setBuiltInZoomControls(true);
 		mapView.setUseDataConnection(online);
 		mapView.setMapListener(mapViewListner);
-		overlayMapLayerListner();
-		//mapView.getController().setZoom(zoom_level);
-		mapView.invalidate();
+
+		overlayPointPathListner();
+
+
 		return_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -143,29 +165,14 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		polygon_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (polygon_connection ==true){
-					showClearDialog();
-				}else{
-					if (map_markers.size()>2){
-						int p = map_markers.size();
-						map_markers.add(map_markers.get(0));
-						pathOverlay.addPoint(map_markers.get(0).getPosition());
-						mapView.invalidate();
-						polygon_connection= true;
-						polygon_button.setVisibility(View.GONE);
-						mapView.getOverlays().remove(OverlayEventos);
-					}else{
-						showPolyonErrorDialog();
-					}
-				}
+				buildPolygon();
 			}
 		});
 		clear_button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				if (map_markers.size() != 0){
-					if (polygon_connection ==true){
+					if (polygon_connection){
 						//clearFeatures();
 						showClearDialog();
 					}else{
@@ -183,33 +190,20 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				showLayersDialog();
 				
 			}
 		});
         
         gps_button = (ImageButton)findViewById(R.id.geoshape_gps_button);
-        //This is the gps button and its functionality
         gps_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
             	setGPSStatus();
             }
         });
-        
-        //Initial Map Setting before Location is found
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                //Do something after 100ms
-                GeoPoint  point = new GeoPoint(34.08145, -39.85007);               
-                mapView.getController().setZoom(3);
-                mapView.getController().setCenter(point);
-            }
-        }, 100);
-        
-        //geoshape_gps_button
+
+
         GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
         imlp.setLocationUpdateMinDistance(1000);
         imlp.setLocationUpdateMinTime(60000);
@@ -219,40 +213,67 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         progress = new ProgressDialog(this);
         progress.setTitle("Loading Location");
         progress.setMessage("Wait while loading...");
-        progress.show();
-        
-        setGPSStatus();
+
         
 		Intent intent = getIntent();
 		if (intent != null && intent.getExtras() != null) {
 			if ( intent.hasExtra(GeoShapeWidget.SHAPE_LOCATION) ) {
 				data_loaded =true;
 				String s = intent.getStringExtra(GeoShapeWidget.SHAPE_LOCATION);
-				//Overlay Polygons and points passed in
 				overlayIntentPolygon(s);
-				//Toast.makeText(this, s, Toast.LENGTH_LONG).show();
+				zoomToCentroid();
 			}
+		}else{
+
+			final Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				public void run() {
+					//Do something after 100ms
+					GeoPoint  point = new GeoPoint(34.08145, -39.85007);
+					mapView.getController().setZoom(3);
+					mapView.getController().setCenter(point);
+				}
+			}, 100);
+
+			setGPSStatus();
+			progress.show();
+
 		}
-        
+
 	    mapView.invalidate();
 	}
-	private void overlayIntentPolygon(String str){
 
+	private void buildPolygon(){
+		if (polygon_connection){
+			showClearDialog();
+		}else{
+			if (map_markers.size()>2){
+				map_markers.add(map_markers.get(0));
+				pathOverlay.addPoint(map_markers.get(0).getPosition());
+				mapView.invalidate();
+				polygon_connection= true;
+				polygon_button.setVisibility(View.GONE);
+				mapView.getOverlays().remove(OverlayEventos);
+			}else{
+				showPolyonErrorDialog();
+			}
+		}
+
+	}
+	private void overlayIntentPolygon(String str){
 		clear_button.setVisibility(View.VISIBLE);
 		clear_button_test = true;
-	
-		//Populate map_markers array
 		String s = str.replace("; ",";");
 		String[] sa = s.split(";");
 		for (int i=0;i<(sa.length -1);i++){
-			int x = i;
 			String[] sp = sa[i].split(" ");
 			double gp[] = new double[4];
 			String lat = sp[0].replace(" ", "");
 			String lng = sp[1].replace(" ", "");
-			gp[0] = Double.valueOf(lat).doubleValue();
-			gp[1] = Double.valueOf(lng).doubleValue();
-			
+            gp[0] = Double.parseDouble(lat);
+            gp[1] = Double.parseDouble(lng);
+//			gp[0] = Double.valueOf(lat).doubleValue();
+//			gp[1] = Double.valueOf(lng).doubleValue();
 			Marker marker = new Marker(mapView);
 			GeoPoint point = new GeoPoint(gp[0], gp[1]);    
 			marker.setPosition(point);
@@ -261,22 +282,13 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 			marker.setOnMarkerClickListener(nullmarkerlistner);
 			map_markers.add(marker);
-			
-			//if (i == (sa.length -2) ){
-				//pathOverlay.addPoint(map_markers.get(0).getPosition());
-			//}else{
 			pathOverlay.addPoint(marker.getPosition());
 			marker.setDraggable(true);
 			marker.setOnMarkerDragListener(draglistner);
 			mapView.getOverlays().add(marker);
-			//}
-			
-			 
 		}
-		polygon_button.callOnClick();
-		//polygon_connection= true;
+		buildPolygon();
 		mapView.getOverlays().remove(OverlayEventos);
-		//mapView.invalidate();
 	}
 	
 	private void setGPSStatus(){
@@ -284,7 +296,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
             gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
             upMyLocationOverlayLayers();
             //enableMyLocation();
-            //zoomToMyLocation();
+			//zoomToMyLocation();
             gpsStatus = true;
         }else{
             gps_button.setImageResource(R.drawable.ic_menu_mylocation);
@@ -299,12 +311,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
         public void run() {
             mHandler.post(new Runnable() {
                 public void run() {
-                	if (data_loaded ==false){
-                		zoomToMyLocation();
-                	}else{
-                		zoomToPoints();
-                	}
-                    //zoomToMyLocation();
+					zoomToMyLocation();
                     progress.dismiss();
                 }
             });
@@ -375,41 +382,18 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
     }
     
 	
-	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-		baseTiles = MapHelper.getTileSource(basemap);
-		mapView.setTileSource(baseTiles);
-		mapView.setUseDataConnection(online);
-		setGPSStatus();
-	}
-	
-	/*@Override
-	public void onBackPressed() {
-		saveGeoTrace();
-	}*/
-	
-    @Override
-	protected void onPause() {
-		// TODO Auto-generated method stub
-		super.onPause();
-		disableMyLocation();
-	}
-	@Override
-	protected void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-		disableMyLocation();
+
+	private void saveGeoShape(){
+		//Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
+		returnLocation();
+		finish();
 	}
 
-	private void overlayMapLayerListner(){
+	private void overlayPointPathListner(){
 		OverlayEventos = new MapEventsOverlay(getBaseContext(), mReceive);
 		pathOverlay= new PathOverlay(Color.RED, this);
 		Paint pPaint = pathOverlay.getPaint();
-	    pPaint.setStrokeWidth(5);
+	    pPaint.setStrokeWidth(stroke_width);
 	    mapView.getOverlays().add(pathOverlay);
 		mapView.getOverlays().add(OverlayEventos);
 		mapView.invalidate();
@@ -423,11 +407,11 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		//clearMarkersOverlay();
 		polygon_button.setVisibility(View.VISIBLE);
 		clear_button.setVisibility(View.GONE);
-		if(gpsStatus ==true){
+		if(gpsStatus){
 			upMyLocationOverlayLayers();
 			
 		}
-		overlayMapLayerListner();
+		overlayPointPathListner();
 		
 		mapView.invalidate();
 		
@@ -494,10 +478,9 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	private MapEventsReceiver mReceive = new MapEventsReceiver() {
 		@Override
 		public boolean longPressHelper(GeoPoint point) {
-			// TODO Auto-generated method stub
 			//Toast.makeText(GeoShapeActivity.this, point.getLatitude()+" ", Toast.LENGTH_LONG).show();
 			//map_points.add(point);
-			if (clear_button_test ==false){
+			if (!clear_button_test){
 				clear_button.setVisibility(View.VISIBLE);
 				clear_button_test = true;
 			}			
@@ -518,7 +501,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 
 		@Override
 		public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-			// TODO Auto-generated method stub
 			return false;
 		}
 	};
@@ -542,8 +524,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 		}
 		@Override
-		public void onMarkerDragEnd(Marker arg0) {
-			// TODO Auto-generated method stub
+		public void onMarkerDragEnd(Marker marker) {
 			update_polygon();
 			
 		}
@@ -555,7 +536,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	};
 
 	private void showLayersDialog() {
-		// TODO Auto-generated method stub
 		//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
 		//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -573,23 +553,26 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		            case 0 :
 		            	mapView.getOverlays().remove(mbTileOverlay);
 		            	layerStatus =false;
-		            	//updateMapOverLayOrder();
+						// Reset max zoom level to max level of baseMap tile layer
+						int baseMapMaxZoomLevel = baseTiles.getMaximumZoomLevel();
+						mapView.setMaxZoomLevel(baseMapMaxZoomLevel);
 		            	break;
 		            default:
-		            		layerStatus = true;
-		            	    mapView.getOverlays().remove(mbTileOverlay);
-		            		//String mbTileLocation = getMBTileFromItem(item);
-		            		String mbFilePath = getMBTileFromItem(item);
-		            	    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
-		            		File mbFile = new File(mbFilePath);
-		            		mbprovider = new MBTileProvider(GeoShapeActivity.this, mbFile);
-			           		mbTileOverlay = new TilesOverlay(mbprovider,GeoShapeActivity.this);
-			           		mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-			           		//updateMapOverLayOrder();
-				           	mapView.getOverlays().add(mbTileOverlay);
-			           		updateMapOverLayOrder();
-				           	mapView.invalidate();
-			               }
+						layerStatus = true;
+						mapView.getOverlays().remove(mbTileOverlay);
+						//String mbTileLocation = getMBTileFromItem(item);
+						String mbFilePath = getMBTileFromItem(item);
+						//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+						File mbFile = new File(mbFilePath);
+						mbprovider = new MBTileProvider(GeoShapeActivity.this, mbFile);
+						int newMaxZoomLevel = mbprovider.getMaximumZoomLevel();
+						mbTileOverlay = new TilesOverlay(mbprovider,GeoShapeActivity.this);
+						mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+						mapView.getOverlays().add(mbTileOverlay);
+						updateMapOverLayOrder();
+						mapView.setMaxZoomLevel(newMaxZoomLevel);
+						mapView.invalidate();
+						}
 	            	//This resets the map and sets the selected Layer
 	            	selected_layer =item;
 	            	dialog.dismiss();
@@ -610,7 +593,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	
 	private void updateMapOverLayOrder(){
 		List<Overlay> overlays = mapView.getOverlays();
-		if (layerStatus =true){
+		if (layerStatus){
 			mapView.getOverlays().remove(mbTileOverlay);
 			mapView.getOverlays().remove(pathOverlay);
 			mapView.getOverlays().add(mbTileOverlay);
@@ -644,7 +627,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 	}
 	
 	private String getMBTileFromItem(int item) {
-		// TODO Auto-generated method stub
 		String foldername = OffilineOverlays[item];
 		File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
 		String mbtilePath;
@@ -659,15 +641,17 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		return mbtilePath;
 	}
 	 private String[] getOfflineLayerList() {
-		// TODO Auto-generated method stub
 		 File files = new File(Collect.OFFLINE_LAYERS);
-		 ArrayList<String> results = new ArrayList<String>();
+		 ArrayList<String> results = new ArrayList<>();
 		 results.add("None");
-		 String[] overlay_folders =  files.list();
-		 for(int i =0;i<overlay_folders.length;i++){
-			 results.add(overlay_folders[i]);
-			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
-		 }
+//		 String[] overlay_folders =  files.list();
+         for(String folder : files.list()){
+             results.add(folder);
+         }
+//		 for(int i =0;i<overlay_folders.length;i++){
+//			 results.add(overlay_folders[i]);
+//			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
+//		 }
 		 String[] finala = new String[results.size()]; 
 		 finala = results.toArray(finala);
 		 /*for(int j = 0;j<finala.length;j++){
@@ -680,30 +664,45 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 			
 			@Override
 			public boolean onMarkerClick(Marker arg0, MapView arg1) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 		};
 		
-		private void zoomToPoints(){
+		private void zoomToCentroid(){
+
+			/*
+				Calculate Centroid of Polygon
+
+			 */
+
+			//----- This should be hard coded but based on the extent of the points
 			mapView.getController().setZoom(15);
+			//-----
+
 			mapView.invalidate();
 			Handler handler=new Handler();
 			Runnable r = new Runnable(){
 			    public void run() {
-			    	GeoPoint c_marker = map_markers.get(0).getPosition();
-			    	mapView.getController().setCenter(c_marker);
+					Integer size  = map_markers.size();
+					Double x_value = 0.0;
+					Double y_value = 0.0;
+					for(int i=0; i<size; i++){
+						GeoPoint temp_marker = map_markers.get(i).getPosition();
+						Double x_marker = temp_marker.getLatitude();
+						Double y_marker = temp_marker.getLongitude();
+						x_value += x_marker;
+						y_value += y_marker;
+					}
+					Double x_cord = x_value/size;
+					Double y_cord = y_value/size;
+					GeoPoint centroid = new GeoPoint(x_cord,y_cord);
+			    	mapView.getController().setCenter(centroid);
 			    }
-			}; 
+			};
 			handler.post(r);
 			mapView.invalidate();
 			
 		}
 
-	    /*private void saveGeoTrace(){
-	    	//Toast.makeText(this, "Do Save Stuff", Toast.LENGTH_LONG).show();
-	    	returnLocation();
-	    	finish();
-	    }*/
 	
 }

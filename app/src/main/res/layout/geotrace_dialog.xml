@@ -13,14 +13,14 @@
 	        android:layout_height="wrap_content"
 	        android:onClick="setGeoTraceMode"
 	        android:checked="true"
-	        android:text="Manual"/>
+	        android:text="Manual Mode"/>
 	    
 	    <RadioButton android:id="@+id/trace_automatic"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:clickable="false"
+	        android:clickable="true"
 	        android:onClick="setGeoTraceMode"
-	        android:text="Automatic (in development)"/>
+	        android:text="Automatic Mode"/>
     
 	</RadioGroup>
 	
@@ -33,6 +33,16 @@
     android:text="200"
     android:inputType="number"
     android:imeActionLabel="Label" />
+
+    <Spinner
+    android:id="@+id/trace_delay"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:entryValues="@array/delay_scale"
+    android:entries="@array/delay_scale"
+    android:visibility="gone"
+
+        />
 	
 	<Spinner
     android:id="@+id/trace_scale"
