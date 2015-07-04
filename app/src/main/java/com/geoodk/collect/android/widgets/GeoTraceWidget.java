@@ -135,13 +135,12 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 
 	@Override
 	public IAnswerData getAnswer() {
-//		ArrayList<double[]> list = new ArrayList<double[]>();
+		ArrayList<double[]> list = new ArrayList<double[]>();
 		String s = mStringAnswer.getText().toString();
 		if (s == null || s.equals("")) {
 			return null;
 		} else {
 			try {
-
 				String[] sa = s.split(";");
 				for (int i=0;i<sa.length;i++){
 					String[] sp = sa[i].trim().split(" ");
@@ -154,7 +153,6 @@ public class GeoTraceWidget extends QuestionWidget implements IBinaryWidget {
 				}
 				//GeoShape shape = new GeoShape(list);
 				//return new GeoShapeData(shape);
-
 				return new StringData(s);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
