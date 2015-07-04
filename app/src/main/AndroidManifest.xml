@@ -181,6 +181,7 @@
             android:label="@string/app_name" />
         <activity
             android:name=".activities.GeoPointMapNewActivity"
+            android:configChanges="orientation"
             android:label="@string/app_name" />
         <activity
             android:name=".activities.GeoPointActivity"
