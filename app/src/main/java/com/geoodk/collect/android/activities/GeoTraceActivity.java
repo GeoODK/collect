@@ -170,10 +170,9 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-
 		baseTiles = MapHelper.getTileSource(basemap);
-
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
+
 		mapView = (MapView)findViewById(R.id.geotrace_mapview);
 		mapView.setTileSource(baseTiles);
 		mapView.setMultiTouchControls(true);
@@ -302,7 +301,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	}
 
 	/*
-		This functions handels the delay and the Runable for
+		This functions handles the delay and the Runnable for
 	*/
 
 	public void setGeoTraceScheuler(long delay, TimeUnit units){
@@ -597,9 +596,6 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
     	play_button.setVisibility(View.GONE);
     	save_button.setVisibility(View.VISIBLE);
     	polygon_button.setVisibility(View.VISIBLE);
-    	
-    	
-    	
     }
     
     private void setupManualMode(){
@@ -797,19 +793,11 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
         File files = new File(Collect.OFFLINE_LAYERS);
         ArrayList<String> results = new ArrayList<>();
         results.add("None");
-//		 String[] overlay_folders =  files.list();
         for(String folder : files.list()){
             results.add(folder);
         }
-//		 for(int i =0;i<overlay_folders.length;i++){
-//			 results.add(overlay_folders[i]);
-//			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
-//		 }
         String[] finala = new String[results.size()];
         finala = results.toArray(finala);
-		 /*for(int j = 0;j<finala.length;j++){
-			 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
-		 }*/
         return finala;
     }
 
@@ -823,12 +811,9 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
             }
         });
         mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
-        //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
 
         return mbtilePath;
     }
-
-
 
     private void updateMapOverLayOrder(){
         List<Overlay> overlays = mapView.getOverlays();
