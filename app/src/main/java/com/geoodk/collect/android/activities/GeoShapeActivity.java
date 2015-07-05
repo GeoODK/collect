@@ -143,7 +143,6 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
 		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-
 		baseTiles = MapHelper.getTileSource(basemap);
 		
 		resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
@@ -554,23 +553,26 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		            case 0 :
 		            	mapView.getOverlays().remove(mbTileOverlay);
 		            	layerStatus =false;
-		            	//updateMapOverLayOrder();
+						// Reset max zoom level to max level of baseMap tile layer
+						int baseMapMaxZoomLevel = baseTiles.getMaximumZoomLevel();
+						mapView.setMaxZoomLevel(baseMapMaxZoomLevel);
 		            	break;
 		            default:
-		            		layerStatus = true;
-		            	    mapView.getOverlays().remove(mbTileOverlay);
-		            		//String mbTileLocation = getMBTileFromItem(item);
-		            		String mbFilePath = getMBTileFromItem(item);
-		            	    //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
-		            		File mbFile = new File(mbFilePath);
-		            		mbprovider = new MBTileProvider(GeoShapeActivity.this, mbFile);
-			           		mbTileOverlay = new TilesOverlay(mbprovider,GeoShapeActivity.this);
-			           		mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-			           		//updateMapOverLayOrder();
-				           	mapView.getOverlays().add(mbTileOverlay);
-			           		updateMapOverLayOrder();
-				           	mapView.invalidate();
-			               }
+						layerStatus = true;
+						mapView.getOverlays().remove(mbTileOverlay);
+						//String mbTileLocation = getMBTileFromItem(item);
+						String mbFilePath = getMBTileFromItem(item);
+						//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+						File mbFile = new File(mbFilePath);
+						mbprovider = new MBTileProvider(GeoShapeActivity.this, mbFile);
+						int newMaxZoomLevel = mbprovider.getMaximumZoomLevel();
+						mbTileOverlay = new TilesOverlay(mbprovider,GeoShapeActivity.this);
+						mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+						mapView.getOverlays().add(mbTileOverlay);
+						updateMapOverLayOrder();
+						mapView.setMaxZoomLevel(newMaxZoomLevel);
+						mapView.invalidate();
+						}
 	            	//This resets the map and sets the selected Layer
 	            	selected_layer =item;
 	            	dialog.dismiss();

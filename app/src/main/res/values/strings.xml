@@ -326,6 +326,7 @@
     <string name="view_shape">Edit Shape</string>
     <string name="record_trace">Record GeoTrace</string>
     <string name="view_trace">View GeoTrace</string>
+    <string name="geopoint_title">GeoPoint</string>
     <string name="geoshape_title">GeoShape</string>
     <string name="geotrace_title">GeoTrace</string>
     <string name="enable_gps">Enable GPS</string>

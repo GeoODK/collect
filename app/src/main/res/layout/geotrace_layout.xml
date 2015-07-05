@@ -13,7 +13,7 @@
 	    android:id="@+id/geotrace_play_button"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:padding="18dp"
+	    android:padding="20dp"
 	    android:src="@drawable/play_button" />
 	 <ImageButton
         android:id="@+id/geotrace_polygon_button"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:visibility="gone"
-        android:padding="18dp"
+        android:padding="20dp"
         android:src="@drawable/polygon" />
 	<ImageButton
         android:id="@+id/geotrace_clear_button"
@@ -30,29 +30,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:padding="18dp"
+        android:padding="20dp"
         android:src="@drawable/sweep" />
-	 
-      <Button 
-            android:text="Record Location Point"
-            android:id="@+id/manual_button"
-            android:layout_toRightOf="@id/geotrace_play_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="21dp"
-            android:textColor="#005229"
-            android:textStyle="bold"
-            android:visibility="gone"
-            >
-        </Button>
-        
-        <ImageButton
+    <ImageButton
+        android:id="@+id/geoShape_layers_button"
+        android:layout_below="@+id/geotrace_play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:src="@drawable/layers" />
+    <Button
+        android:text="Record Location Point"
+        android:id="@+id/manual_button"
+        android:layout_toRightOf="@id/geotrace_play_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="25dp"
+        android:textColor="#005229"
+        android:textStyle="bold"
+        android:visibility="gone" />
+    <ImageButton
         android:id="@+id/geotrace_save"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:padding="20dp"
         android:visibility="gone"
-        android:padding="18dp"
-        android:src="@drawable/ic_menu_save" />
+        android:src="@drawable/ic_menu_save"
+        android:layout_toRightOf="@+id/geoShape_layers_button" />
 
 </RelativeLayout>
