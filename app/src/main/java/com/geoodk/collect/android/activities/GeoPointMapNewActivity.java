@@ -13,7 +13,11 @@
  */
 
 /**
- * Responsible for creating polygons
+ * [2015/07/05] Created by:
+ *
+ * @author Marco Foi (foimarco@gmail.com)
+ * 
+ * Original template Activity by:
  *
  * @author Jon Nordling (jonnordling@gmail.com)
  */
