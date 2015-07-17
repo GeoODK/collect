@@ -2,7 +2,9 @@
 package com.geoodk.collect.android.database;
 
 import com.geoodk.collect.android.application.Collect;
-
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -74,7 +76,7 @@ public class ItemsetDbAdapter {
      * Open the database. If it cannot be opened, try to create a new instance
      * of the database. If it cannot be created, throw an exception to signal
      * the failure
-     * 
+     *
      * @return this (self reference, allowing this to be chained in an
      *         initialization call)
      * @throws SQLException if the database could be neither opened or created
@@ -89,9 +91,13 @@ public class ItemsetDbAdapter {
         mDbHelper.close();
     }
 
-    public boolean createTable(String formHash, String[] columns, String path) {
+    public boolean createTable(String formHash, String pathHash, String[] columns, String path) {
         StringBuilder sb = new StringBuilder();
-        sb.append("create table " + DATABASE_TABLE + formHash
+
+        // get md5 of the path to itemset.csv, which is unique per form
+        // the md5 is easier to use because it doesn't have chars like '/'
+
+        sb.append("create table " + DATABASE_TABLE + pathHash
                 + " (_id integer primary key autoincrement ");
         for (int j = 0; j < columns.length; j++) {
             // add double quotes in case the column is of label:lang
@@ -155,12 +161,14 @@ public class ItemsetDbAdapter {
         return mCursor;
     }
 
-    public void dropTable(String formHash) {
-        mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE + formHash);
+    public void dropTable(String pathHash, String path) {
+        // drop the table
+        mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE + pathHash);
 
-        String where = KEY_ITEMSET_HASH + "=?";
+        // and remove the entry from the itemsets table
+        String where = KEY_PATH + "=?";
         String[] whereArgs = {
-            formHash
+                path
         };
         mDb.delete(ITEMSET_TABLE, where, whereArgs);
     }
@@ -168,7 +176,7 @@ public class ItemsetDbAdapter {
     public Cursor getItemsets(String path) {
         String selection = KEY_PATH + "=?";
         String[] selectionArgs = {
-            path
+                path
         };
         Cursor c = mDb.query(ITEMSET_TABLE, null, selection, selectionArgs, null, null, null);
         return c;
@@ -179,7 +187,7 @@ public class ItemsetDbAdapter {
         if (c != null) {
             if (c.getCount() == 1) {
                 c.moveToFirst();
-                String table = c.getString(c.getColumnIndex(KEY_ITEMSET_HASH));
+                String table = getMd5FromString(c.getString(c.getColumnIndex(KEY_PATH)));
                 mDb.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE + table);
             }
             c.close();
@@ -187,9 +195,24 @@ public class ItemsetDbAdapter {
 
         String where = KEY_PATH + "=?";
         String[] whereArgs = {
-            path
+                path
         };
         mDb.delete(ITEMSET_TABLE, where, whereArgs);
+    }
+
+    public static String getMd5FromString(String toEncode) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            Log.e("MD5", e.getMessage());
+        }
+        md.update(toEncode.getBytes());
+        byte[] digest = md.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashtext = bigInt.toString(16);
+        return hashtext;
     }
 
 }

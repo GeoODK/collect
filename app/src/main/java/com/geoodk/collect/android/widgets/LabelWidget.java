@@ -15,7 +15,7 @@
 package com.geoodk.collect.android.widgets;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.List;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -58,7 +58,7 @@ public class LabelWidget extends QuestionWidget {
 
     LinearLayout buttonLayout;
     LinearLayout questionLayout;
-    Vector<SelectChoice> mItems;
+    List<SelectChoice> mItems;
 
     private TextView mQuestionText;
     private TextView mMissingImage;

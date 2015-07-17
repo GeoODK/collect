@@ -146,7 +146,7 @@ public class SelectOneWidget extends QuestionWidget implements
 		if (i == -1) {
 			return null;
 		} else {
-			SelectChoice sc = mItems.elementAt(i);
+			SelectChoice sc = mItems.get(i);
 			return new SelectOneData(new Selection(sc));
 		}
 	}
@@ -182,8 +182,15 @@ public class SelectOneWidget extends QuestionWidget implements
 			}
 		}
 		
+		SelectChoice choice = mItems.get((Integer)buttonView.getTag());
+		
+		if ( choice != null ) {
        	Collect.getInstance().getActivityLogger().logInstanceAction(this, "onCheckedChanged", 
-    			mItems.get((Integer)buttonView.getTag()).getValue(), mPrompt.getIndex());
+     	      choice.getValue(), mPrompt.getIndex());
+		} else {
+        Collect.getInstance().getActivityLogger().logInstanceAction(this, "onCheckedChanged", 
+            "<no matching choice>", mPrompt.getIndex());
+		}
 	}
 
 	@Override

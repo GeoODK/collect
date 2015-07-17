@@ -11,13 +11,13 @@
 	<string-array
 		name="protocol_entry_values">
 		<item>@string/protocol_odk_default</item>
-		<item>@string/protocol_google</item>
+		<item>@string/protocol_google_maps_engine</item>
 		<item>@string/protocol_other</item>
 	</string-array>
 	<string-array
 		name="protocol_entries">
 		<item>@string/server_platform_odk_aggregate</item>
-		<item>@string/server_platform_google_forms</item>
+		<item>@string/server_platform_google_maps_engine</item>
 		<item>@string/server_platform_other</item>
 	</string-array>
 	<!-- DO NOT alter font_size_entry_values - used internally in preferences activity -->
@@ -59,6 +59,20 @@
 		name="constraint_behavior_entries">
 		<item>@string/constraint_behavior_on_swipe</item>
 		<item>@string/constraint_behavior_on_finalize</item>
+	</string-array>
+	<string-array translatable="false" name="form_processing_logic_entry_values">
+		<item>-1</item>
+		<item>0</item>
+		<item>1</item>
+		<item>2</item>
+		<item>3</item>
+	</string-array>
+	<string-array name="form_processing_logic_entries">
+		<item>@string/form_processing_logic_recommended</item>
+		<item>@string/form_processing_logic_0</item>
+		<item>@string/form_processing_logic_1</item>
+		<item>@string/form_processing_logic_2</item>
+		<item>@string/form_processing_logic_3</item>
 	</string-array>
 	<string-array
 	    name="basemap_entries">

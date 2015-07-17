@@ -15,6 +15,7 @@
 package com.geoodk.collect.android.logic;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -145,7 +146,7 @@ public class PropertyManager implements IPropertyManager {
     }
 
     @Override
-    public Vector<String> getProperty(String propertyName) {
+    public List<String> getProperty(String propertyName) {
         return null;
     }
 
@@ -163,7 +164,7 @@ public class PropertyManager implements IPropertyManager {
 
 
     @Override
-    public void setProperty(String propertyName, @SuppressWarnings("rawtypes") Vector propertyValue) {
+    public void setProperty(String propertyName, List<String> propertyValue) {
 
     }
 
@@ -175,7 +176,7 @@ public class PropertyManager implements IPropertyManager {
 
 
     @Override
-    public Vector<IPropertyRules> getRules() {
+    public List<IPropertyRules> getRules() {
         return null;
     }
 

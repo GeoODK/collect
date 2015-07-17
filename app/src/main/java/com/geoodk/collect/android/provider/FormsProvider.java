@@ -236,19 +236,30 @@ public class FormsProvider extends ContentProvider {
 
 	private DatabaseHelper mDbHelper;
 
+    private DatabaseHelper getDbHelper() {
+        // wrapper to test and reset/set the dbHelper based upon the attachment state of the device.
+        try {
+            Collect.createODKDirs();
+        } catch (RuntimeException e) {
+        	mDbHelper = null;
+            return null;
+        }
+
+        if (mDbHelper != null) {
+        	return mDbHelper;
+        }
+        mDbHelper = new DatabaseHelper(DATABASE_NAME);
+        return mDbHelper;
+    }
+
 	@Override
 	public boolean onCreate() {
-
-		// must be at the beginning of any activity that can be called from an
-		// external intent
-		try {
-			Collect.createODKDirs();
-		} catch (RuntimeException e) {
-			return false;
-		}
-
-		mDbHelper = new DatabaseHelper(DATABASE_NAME);
-		return true;
+        // must be at the beginning of any activity that can be called from an external intent
+		DatabaseHelper h = getDbHelper();
+        if ( h == null ) {
+        	return false;
+        }
+        return true;
 	}
 
 	@Override
@@ -273,7 +284,7 @@ public class FormsProvider extends ContentProvider {
 		}
 
 		// Get the database and run the query
-		SQLiteDatabase db = mDbHelper.getReadableDatabase();
+		SQLiteDatabase db = getDbHelper().getReadableDatabase();
 		Cursor c = qb.query(db, projection, selection, selectionArgs, null,
 				null, sortOrder);
 
@@ -361,7 +372,7 @@ public class FormsProvider extends ContentProvider {
 			values.put(FormsColumns.FORM_MEDIA_PATH, mediaPath);
 		}
 
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		SQLiteDatabase db = getDbHelper().getWritableDatabase();
 
 		// first try to see if a record with this filename already exists...
 		String[] projection = { FormsColumns._ID, FormsColumns.FORM_FILE_PATH };
@@ -436,7 +447,7 @@ public class FormsProvider extends ContentProvider {
 	 */
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		SQLiteDatabase db = getDbHelper().getWritableDatabase();
 		int count;
 
 		switch (sUriMatcher.match(uri)) {
@@ -528,7 +539,7 @@ public class FormsProvider extends ContentProvider {
 	@Override
 	public int update(Uri uri, ContentValues values, String where,
 			String[] whereArgs) {
-		SQLiteDatabase db = mDbHelper.getWritableDatabase();
+		SQLiteDatabase db = getDbHelper().getWritableDatabase();
 		int count = 0;
 		switch (sUriMatcher.match(uri)) {
 		case FORMS:
