@@ -86,29 +86,30 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="android-support-v4" level="project" />
-    <orderEntry type="library" exported="" name="joda-time-2.0" level="project" />
-    <orderEntry type="library" exported="" name="google-http-client-1.15.0-rc" level="project" />
-    <orderEntry type="library" exported="" name="google-http-client-android-1.17.0-rc" level="project" />
+    <orderEntry type="library" exported="" name="google-oauth-client-1.17.0-rc" level="project" />
     <orderEntry type="library" exported="" name="httpclientandroidlib-4.2.1" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-android-1.17.0-rc" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-1.15.0-rc" level="project" />
     <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="apache-mime4j-0.6" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="google-api-client-android-1.17.0-rc" level="project" />
-    <orderEntry type="library" exported="" name="opencsv-2.3" level="project" />
     <orderEntry type="library" exported="" name="kxml2-2.3.0" level="project" />
     <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="google-api-services-drive-v2-rev113-1.17.0-rc" level="project" />
-    <orderEntry type="library" exported="" name="maps" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="osmbonuspack_v4.6" level="project" />
     <orderEntry type="library" exported="" name="javarosa-libraries-2015-04-17" level="project" />
-    <orderEntry type="library" exported="" name="google-http-client-gson-1.17.0-rc" level="project" />
     <orderEntry type="library" exported="" name="google-api-client-1.15.0-rc" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.6.1-RC1" level="project" />
-    <orderEntry type="library" exported="" name="httpmime-4.0" level="project" />
     <orderEntry type="library" exported="" name="osmdroid-android-4.2" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.0" level="project" />
+    <orderEntry type="library" exported="" name="google-api-client-android-1.17.0-rc" level="project" />
+    <orderEntry type="library" exported="" name="opencsv-2.3" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="maps" level="project" />
+    <orderEntry type="library" exported="" name="google-http-client-gson-1.17.0-rc" level="project" />
+    <orderEntry type="library" exported="" name="gson-2.1" level="project" />
+    <orderEntry type="library" exported="" name="google-play-services" level="project" />
+    <orderEntry type="library" exported="" name="httpmime-4.0" level="project" />
   </component>
 </module>

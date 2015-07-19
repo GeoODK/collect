@@ -6,7 +6,7 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<com.geoodk.collect.android.views.TwoItemMultipleChoiceView
+<org.odk.collect.android.views.TwoItemMultipleChoiceView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
@@ -16,30 +16,24 @@
 	android:paddingTop="4dip"
 	android:paddingBottom="8dip"
 	android:minHeight="?android:attr/listPreferredItemHeight">
-   	<TextView
-		android:id="@+id/text1"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:layout_alignParentTop="true"
-		android:layout_alignParentLeft="true"
-		android:textAppearance="?android:attr/textAppearanceLarge"/>
-	<TextView
-		android:id="@+id/text3"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-		android:layout_below="@+id/text1"
-		android:layout_alignParentLeft="true"
-		android:textAppearance="?android:attr/textAppearanceSmall"/>
-	<TextView
-		android:id="@+id/text2"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:layout_below="@+id/text3"
-		android:layout_alignParentLeft="true"
-		android:textAppearance="?android:attr/textAppearanceSmall"/>
+    <TextView
+            android:id="@+id/text1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:text="text1"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+    <TextView
+            android:id="@+id/text2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_below="@+id/text1"
+            android:layout_alignParentLeft="true"
+            android:text="text2"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
 	<CheckBox
 		android:id="@+id/checkbox"
 		android:layout_width="wrap_content"
@@ -49,4 +43,4 @@
 		android:clickable="false"
 		android:layout_centerVertical="true"
 		android:layout_alignParentRight="true" />
-</com.geoodk.collect.android.views.TwoItemMultipleChoiceView>
+</org.odk.collect.android.views.TwoItemMultipleChoiceView>

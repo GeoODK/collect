@@ -185,7 +185,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
       prefIntent = new Intent(this, AggregatePreferencesActivity.class);
     } else if (mProtocolPreference.getValue().equals(
         getString(R.string.protocol_google_maps_engine))) {
-      prefIntent = new Intent(this, GMEPreferencesActivity.class);
+      //prefIntent = new Intent(this, GMEPreferencesActivity.class);
     } else {
       // other
       prefIntent = new Intent(this, OtherPreferencesActivity.class);
@@ -208,7 +208,7 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
           setDefaultAggregatePaths();
           prefIntent = new Intent(PreferencesActivity.this, AggregatePreferencesActivity.class);
         } else if (value.equals(getString(R.string.protocol_google_maps_engine))) {
-          prefIntent = new Intent(PreferencesActivity.this, GMEPreferencesActivity.class);
+          //prefIntent = new Intent(PreferencesActivity.this, GMEPreferencesActivity.class);
         } else {
           // other
           prefIntent = new Intent(PreferencesActivity.this, OtherPreferencesActivity.class);

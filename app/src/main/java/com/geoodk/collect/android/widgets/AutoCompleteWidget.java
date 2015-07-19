@@ -24,7 +24,7 @@ import org.javarosa.core.model.data.SelectOneData;
 import org.javarosa.core.model.data.helper.Selection;
 import org.javarosa.form.api.FormEntryPrompt;
 import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.odk.collect.android.external.ExternalDataUtil;
+import com.geoodk.collect.android.external.ExternalDataUtil;
 
 import android.content.Context;
 import android.graphics.Color;
