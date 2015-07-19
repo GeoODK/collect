@@ -4,59 +4,72 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-	<org.osmdroid.views.MapView
-	    android:id="@+id/geotrace_mapview"
-	    android:layout_width="fill_parent"
+    <org.osmdroid.views.MapView
+        android:id="@+id/geotrace_mapview"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
 
-	 <ImageButton
-	    android:id="@+id/geotrace_play_button"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:padding="20dp"
-	    android:src="@drawable/play_button" />
-	 <ImageButton
+
+    <ImageButton
+        android:id="@+id/geotrace_play_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="18dp"
+        android:src="@drawable/play_button" />
+    <ImageButton
+        android:id="@+id/geotrace_pause_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="18dp"
+        android:visibility="gone"
+        android:src="@drawable/pause_button" />
+    <ImageButton
         android:id="@+id/geotrace_polygon_button"
         android:layout_below="@+id/geotrace_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:visibility="gone"
-        android:padding="20dp"
+        android:padding="18dp"
         android:src="@drawable/polygon" />
-	<ImageButton
+    <ImageButton
         android:id="@+id/geotrace_clear_button"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:padding="20dp"
+        android:padding="18dp"
+        android:visibility="gone"
         android:src="@drawable/sweep" />
-    <ImageButton
-        android:id="@+id/geoShape_layers_button"
-        android:layout_below="@+id/geotrace_play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:src="@drawable/layers" />
+
     <Button
         android:text="Record Location Point"
         android:id="@+id/manual_button"
-        android:layout_toRightOf="@id/geotrace_play_button"
+        android:layout_toRightOf="@id/geotrace_pause_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="25dp"
+        android:padding="21dp"
+        android:visibility="gone"
         android:textColor="#005229"
         android:textStyle="bold"
-        android:visibility="gone" />
+        />
+
     <ImageButton
         android:id="@+id/geotrace_save"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:padding="20dp"
+        android:layout_toRightOf="@id/geotrace_play_button"
         android:visibility="gone"
-        android:src="@drawable/ic_menu_save"
-        android:layout_toRightOf="@+id/geoShape_layers_button" />
+        android:padding="18dp"
+        android:src="@drawable/ic_menu_save" />
+
+    <ImageButton
+        android:id="@+id/geoTrace_layers_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/layers" />
 
 </RelativeLayout>
