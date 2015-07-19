@@ -6,7 +6,7 @@
 	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
-<org.odk.collect.android.views.TwoItemMultipleChoiceView
+<com.geoodk.collect.android.views.TwoItemMultipleChoiceView
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
@@ -43,4 +43,4 @@
 		android:clickable="false"
 		android:layout_centerVertical="true"
 		android:layout_alignParentRight="true" />
-</org.odk.collect.android.views.TwoItemMultipleChoiceView>
+</com.geoodk.collect.android.views.TwoItemMultipleChoiceView>

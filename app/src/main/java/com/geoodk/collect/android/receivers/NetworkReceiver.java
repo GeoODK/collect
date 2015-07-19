@@ -1,7 +1,6 @@
 
 package com.geoodk.collect.android.receivers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,9 +31,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
-import com.google.android.gms.auth.UserRecoverableAuthException;
+
 
 public class NetworkReceiver extends BroadcastReceiver implements InstanceUploaderListener {
 
@@ -61,7 +58,7 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
                     uploadForms(context);
                 }
             }
-        } else if (action.equals("org.odk.collect.android.FormSaved")) {
+        } else if (action.equals("com.geoodk.collect.android.FormSaved")) {
             ConnectivityManager connectivityManager = (ConnectivityManager) context
                     .getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
