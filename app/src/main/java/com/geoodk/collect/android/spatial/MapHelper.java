@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
+import org.osmdroid.tileprovider.MapTile;
 
 import com.geoodk.collect.android.application.Collect;
 
@@ -15,23 +16,33 @@ public class MapHelper {
 		// TODO Auto-generated method stub
 		
 		ITileSource baseTiles;
-        if (basemap.equals("MAPNIK")){
-           baseTiles = TileSourceFactory.MAPNIK;
-        }else if (basemap.equals("CYCLEMAP")){
-            baseTiles = TileSourceFactory.CYCLEMAP;
-        }else if (basemap.equals("PUBLIC_TRANSPORT")){
-            baseTiles = TileSourceFactory.PUBLIC_TRANSPORT;
-        }else if(basemap.equals("MAPQUESTOSM")){
-            baseTiles = TileSourceFactory.MAPQUESTOSM;
-        }else if(basemap.equals("MAPQUESTAERIAL")){
-            baseTiles = TileSourceFactory.MAPQUESTAERIAL;
-        }else if(basemap.equals("Moabi_Baselayer")){
-            	String[] baseURL = new String[]{"http://tiles.osm.moabi.org/moabi_base/"}; 
-            	baseTiles = new XYTileSource("Moabli",null, 4, 17, 256, ".png", baseURL);
+        String[] baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
+        if (basemap.equals("Default")){
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
+        }else if(basemap.equals("Steets Classic")){
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n141ednk/"};
+        }else if(basemap.equals("Outdoors")){
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n1417e4k/"};
+        }else if(basemap.equals("Dark")){
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n1425ld2/"};
+        }else if(basemap.equals("Activities")){
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
+
         }else{
-            baseTiles = TileSourceFactory.MAPQUESTOSM;
+            //Else nothing
+            baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
         	
         }
+
+        final String accessToken = "pk.eyJ1Ijoiam9ubm9yZGxpbmciLCJhIjoiZTcwNDcxN2ZiMWU0YTZhZjM2ZWFlNTMxZWI4Y2QwNWMifQ.mMQKvbPR2IYIv7DsV2HU4A#4";
+        baseTiles = new XYTileSource(basemap, null, 1, 22, 256, ".png", baseURL){
+            @Override
+            public String getTileURLString(MapTile aTile) {
+                String str = super.getTileURLString(aTile) + "?access_token=" + accessToken;
+                return str;
+            }
+        };
+
         return baseTiles;
 	}
     public static String[] getOfflineLayerList() {
