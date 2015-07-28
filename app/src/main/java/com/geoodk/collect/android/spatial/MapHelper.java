@@ -14,6 +14,9 @@ public class MapHelper {
 	
 	public static ITileSource getTileSource(String basemap) {
 		// TODO Auto-generated method stub
+
+        //Having Custom Tile Sources, this allows for custom zoom level
+        
 		
 		ITileSource baseTiles;
         String[] baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
