@@ -16,6 +16,7 @@
  * Responsible for creating polygons/polyline with GPS Tracking
  *
  * @author Jon Nordling (jonnordling@gmail.com)
+ * 
  */
 
 package com.geoodk.collect.android.activities;
