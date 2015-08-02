@@ -187,6 +187,9 @@ public class SplashScreenActivity extends Activity {
                 try {
                     super.run();
                     while (count < mSplashTimeout) {
+                        if (count > (mSplashTimeout - 300)){
+
+                        }
                         sleep(100);
                         count += 100;
                     }

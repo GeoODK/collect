@@ -61,6 +61,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -98,9 +99,13 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	private ImageButton pause_button;
 	private ProgressDialog progress;
 	public AlertDialog.Builder builder;
+	public AlertDialog.Builder p_builder;
+
 	public LayoutInflater inflater;
 	private AlertDialog alert;
+	private AlertDialog p_alert;
 	private View traceSettingsView;
+	private View polygonPolylineView;
 	private PathOverlay pathOverlay;
 	private ArrayList<Marker> map_markers = new ArrayList<>();
 	private String final_return_string;
@@ -109,6 +114,8 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	private	EditText time_number;
 	private Spinner time_units;
 	private Spinner time_delay;
+	private Button polygon_save;
+	private Button polyline_save;
 	private Boolean beenPaused;
 	public Boolean layerStatus = false;
 	private String[] OffilineOverlays;
@@ -131,11 +138,11 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	protected void onResume() {
 		//setGPSStatus();
 		super.onResume();
-//		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-//		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
-//		baseTiles = MapHelper.getTileSource(basemap);
-//		mapView.setTileSource(baseTiles);
-//		mapView.setUseDataConnection(online);
+		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		baseTiles = MapHelper.getTileSource(basemap);
+		mapView.setTileSource(baseTiles);
+		mapView.setUseDataConnection(online);
 		setGPSStatus();
 	}
 
@@ -150,6 +157,12 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	protected void onStop() {
 		super.onStop();
 		disableMyLocation();
+	}
+	@Override
+	public void finish() {
+		ViewGroup view = (ViewGroup) getWindow().getDecorView();
+		view.removeAllViews();
+		super.finish();
 	}
 
 	@Override
@@ -185,6 +198,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		mMyLocationOverlay.runOnFirstFix(centerAroundFix);
 		inflater = this.getLayoutInflater();
 		traceSettingsView = inflater.inflate(R.layout.geotrace_dialog, null);
+		polygonPolylineView = inflater.inflate(R.layout.polygon_polyline_dialog, null);
 		time_delay = (Spinner) traceSettingsView.findViewById(R.id.trace_delay);
 		time_delay.setSelection(3);
 		time_units = (Spinner) traceSettingsView.findViewById(R.id.trace_scale);
@@ -237,7 +251,13 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 			@Override
 			public void onClick(View v) {
-				saveConfirm();
+//				saveConfirm();
+//				alert.dismiss();
+				p_alert.show();
+//				openPolygonDialog();
+
+//				setContentView(R.layout.geotrace_layout);
+
 
 			}
 		});
@@ -320,7 +340,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		});
 
 		overlayMapLayerListner();
-		buildDialog();
+		buildDialogs();
 		Intent intent = getIntent();
 		if (intent != null && intent.getExtras() != null) {
 			if ( intent.hasExtra(GeoTraceWidget.TRACE_LOCATION) ) {
@@ -335,6 +355,35 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 			progress.show();
 
 		}
+
+		polygon_save = (Button) polygonPolylineView.findViewById(R.id.polygon_save);
+		polygon_save.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (map_markers.size()>2){
+					createPolygon();
+					p_alert.dismiss();
+					saveGeoTrace();
+				}else{
+					p_alert.dismiss();
+					showPolyonErrorDialog();
+				}
+
+
+			}
+		});
+		polyline_save = (Button) polygonPolylineView.findViewById(R.id.polyline_save);
+		polyline_save.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				p_alert.dismiss();
+				saveGeoTrace();
+
+			}
+		});
+
 
 		mapView.invalidate();
 	}
@@ -520,23 +569,27 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	}
 
 
-	private void buildDialog(){
+	private void buildDialogs(){
+
 		builder = new AlertDialog.Builder(this);
 
 		builder.setTitle(getString(R.string.geotrace_instruction));
 		builder.setMessage(getString(R.string.geotrace_instruction_message));
-
+		builder.setView(null);
 		builder.setView(traceSettingsView)
 				// Add action buttons
 				.setPositiveButton(getString(R.string.start), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						startGeoTrace();
+						dialog.cancel();
+						alert.dismiss();
 					}
 				})
 				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.cancel();
+						alert.dismiss();
 						reset_trace_settings();
 					}
 				})
@@ -551,37 +604,44 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 		alert = builder.create();
 
+
+
+		p_builder = new AlertDialog.Builder(this);
+		p_builder.setTitle("Select Polygon/Polyline");
+//		p_builder.setMessage(getString(R.string.polygon_conection_message));
+		p_builder.setView(polygonPolylineView)
+				// Add action buttons
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+
+					}
+				})
+				.setOnCancelListener(new OnCancelListener() {
+
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						dialog.cancel();
+						alert.dismiss();
+					}
+				});
+
+		p_alert = p_builder.create();
+
+
+
 	}
 
 	private void createPolygon(){
 		map_markers.add(map_markers.get(0));
 		pathOverlay.addPoint(map_markers.get(0).getPosition());
 		mapView.invalidate();
+
 		//polygon_button.setVisibility(View.GONE);
 	}
 
 	private void openPolygonDialog(){
-		Builder polygonBuilder = new AlertDialog.Builder(this);
-		polygonBuilder.setTitle(getString(R.string.polygon_conection_title));
-		polygonBuilder.setMessage(getString(R.string.polygon_conection_message));
-		polygonBuilder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int id) {
-				createPolygon();
-
-
-			}
-		});
-		polygonBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-
-			@Override
-			public void onClick(DialogInterface dialog, int id) {
-
-			}
-		});
-		AlertDialog aD = polygonBuilder.create();
-		aD.show();
+		p_alert.show();
 	}
 
 	private void reset_trace_settings(){
@@ -672,18 +732,41 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 	}
 	private void saveConfirm(){
+//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//		builder.setMessage("Are you sure you are done? (Polygon will be created)")
+//				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int id) {
+//						//createPolygon();
+//						saveGeoTrace();
+//					}
+//				})
+//				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//
+//					}
+//				}).show();
+
+
+
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you are done? (Polygon will be created)")
-				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+
+		builder.setTitle("Title");
+		builder.setMessage("Are you sure you are done? (Polygon will be created)");
+
+		builder.setView(polygonPolylineView)
+				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						//createPolygon();
-						saveGeoTrace();
+//						dialog.cancel();
+//						reset_trace_settings();
 					}
 				})
-				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+				.setOnCancelListener(new OnCancelListener() {
 
+					@Override
+					public void onCancel(DialogInterface dialog) {
+//						reset_trace_settings();
 					}
 				}).show();
 
@@ -765,7 +848,6 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 			}
 		});
 		mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
-		//returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
 
 		return mbtilePath;
 	}
@@ -773,37 +855,21 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		File files = new File(Collect.OFFLINE_LAYERS);
 		ArrayList<String> results = new ArrayList<>();
 		results.add("None");
-//		 String[] overlay_folders =  files.list();
 		for(String folder : files.list()){
 			results.add(folder);
 		}
-//		 for(int i =0;i<overlay_folders.length;i++){
-//			 results.add(overlay_folders[i]);
-//			 //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
-//		 }
 		String[] finala = new String[results.size()];
 		finala = results.toArray(finala);
-		 /*for(int j = 0;j<finala.length;j++){
-			 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
-		 }*/
 		return finala;
 	}
 
 
 	private void showLayersDialog() {
-		//FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
-		//View view=fl.inflate(self, R.layout.showlayers_layout, null);
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
 		alertDialog.setTitle("Select Offline Layer");
 		OffilineOverlays = getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
-		//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
 		alertDialog.setSingleChoiceItems(OffilineOverlays, selected_layer, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
-				//Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
-				// The 'which' argument contains the index position
-				// of the selected item
-				//Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
-
 				switch (item) {
 					case 0:
 						mapView.getOverlays().remove(mbTileOverlay);

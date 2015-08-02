@@ -378,4 +378,6 @@
     <string name="polygon_conection_title">"Polygon Connector (Non-reversible)"</string>
     <string name="polygon_conection_message">"Select Yes to connect as polygon. For Polyline select cancel and just save"</string>
     <string name="yes">Yes</string>
+    <string name="polygon_save">Save as Polygon</string>
+    <string name="polyline_save">Save as Polyline</string>
 </resources>
