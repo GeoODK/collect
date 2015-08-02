@@ -238,11 +238,11 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 			@Override
 			public void onClick(View v) {
-				if (map_markers.size()>2){
-					openPolygonDialog();
-				}else{
-					showPolyonErrorDialog();
-				}
+//				if (map_markers.size()>2){
+//					openPolygonDialog();
+//				}else{
+//					showPolyonErrorDialog();
+//				}
 
 			}
 		});
@@ -251,13 +251,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 			@Override
 			public void onClick(View v) {
-//				saveConfirm();
-//				alert.dismiss();
 				p_alert.show();
-//				openPolygonDialog();
-
-//				setContentView(R.layout.geotrace_layout);
-
 
 			}
 		});
@@ -286,8 +280,6 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 						progress.show();
 
 					}else{
-						//play_button.setImageResource(R.drawable.stop_button);
-//            			alert.show();
 						if(!beenPaused){
 							alert.show();
 						}else{
@@ -307,17 +299,8 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 						play_check=true;
 					}
 				}else{
-					//play_button.setImageResource(R.drawable.play_button);
 					play_check=false;
 					startGeoTrace();
-					//stop_play();
-//                    try{
-//                        schedulerHandler.cancel(true);
-//                    }catch (Exception e){
-//                        // Do nothing
-//                    }
-
-					//disableMyLocation();
 				}
 			}
 		});
@@ -636,18 +619,12 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		map_markers.add(map_markers.get(0));
 		pathOverlay.addPoint(map_markers.get(0).getPosition());
 		mapView.invalidate();
-
-		//polygon_button.setVisibility(View.GONE);
 	}
 
-	private void openPolygonDialog(){
-		p_alert.show();
-	}
 
 	private void reset_trace_settings(){
 		play_button.setImageResource(R.drawable.play_button);
 		play_check=false;
-		//manual_button.setVisibility(View.GONE);
 	}
 
 	private void startGeoTrace(){
@@ -670,13 +647,13 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 
 	}
-	private void stop_play(){
-		manual_button.setVisibility(View.GONE);
-		play_button.setVisibility(View.GONE);
-		save_button.setVisibility(View.VISIBLE);
-		polygon_button.setVisibility(View.VISIBLE);
-
-	}
+//	private void stop_play(){
+//		manual_button.setVisibility(View.GONE);
+//		play_button.setVisibility(View.GONE);
+//		save_button.setVisibility(View.VISIBLE);
+//		polygon_button.setVisibility(View.VISIBLE);
+//
+//	}
 
 	private void setupManualMode(){
 		manual_button.setVisibility(View.VISIBLE);
@@ -698,7 +675,6 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 	}
 
 	private void addLocationMarker(){
-//    	Toast.makeText(this, "Add Point", Toast.LENGTH_LONG).show();
 		Marker marker = new Marker(mapView);
 		marker.setPosition(mMyLocationOverlay.getMyLocation());
 		Float last_know_acuracy = mMyLocationOverlay.getMyLocationProvider().getLastKnownLocation().getAccuracy();
@@ -707,7 +683,6 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 		marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 		marker.setDraggable(true);
 		marker.setOnMarkerDragListener(draglistner);
-		//Place holder to Accuracy
 		marker.setSubDescription(Float.toString(last_know_acuracy));
 		map_markers.add(marker);
 
@@ -731,46 +706,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 				}).show();
 
 	}
-	private void saveConfirm(){
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setMessage("Are you sure you are done? (Polygon will be created)")
-//				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						//createPolygon();
-//						saveGeoTrace();
-//					}
-//				})
-//				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//
-//					}
-//				}).show();
 
-
-
-
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-		builder.setTitle("Title");
-		builder.setMessage("Are you sure you are done? (Polygon will be created)");
-
-		builder.setView(polygonPolylineView)
-				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-//						dialog.cancel();
-//						reset_trace_settings();
-					}
-				})
-				.setOnCancelListener(new OnCancelListener() {
-
-					@Override
-					public void onCancel(DialogInterface dialog) {
-//						reset_trace_settings();
-					}
-				}).show();
-
-	}
 
 	private String generateReturnString() {
 		String temp_string = "";
@@ -904,7 +840,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 
 			}
 		});
-		//alertDialog.setView(view);
+
 		alertDialog.show();
 	}
 
@@ -962,8 +898,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 						mapView.invalidate();
 					}
 				}, 100);
-				//mapView.getOverlays().remove(overlay);
-				//mapView.getOverlays().add(overlay);
+
 
 			}
 		}
