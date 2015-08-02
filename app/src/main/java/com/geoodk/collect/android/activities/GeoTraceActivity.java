@@ -308,6 +308,7 @@ public class GeoTraceActivity extends Activity implements IRegisterReceiver {
 				save_button.setVisibility(View.VISIBLE);
 				pause_button.setVisibility(View.GONE);
 				manual_button.setVisibility(View.GONE);
+				play_check = true;
 				try {
 					schedulerHandler.cancel(true);
 				} catch (Exception e) {

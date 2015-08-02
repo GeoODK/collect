@@ -47,10 +47,11 @@
         android:layout_toRightOf="@id/geotrace_pause_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="21dp"
+        android:padding="18dp"
         android:visibility="gone"
         android:textColor="#005229"
         android:textStyle="bold"
+        android:drawableRight="@drawable/distance"
         />
 
     <ImageButton
