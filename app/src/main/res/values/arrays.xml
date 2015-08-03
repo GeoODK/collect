@@ -74,7 +74,7 @@
 		<item>@string/form_processing_logic_2</item>
 		<item>@string/form_processing_logic_3</item>
 	</string-array>
-	<string-array
+	<string-array translatable="false"
 	    name="basemap_entries">
 		<item>Default</item>
 		<item>Steets Classic</item>
@@ -83,12 +83,12 @@
 		<item>Activities</item>
 	</string-array>
 	
-	<string-array name="time_scale">
+	<string-array name="time_scale" translatable="false">
         <item>Seconds</item>
 		<item>Minutes</item>
     </string-array>
 
-	<string-array name="delay_scale">
+	<string-array name="delay_scale" translatable="false">
 		<item>1</item>
 		<item>5</item>
 		<item>10</item>

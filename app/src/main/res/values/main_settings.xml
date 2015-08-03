@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-     <string-array name="main_settings">
+     <string-array name="main_settings" translatable="false">
         <item>Form Management</item>
         <item>General Settings</item>
         <item>Admin Settings</item>

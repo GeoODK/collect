@@ -8,8 +8,8 @@ android {
         applicationId "com.geoodk.collect.android"
         minSdkVersion 9
         targetSdkVersion 9
-        versionCode 1
-        versionName "1.0"
+        versionCode 12
+        versionName "1.8"
     }
     buildTypes {
         release {
