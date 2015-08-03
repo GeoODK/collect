@@ -40,11 +40,11 @@
     	do not declare anything here - detect capabilities at runtime.
     -->
 
-    <permission
-        android:name="org.opendatakit.tables.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" />
+    <!--<permission-->
+        <!--android:name="org.opendatakit.tables.permission.MAPS_RECEIVE"-->
+        <!--android:protectionLevel="signature" />-->
 
-    <uses-permission android:name="org.opendatakit.tables.permission.MAPS_RECEIVE" />
+    <!--<uses-permission android:name="org.opendatakit.tables.permission.MAPS_RECEIVE" />-->
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <uses-sdk
@@ -64,7 +64,6 @@
         android:icon="@drawable/notes2"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:debuggable="true"
         android:theme="@style/Collect" >
         <provider
             android:name=".provider.FormsProvider"
