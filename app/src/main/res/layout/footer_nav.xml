@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/footer"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:layout_gravity="center"
+	android:background="@color/common_action_bar_splitter"
+	android:layout_alignParentBottom="true"
+	style="@android:style/ButtonBar">
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:orientation="vertical"
+		android:layout_weight="1">
+
+		<ImageButton android:id="@+id/collect_data"
+			android:layout_gravity="center"
+			android:layout_width="wrap_content"
+
+			android:layout_height="wrap_content"
+			android:background="@drawable/state_color"
+			android:src="@drawable/geoodk_notes" />
+
+	</LinearLayout>
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:orientation="vertical"
+		android:layout_weight="1">
+		<ImageButton android:id="@+id/edit_data"
+			android:layout_width="wrap_content"
+			android:layout_gravity="center"
+			android:layout_height="wrap_content"
+			android:background="@drawable/state_color"
+			android:src="@drawable/edit_data" />
+
+	</LinearLayout>
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center"
+		android:orientation="vertical"
+		android:layout_weight="1">
+		<ImageButton android:id="@+id/setting_data"
+			android:layout_width="wrap_content"
+			android:layout_gravity="center"
+			android:layout_height="wrap_content"
+			android:background="@drawable/state_color"
+			android:src="@drawable/settings_gear" />
+
+	</LinearLayout>
+</LinearLayout>

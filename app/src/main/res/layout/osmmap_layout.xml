@@ -30,5 +30,6 @@
 	    android:layout_alignParentRight="true"
 	    android:padding="20dp"
 	    android:src="@drawable/layers" />
-	
+
+	<!--<include layout="@layout/footer_nav"/>-->
 </RelativeLayout>

@@ -21,37 +21,26 @@
 
 package com.geoodk.collect.android.activities;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+
+import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.application.Collect;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.geoodk.collect.android.R;
-import com.geoodk.collect.android.application.Collect;
-import com.geoodk.collect.android.preferences.AdminPreferencesActivity;
-import com.geoodk.collect.android.preferences.MapSettings;
-import com.geoodk.collect.android.preferences.PreferencesActivity;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.AssetManager;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.Toast;
-
-public class GeoODK extends Activity {
+public class GeoODKClassicActivity extends Activity {
 	private static final String t = "GeoODK";
 	private static boolean EXIT = true;
 	private AlertDialog mAlertDialog;
@@ -64,10 +53,9 @@ public class GeoODK extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.geoodk_layout);
+        setContentView(R.layout.geoodk_classic_layout);
         
-        //Create the files and directorys
-        
+
         Log.i(t, "Starting up, creating directories");
 		try {
 			Collect.createODKDirs();
@@ -77,8 +65,8 @@ public class GeoODK extends Activity {
 		}
 		assestFormList = getAssetFormList();
 		copyForms(assestFormList);
-		
-		
+
+
 		ImageButton geoodk_collect_button = (ImageButton) findViewById(R.id.geoodk_collect_butt);
         geoodk_collect_button.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
@@ -88,30 +76,28 @@ public class GeoODK extends Activity {
 				startActivity(i);
 		    }
 		});
-       
+
         ImageButton geoodk_manage_but = (ImageButton) findViewById(R.id.geoodk_edit_butt);
 		geoodk_manage_but.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Collect.getInstance().getActivityLogger()
 						.logAction(this, "editSavedForm", "click");
-				Intent i = new Intent(getApplicationContext(),
-						InstanceChooserList.class);
+				Intent i = new Intent(getApplicationContext(),InstanceChooserList.class);
 				startActivity(i);
 			}
 		});
 		ImageButton geoodk_map_but = (ImageButton) findViewById(R.id.geoodk_map_butt);
 		geoodk_map_but.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				Collect.getInstance().getActivityLogger()
 						.logAction(this, "map_data", "click");
-				Intent i = new Intent(getApplicationContext(),
-						OSM_Map.class);
+				Intent i = new Intent(getApplicationContext(),	OSM_Map.class);
 				startActivity(i);
 			}
 		});
-		
+
 		ImageButton geoodk_settings_but = (ImageButton) findViewById(R.id.geoodk_settings_butt);
 		geoodk_settings_but.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -119,10 +105,10 @@ public class GeoODK extends Activity {
 				.getActivityLogger()
 				.logAction(this,"Main_Settings","click");
 				Intent ig = new Intent( getApplicationContext(), MainSettingsActivity.class);
-						startActivity(ig);
+				startActivity(ig);
 			}
 		});
-		
+
 		ImageButton geoodk_send_but = (ImageButton) findViewById(R.id.geoodk_send_data_butt);
 		geoodk_send_but.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -130,8 +116,7 @@ public class GeoODK extends Activity {
 				// TODO Auto-generated method stub
 				Collect.getInstance().getActivityLogger()
 				.logAction(this, "uploadForms", "click");
-					Intent i = new Intent(getApplicationContext(),
-							InstanceUploaderList.class);
+					Intent i = new Intent(getApplicationContext(),InstanceUploaderList.class);
 					startActivity(i);
 			}
 		});
@@ -141,8 +126,7 @@ public class GeoODK extends Activity {
 			public void onClick(View v) {
 				Collect.getInstance().getActivityLogger()
 						.logAction(this, "deleteSavedForms", "click");
-				Intent i = new Intent(getApplicationContext(),
-						FileManagerTabs.class);
+				Intent i = new Intent(getApplicationContext(),FileManagerTabs.class);
 				startActivity(i);
 			}
 		});

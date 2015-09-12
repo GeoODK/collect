@@ -155,13 +155,13 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
     private ImageButton gps_button;
     private ImageButton layers_button;
     private ImageButton map_setting_button;
-
+    private ImageButton collect_data;
+    private ImageButton edit_data;
+    private ImageButton settings_data;
 
     XmlPullParserFactory factory;
 
     private AlertDialog mAlertDialog;
-
-
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private final Runnable centerAroundFix = new Runnable() {
@@ -381,7 +381,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
         instance_cur.close();
     }
-    //Make this more eficient so that you dont have to use the cursor all the time only if the form has not be queried
+    //Make this more eficient so that you dont have to use the cursoron all the time only if the form has not be queried
     public String getGeoField(final String form_id) throws XmlPullParserException, IOException{
         String formFilePath ="";
         final String formsortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
@@ -556,11 +556,46 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 mapView.getController().setCenter(point);
             }
         }, 100);
+
         
         //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
         //compassOverlay.enableCompass();
         //mapView.getOverlays().add(compassOverlay);
         mapView.invalidate();
+
+//        // TODO, put this in a class to deal with other pages that want
+//        // to also use it
+//
+//        collect_data = (ImageButton) findViewById(R.id.collect_data);
+//        collect_data.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(final View v) {
+//                // TODO Auto-generated method stub
+//                final Intent i = new Intent(self, FormChooserList.class);
+//                startActivity(i);
+//
+//            }
+//        });
+//        edit_data = (ImageButton) findViewById(R.id.edit_data);
+//        edit_data.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(final View v) {
+//                // TODO Auto-generated method stub
+//                final Intent i = new Intent(self, InstanceChooserList.class);
+//                startActivity(i);
+//
+//            }
+//        });
+//        settings_data = (ImageButton) findViewById(R.id.setting_data);
+//        settings_data.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(final View v) {
+//                // TODO Auto-generated method stub
+//                final Intent i = new Intent(self, MainSettingsActivity.class);
+//                startActivity(i);
+//
+//            }
+//        });
     }
 
     @Override

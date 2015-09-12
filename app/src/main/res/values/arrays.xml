@@ -95,5 +95,9 @@
 		<item>20</item>
 		<item>30</item>
 	</string-array>
+	<string-array name="geoodk_themes" translatable="false">
+		<item>Clasic Theme</item>
+		<item>Map Theme</item>
+	</string-array>
 
 </resources>

@@ -380,4 +380,5 @@
     <string name="yes">Yes</string>
     <string name="polygon_save">Save as Polygon</string>
     <string name="polyline_save">Save as Polyline</string>
+    <string name="subtitle">Collect, Map &amp; Manage Data</string>
 </resources>

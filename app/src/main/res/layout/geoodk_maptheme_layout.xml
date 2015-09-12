@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical" >
+
+	<org.osmdroid.views.MapView
+		android:id="@+id/mainMapView"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"/>
+
+
+	<ImageButton
+		android:id="@+id/collect_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/clipboard_map"
+		android:layout_margin="5dp"
+		android:padding="20dp"
+		android:layout_above="@+id/layers"
+		android:layout_alignParentRight="true"/>
+	<ImageButton
+		android:id="@+id/layers"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:padding="20dp"
+		android:src="@drawable/layers"
+		android:layout_margin="5dp"
+		android:layout_above="@+id/grid"
+		android:layout_alignParentRight="true"/>
+	<ImageButton
+		android:id="@+id/grid"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:padding="20dp"
+		android:layout_margin="5dp"
+		android:layout_above="@+id/gps"
+        android:layout_alignParentRight="true"
+		android:src="@drawable/grid" />
+    <ImageButton
+        android:id="@+id/gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_menu_mylocation"
+        android:layout_margin="5dp"
+        android:padding="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+
+</RelativeLayout>

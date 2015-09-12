@@ -14,11 +14,6 @@
 
 package com.geoodk.collect.android.activities;
 
-import com.geoodk.collect.android.R;
-
-import com.geoodk.collect.android.application.Collect;
-import com.geoodk.collect.android.preferences.PreferencesActivity;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,10 +27,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+
+import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.application.Collect;
+import com.geoodk.collect.android.preferences.PreferencesActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +40,7 @@ import java.io.IOException;
 
 public class SplashScreenActivity extends Activity {
 
-    private static final int mSplashTimeout = 2000; // milliseconds
+    private static final int mSplashTimeout = 4000; // milliseconds
     private static final boolean EXIT = true;
 
     private int mImageMaxWidth;
@@ -103,7 +99,8 @@ public class SplashScreenActivity extends Activity {
             editor.commit();
             startSplashScreen(splashPath);
         } else {
-            endSplashScreen();
+            startSplashScreen(splashPath);
+            //endSplashScreen();
         }
 
     }
@@ -112,8 +109,10 @@ public class SplashScreenActivity extends Activity {
     private void endSplashScreen() {
 
         // launch new activity and close splash screen
-    	startActivity(new Intent(SplashScreenActivity.this, GeoODK.class));
+//    	startActivity(new Intent(SplashScreenActivity.this, OSM_Map.class));
     	//Used when testing specific activity :)
+//        startActivity(new Intent(SplashScreenActivity.this, GeoODKClassicActivity.class));
+        startActivity(new Intent(SplashScreenActivity.this, GeoODKMapThemeActivity.class));
     	//startActivity(new Intent(SplashScreenActivity.this, GeoTraceActivity.class));
         //startActivity(new Intent(SplashScreenActivity.this, MainMenuActivity.class));
         finish();
@@ -166,16 +165,16 @@ public class SplashScreenActivity extends Activity {
 
     private void startSplashScreen(String path) {
 
-        // add items to the splash screen here. makes things less distracting.
-        ImageView iv = (ImageView) findViewById(R.id.splash);
-        LinearLayout ll = (LinearLayout) findViewById(R.id.splash_default);
-
-        File f = new File(path);
-        if (f.exists()) {
-            iv.setImageBitmap(decodeFile(f));
-            ll.setVisibility(View.GONE);
-            iv.setVisibility(View.VISIBLE);
-        }
+//        // add items to the splash screen here. makes things less distracting.
+//        ImageView iv = (ImageView) findViewById(R.id.splash);
+//        LinearLayout ll = (LinearLayout) findViewById(R.id.splash_default);
+//
+//        File f = new File(path);
+//        if (f.exists()) {
+//            iv.setImageBitmap(decodeFile(f));
+//            ll.setVisibility(View.GONE);
+//            iv.setVisibility(View.VISIBLE);
+//        }
 
         // create a thread that counts up to the timeout
         Thread t = new Thread() {
