@@ -99,8 +99,8 @@ public class SplashScreenActivity extends Activity {
             editor.commit();
             startSplashScreen(splashPath);
         } else {
-            startSplashScreen(splashPath);
-            //endSplashScreen();
+            //startSplashScreen(splashPath);
+            endSplashScreen();
         }
 
     }

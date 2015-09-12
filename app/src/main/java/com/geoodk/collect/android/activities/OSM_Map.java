@@ -29,49 +29,6 @@ package com.geoodk.collect.android.activities;
  *
  */
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-//import org.apache.james.mime4j.util.StringArrayMap;
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
-import org.osmdroid.events.MapListener;
-import org.osmdroid.events.ScrollEvent;
-import org.osmdroid.events.ZoomEvent;
-import org.osmdroid.tileprovider.IRegisterReceiver;
-import org.osmdroid.tileprovider.MapTileProviderBasic;
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.TilesOverlay;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentUris;
@@ -92,6 +49,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
+
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
@@ -102,6 +60,47 @@ import com.geoodk.collect.android.spatial.CustomMarkerHelper;
 import com.geoodk.collect.android.spatial.CustomPopupMaker;
 import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
+
+import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.IRegisterReceiver;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.TilesOverlay;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+//import org.apache.james.mime4j.util.StringArrayMap;
 
 public class OSM_Map extends Activity implements IRegisterReceiver{
     private MapView mapView;
@@ -362,9 +361,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
 
             final String[] markerObj = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString,geopoint_field};
             markerListArray.add(markerObj);
-
             //startActivity(new Intent(Intent.ACTION_EDIT, instanceUri));
-
             //Determine the geoPoint Field
             try {
                 createMaker(markerObj);
@@ -433,12 +430,6 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 eventType = xpp.next();
 
             }
-
-
-            //Now you loop through the xml form to find the geopoint.
-            //Im sure ODK has something that figured this out, but I could not find it so I wrote it
-
-
         }else{
             //File file Does not exist
         }

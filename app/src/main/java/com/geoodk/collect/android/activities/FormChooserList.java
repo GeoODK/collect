@@ -14,14 +14,6 @@
 
 package com.geoodk.collect.android.activities;
 
-import com.geoodk.collect.android.R;
-
-import com.geoodk.collect.android.application.Collect;
-import com.geoodk.collect.android.listeners.DiskSyncListener;
-import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import com.geoodk.collect.android.tasks.DiskSyncTask;
-import com.geoodk.collect.android.utilities.VersionHidingCursorAdapter;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentUris;
@@ -33,9 +25,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.application.Collect;
+import com.geoodk.collect.android.listeners.DiskSyncListener;
+import com.geoodk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import com.geoodk.collect.android.tasks.DiskSyncTask;
+import com.geoodk.collect.android.utilities.VersionHidingCursorAdapter;
 
 /**
  * Responsible for displaying all the valid forms in the forms directory. Stores the path to
@@ -98,6 +98,30 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
             mDiskSyncTask.setDiskSyncListener(this);
             mDiskSyncTask.execute((Void[]) null);
         }
+
+        Button formDownloadList = (Button) findViewById(R.id.getforms);
+        formDownloadList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collect.getInstance().getActivityLogger()
+                        .logAction(this, "FormDownloadList", "click");
+                Intent i = new Intent(getApplicationContext(),	FormDownloadList.class);
+                startActivity(i);
+            }
+        });
+
+        Button collect_button = (Button) findViewById(R.id.generalsettings);
+        collect_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collect.getInstance().getActivityLogger()
+                        .logAction(this, "FormDownloadList", "click");
+                Intent i = new Intent(getApplicationContext(),	FormDownloadList.class);
+                startActivity(i);
+            }
+        });
+
+
     }
 
 

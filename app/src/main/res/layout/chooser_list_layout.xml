@@ -33,15 +33,36 @@ the License.
 			android:id="@id/android:list"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"/>
-		<TextView
+
+		<RelativeLayout
 			android:id="@android:id/empty"
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:text="@string/no_items_display_forms"
-			android:textSize="21sp"
-			android:paddingLeft="20dp"
-			android:paddingRight="20dp"
-			android:gravity="center"
-			android:background="@drawable/white"
-			android:textColor="@drawable/black" />
+			android:layout_height="fill_parent">
+			<TextView
+				android:id="@+id/nothingText"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:text="@string/no_items_display_forms"
+				android:textSize="21sp"
+				android:paddingLeft="20dp"
+				android:paddingRight="20dp"
+				android:layout_marginTop="50dp"
+				android:layout_marginBottom="50dp"
+				android:gravity="center"
+				android:textColor="@drawable/black"
+				android:background="@drawable/white"/>
+			<Button
+				android:id="@+id/getforms"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/nothingText"
+				android:text="@string/get_forms"/>
+			<Button
+				android:id="@+id/generalsettings"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/getforms"
+				android:text="@string/general_preferences"/>
+		</RelativeLayout>
+
 </LinearLayout>

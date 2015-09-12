@@ -130,6 +130,8 @@ public class GeoODKClassicActivity extends Activity {
 				startActivity(i);
 			}
 		});
+
+
 		//End of Main activity
     }
 	

@@ -87,7 +87,7 @@
     <string name="forms">Blank Forms</string>
     <string name="getting_location">Loading Location</string>
     <string name="get_barcode">Get Barcode</string>
-    <string name="get_forms">Get Blank Form</string>
+    <string name="get_forms">Get Blank Forms</string>
     <string name="get_location">Record Location</string>
     <string name="provider_disabled_error">Sorry, Location providers are disabled!</string>
     <string name="invalid_answer_error">Sorry, this response is invalid!</string>
