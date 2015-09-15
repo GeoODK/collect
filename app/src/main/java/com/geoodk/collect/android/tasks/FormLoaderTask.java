@@ -14,37 +14,11 @@
 
 package com.geoodk.collect.android.tasks;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.util.Log;
 
-import org.apache.commons.io.IOUtils;
-import org.javarosa.core.model.FormDef;
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.instance.InstanceInitializationFactory;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.core.model.instance.TreeReference;
-import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
-import org.javarosa.core.reference.ReferenceManager;
-import org.javarosa.core.reference.RootTranslator;
-import org.javarosa.core.util.externalizable.DeserializationException;
-import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.debug.Event;
-import org.javarosa.debug.EventNotifier;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryModel;
-import org.javarosa.xform.parse.XFormParseException;
-import org.javarosa.xform.parse.XFormParser;
-import org.javarosa.xform.util.XFormUtils;
-import org.javarosa.xpath.XPathTypeMismatchException;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.database.ItemsetDbAdapter;
@@ -62,10 +36,36 @@ import com.geoodk.collect.android.preferences.AdminPreferencesActivity;
 import com.geoodk.collect.android.utilities.FileUtils;
 import com.geoodk.collect.android.utilities.ZipUtils;
 
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.util.Log;
+import org.apache.commons.io.IOUtils;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.instance.InstanceInitializationFactory;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.core.model.instance.TreeReference;
+import org.javarosa.core.model.instance.utils.DefaultAnswerResolver;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.core.reference.RootTranslator;
+import org.javarosa.core.util.externalizable.DeserializationException;
+import org.javarosa.core.util.externalizable.ExtUtil;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryModel;
+import org.javarosa.xform.parse.XFormParseException;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.util.XFormUtils;
+import org.javarosa.xpath.XPathTypeMismatchException;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import au.com.bytecode.opencsv.CSVReader;
 
 /**

@@ -1,17 +1,16 @@
 package com.geoodk.collect.android.spatial;
 
+import com.geoodk.collect.android.application.Collect;
+
+import org.osmdroid.tileprovider.MapTile;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
+
 import java.io.File;
 import java.util.ArrayList;
 
-import org.osmdroid.tileprovider.tilesource.ITileSource;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.tilesource.XYTileSource;
-import org.osmdroid.tileprovider.MapTile;
-
-import com.geoodk.collect.android.application.Collect;
-
 public class MapHelper {
-	
+
 	public static ITileSource getTileSource(String basemap) {
 		// TODO Auto-generated method stub
 

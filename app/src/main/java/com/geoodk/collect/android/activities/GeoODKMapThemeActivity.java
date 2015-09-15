@@ -41,6 +41,7 @@ import android.widget.ImageButton;
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
+import com.geoodk.collect.android.spatial.GeoRender;
 import com.geoodk.collect.android.spatial.MapHelper;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -79,6 +80,8 @@ public class GeoODKMapThemeActivity extends Activity {
 	private final Context self = this;
 	public int zoom_level =-1;
 
+	private GeoRender geoRender;
+
 	
     public static final String FORMS_PATH = Collect.ODK_ROOT + File.separator + "forms";
 	@Override
@@ -105,7 +108,7 @@ public class GeoODKMapThemeActivity extends Activity {
 	}
 
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.geoodk_maptheme_layout);
         
@@ -119,6 +122,23 @@ public class GeoODKMapThemeActivity extends Activity {
 		}
 		assestFormList = getAssetFormList();
 		copyForms(assestFormList);
+
+		// Testing
+			geoRender = new GeoRender(this.getApplicationContext());
+
+
+
+//		Cursor c = geoRender.getAllCursor();
+//		while (c.moveToNext()) {
+//			// Extract data.
+//			final String instance_url = c.getString(c.getColumnIndex("instanceFilePath"));
+//			final String instance_form_id = c.getString(c.getColumnIndex("jrFormId"));
+//			final String instance_form_name = c.getString(c.getColumnIndex("displayName"));
+//			final String instance_form_status = c.getString(c.getColumnIndex("status"));
+//			Log.i("Help!!!!!!!!!",instance_form_name);
+//
+//		}
+
 
 
 
