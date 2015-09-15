@@ -124,22 +124,7 @@ public class GeoODKMapThemeActivity extends Activity {
 		copyForms(assestFormList);
 
 		// Testing
-			geoRender = new GeoRender(this.getApplicationContext());
-
-
-
-//		Cursor c = geoRender.getAllCursor();
-//		while (c.moveToNext()) {
-//			// Extract data.
-//			final String instance_url = c.getString(c.getColumnIndex("instanceFilePath"));
-//			final String instance_form_id = c.getString(c.getColumnIndex("jrFormId"));
-//			final String instance_form_name = c.getString(c.getColumnIndex("displayName"));
-//			final String instance_form_status = c.getString(c.getColumnIndex("status"));
-//			Log.i("Help!!!!!!!!!",instance_form_name);
-//
-//		}
-
-
+		geoRender = new GeoRender(this.getApplicationContext(),mapView);
 
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

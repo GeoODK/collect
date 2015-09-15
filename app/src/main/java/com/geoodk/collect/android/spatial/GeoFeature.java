@@ -1,15 +1,30 @@
 package com.geoodk.collect.android.spatial;
 
+import java.util.ArrayList;
+
 /**
  * Created by jnordling on 9/14/15.
  */
+
+
 public class GeoFeature {
+
+
+
+    public ArrayList<ArrayList<GeoObject>> geoFields = new ArrayList<ArrayList<GeoObject>>();
     public String instance_url;
     public String instance_form_id;
     public String instance_form_name;
     public String instance_form_status;
     public String instanceUriString;
-    public String geopoint_field;
+
+
+    public ArrayList<ArrayList<GeoObject>> getGeoFields() {
+        return geoFields;
+    }
+    public void setGeoFields(ArrayList<ArrayList<GeoObject>> geoFields) {
+        this.geoFields = geoFields;
+    }
 
     public String getInstance_url() {
         return instance_url;
@@ -51,11 +66,4 @@ public class GeoFeature {
         this.instanceUriString = instanceUriString;
     }
 
-    public String getGeopoint_field() {
-        return geopoint_field;
-    }
-
-    public void setGeopoint_field(String geopoint_field) {
-        this.geopoint_field = geopoint_field;
-    }
 }
