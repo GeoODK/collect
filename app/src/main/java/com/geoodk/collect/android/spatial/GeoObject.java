@@ -1,5 +1,7 @@
 package com.geoodk.collect.android.spatial;
 
+import org.osmdroid.views.overlay.PathOverlay;
+
 import java.util.ArrayList;
 
 /**
@@ -9,6 +11,24 @@ public class GeoObject{
     public String type;
     public String nodeset;
     public ArrayList<ArrayList<String>> values = new ArrayList<ArrayList<String>>();
+    public CustomMarkerHelper pointMarker;
+    public PathOverlay pathOverlay;
+
+    public PathOverlay getPathOverlay() {
+        return pathOverlay;
+    }
+
+    public void setPathOverlay(PathOverlay pathOverlay) {
+        this.pathOverlay = pathOverlay;
+    }
+
+    public CustomMarkerHelper getPointMarker() {
+        return pointMarker;
+    }
+
+    public void setPointMarker(CustomMarkerHelper pointMarker) {
+        this.pointMarker = pointMarker;
+    }
 
     public String getGeotype() {
         return type;

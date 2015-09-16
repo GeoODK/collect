@@ -13,7 +13,7 @@ import android.util.Log;
 import com.geoodk.collect.android.provider.FormsProviderAPI;
 import com.geoodk.collect.android.provider.InstanceProviderAPI;
 
-import org.javarosa.xform.parse.XFormParser;
+
 import org.osmdroid.views.MapView;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +34,8 @@ import javax.xml.parsers.ParserConfigurationException;
 public class GeoRender {
 
     public Context context;
+    public MapView mapView;
+    public ArrayList<GeoFeature> geoFeatures = new ArrayList<GeoFeature>();
     private ArrayList<GeoFeature> geoFeaturesList;
     private XmlPullParserFactory factory;
     private ArrayList geoDataArray;
@@ -41,7 +43,6 @@ public class GeoRender {
     private String geoshape = "geoshape";
     private String geopoint = "geopoint";
     private String geotrace = "geotrace";
-    private XFormParser xform;
 
     public ArrayList getGeoData(){
         return this.geoDataArray;
@@ -49,8 +50,9 @@ public class GeoRender {
 
 
     public GeoRender(Context pContext,MapView mapView) {
-        if(pContext != null) {
+        if((pContext != null) && (mapView !=null)) {
             this.context = pContext;
+            this.mapView = mapView;
             Cursor instanceCursor = this.getAllCursor();
             while (instanceCursor.moveToNext()) {
                 String instance_url = instanceCursor.getString(instanceCursor.getColumnIndex("instanceFilePath"));
@@ -68,7 +70,10 @@ public class GeoRender {
                 geoFeature.setInstance_form_status(instance_form_status);
                 geoFeature.setInstance_url(instance_url);
                 geoFeature.setInstanceUriString(instanceUriString);
-                geoFeature.setGeoFields(getGeoField(fXmlFile));
+                geoFeature.setGeoFields(getGeoField(geoFeature,fXmlFile));
+
+//                createPointOverlay(geoFeature);
+
 
                 String tesss = "sds";
 
@@ -98,7 +103,7 @@ public class GeoRender {
     }
 
 
-    private ArrayList getGeoField(File file){
+    private ArrayList getGeoField(GeoFeature geoFeature,File file){
         //final String[] markerObj = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString,geopoint_field};
         ArrayList<GeoObject> geoFields = new ArrayList<GeoObject>();
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -125,6 +130,16 @@ public class GeoRender {
                             String nodeset = eElement.getAttribute("nodeset");
                             geoObject.setNodeset(nodeset);
                             geoObject.setGeotype(type);
+
+                            //Set The overlay data
+                            if (type.equals( geopoint)){
+                                geoObject.setPointMarker(createPointOverlay(geoFeature, geoObject));
+                            }
+
+//                            if (type.equals(geoshape)) {
+//                                createPathOverlay();
+//                            }
+
                             geoFields.add(geoObject);
                         }
                     }
@@ -141,5 +156,66 @@ public class GeoRender {
         }
         return geoFields;
     }
+
+    private CustomMarkerHelper createPointOverlay(GeoFeature geoFeature,GeoObject geoObject){
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        CustomMarkerHelper marker = new CustomMarkerHelper(this.mapView);
+
+        return marker;
+
+    }
+
+    private void createPathOverlay(){
+
+    }
+
+//    public void createMaker (final String[] cur_mark) throws XmlPullParserException, IOException {
+//        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+//        factory.setNamespaceAware(true);
+//        XmlPullParser xpp = factory.newPullParser();
+//        xpp.setInput(new FileReader(new File(cur_mark[pos_url])));
+//        int eventType = xpp.getEventType();
+//
+//        //For each of the objects in the instance xml <location>
+//        while (eventType != XmlPullParser.END_DOCUMENT) {
+//            if (xpp.getName()!=null){
+//                if(xpp.getName().equals(cur_mark[pos_geoField])){
+//                    if (eventType == XmlPullParser.START_TAG){
+//                        String tagname = xpp.getName();
+//                        eventType = xpp.next();
+//                        String value = xpp.getText();
+//                        if (value != null){
+//                            String[] location = xpp.getText().split(" ");
+//                            Double lat = Double.parseDouble(location[0]);
+//                            Double lng = Double.parseDouble(location[1]);
+//                            GeoPoint point = new GeoPoint(lat, lng);
+//                            CustomMarkerHelper startMarker = new CustomMarkerHelper(mapView);
+//                            startMarker.setMarker_name(cur_mark[pos_name]);
+//                            startMarker.setMarker_uri(Uri.parse(cur_mark[pos_uri]));
+//                            startMarker.setMarker_status(cur_mark[pos_status]);
+//                            startMarker.setMarker_url(cur_mark[pos_url]);
+//                            startMarker.setMarker_id(cur_mark[pos_id]);
+//                            startMarker.setMarker_geoField(cur_mark[pos_geoField]);
+//                            startMarker.setPosition(point);
+//                            startMarker.setIcon(this.getResources().getDrawable(R.drawable.map_marker));
+//                            startMarker.setTitle("Name: "+ cur_mark[pos_name]);
+//                            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+//                            startMarker.setSnippet("Status: "+cur_mark[pos_status]);
+//                            startMarker.setDraggable(true);
+//                            startMarker.setOnMarkerDragListener(draglistner);
+//                            startMarker.setInfoWindow(new CustomPopupMaker(mapView, Uri.parse(cur_mark[pos_uri])));
+//                            mapView.getOverlays().add(startMarker);
+//                            break;
+//                        }else{
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//            }
+//            eventType = xpp.next();
+//        }
+//    }
 
 }

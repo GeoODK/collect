@@ -289,11 +289,11 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                         eventType = xpp.next();
                         final String value = xpp.getText();
                         if (value != null){
-                            final String[] location = xpp.getText().split(" ");
-                            final Double lat = Double.parseDouble(location[0]);
-                            final Double lng = Double.parseDouble(location[1]);
-                            final GeoPoint point = new GeoPoint(lat, lng);
-                            final CustomMarkerHelper startMarker = new CustomMarkerHelper(mapView);
+                            String[] location = xpp.getText().split(" ");
+                            Double lat = Double.parseDouble(location[0]);
+                            Double lng = Double.parseDouble(location[1]);
+                            GeoPoint point = new GeoPoint(lat, lng);
+                            CustomMarkerHelper startMarker = new CustomMarkerHelper(mapView);
                             startMarker.setMarker_name(cur_mark[pos_name]);
                             startMarker.setMarker_uri(Uri.parse(cur_mark[pos_uri]));
                             startMarker.setMarker_status(cur_mark[pos_status]);
