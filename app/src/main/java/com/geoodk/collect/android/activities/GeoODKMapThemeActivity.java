@@ -89,7 +89,7 @@ public class GeoODKMapThemeActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onPause();
 		this.disableMyLocation();
-//		clearMapMarkers();
+		clearMapMarkers();
 	}
 	@Override
 	protected void onResume() {
@@ -105,6 +105,11 @@ public class GeoODKMapThemeActivity extends Activity {
 		setGPSStatus();
 
 		mapView.invalidate();
+	}
+
+	private void clearMapMarkers() {
+		mapView.getOverlays().clear();
+//		markerListArray.clear();
 	}
 
 	@Override
@@ -124,7 +129,7 @@ public class GeoODKMapThemeActivity extends Activity {
 		copyForms(assestFormList);
 
 		// Testing
-		geoRender = new GeoRender(this.getApplicationContext(),mapView);
+
 
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -144,6 +149,9 @@ public class GeoODKMapThemeActivity extends Activity {
 				return false;
 			}
 		});
+
+
+		geoRender = new GeoRender(this.getApplicationContext(),mapView);
 		//Initial Map Setting before Location is found
 
 		final Handler handler = new Handler();
