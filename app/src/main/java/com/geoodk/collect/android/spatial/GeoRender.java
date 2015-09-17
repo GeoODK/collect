@@ -8,6 +8,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.util.Log;
 
@@ -137,9 +138,9 @@ public class GeoRender {
                             if (type.equals( geopoint)){
                                 geoObject.setPointMarker(createPointOverlay(geoFeature, geoObject));
                             }
-//                            if (type.equals(geoshape)) {
-//                                createPathOverlay();
-//                            }
+                            if (type.equals(geoshape)) {
+                                createPathOverlay(geoFeature, geoObject);
+                            }
 
                             geoFields.add(geoObject);
                         }
@@ -180,8 +181,9 @@ public class GeoRender {
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
                         String value = eElement.getTextContent();
-                        if (value != null){
+                        if ((value != null) && (!value.equals(""))){
                             String[] location = value.split(" ");
+                            String z = "";
                             Double lat = Double.parseDouble(location[0]);
                             Double lng = Double.parseDouble(location[1]);
                             GeoPoint point = new GeoPoint(lat, lng);
@@ -219,6 +221,8 @@ public class GeoRender {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder;
         PathOverlay pathOverlay = new PathOverlay(Color.RED, this.context);
+        Paint pPaint = pathOverlay.getPaint();
+        pPaint.setStrokeWidth(6);
 //        CustomMarkerHelper marker = new CustomMarkerHelper(this.mapView);
         try{
             dBuilder = dbFactory.newDocumentBuilder();
@@ -239,8 +243,8 @@ public class GeoRender {
                         String value = eElement.getTextContent();
                         String s = value.replace("; ",";");
                         String[] sa = s.split(";");
-                        if (value != null){
-                            for (int i=0;i<(sa.length -1);i++){
+                        if ((value != null) && (!value.equals(""))){
+                            for (int i=0;i<(sa.length);i++){
                                 String[] sp = sa[i].split(" ");
                                 double gp[] = new double[4];
                                 String lat = sp[0].replace(" ", "");
@@ -275,6 +279,7 @@ public class GeoRender {
         }catch(ParserConfigurationException e){
             e.printStackTrace();
         }
+        mapView.getOverlays().add(pathOverlay);
 //        return marker;
 
     }

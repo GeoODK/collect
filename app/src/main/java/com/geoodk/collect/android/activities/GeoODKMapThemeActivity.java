@@ -36,6 +36,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import com.geoodk.collect.android.R;
@@ -101,7 +102,7 @@ public class GeoODKMapThemeActivity extends Activity {
 		baseTiles = MapHelper.getTileSource(basemap);
 		mapView.setTileSource(this.baseTiles);
 		mapView.setUseDataConnection(this.online);
-//		drawMarkers();
+		drawMarkers();
 		setGPSStatus();
 
 		mapView.invalidate();
@@ -112,6 +113,20 @@ public class GeoODKMapThemeActivity extends Activity {
 //		markerListArray.clear();
 	}
 
+	private void drawMarkers(){
+		geoRender = new GeoRender(this.getApplicationContext(),mapView);
+	}
+	@Override
+	public void finish() {
+		ViewGroup view = (ViewGroup) getWindow().getDecorView();
+		view.removeAllViews();
+		super.finish();
+	}
+	@Override
+	public void onDetachedFromWindow(){
+		super.onDetachedFromWindow();
+		setVisible(false);
+	}
 	@Override
     public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
@@ -151,8 +166,9 @@ public class GeoODKMapThemeActivity extends Activity {
 		});
 
 
-		geoRender = new GeoRender(this.getApplicationContext(),mapView);
+//		geoRender = new GeoRender(this.getApplicationContext(),mapView);
 		//Initial Map Setting before Location is found
+		drawMarkers();
 
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
