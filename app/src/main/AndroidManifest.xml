@@ -257,7 +257,7 @@
             android:required="false" />
 
         <activity
-            android:name=".activities.OSM_Map"
+            android:name=".activities.GeoODKMainMapActivity"
             android:configChanges="orientation"
             android:label="@string/title_activity_osm__map" >
         </activity>

@@ -93,7 +93,7 @@ public class GeoODKClassicActivity extends Activity {
 			public void onClick(View v) {
 				Collect.getInstance().getActivityLogger()
 						.logAction(this, "map_data", "click");
-				Intent i = new Intent(getApplicationContext(),	OSM_Map.class);
+				Intent i = new Intent(getApplicationContext(),	GeoODKMainMapActivity.class);
 				startActivity(i);
 			}
 		});

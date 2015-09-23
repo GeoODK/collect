@@ -94,7 +94,7 @@ import javax.xml.transform.stream.StreamResult;
 
 //import org.apache.james.mime4j.util.StringArrayMap;
 
-public class OSM_Map extends Activity implements IRegisterReceiver{
+public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver{
     private MapView mapView;
     private MapController myMapController;
     //private ItemizedIconOverlay<OverlayItem> complete_overlays;
@@ -181,7 +181,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             final GeoPoint newlocation = m.getPosition();
             newlocation.getLatitude();
             newlocation.getLongitude();
-            OSM_Map.this.loc_marker = new Marker(OSM_Map.this.mapView);
+            GeoODKMainMapActivity.this.loc_marker = new Marker(GeoODKMainMapActivity.this.mapView);
             final String lat = Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
             final String lng = Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
             //Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
@@ -242,7 +242,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             }
         };
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(OSM_Map.this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(GeoODKMainMapActivity.this);
         builder.setMessage(
                 "Are you sure you want to change the location of this point?")
                 .setPositiveButton("Yes", dialogClickListener)
@@ -510,7 +510,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         gps_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                OSM_Map.this.setGPSStatus();
+                GeoODKMainMapActivity.this.setGPSStatus();
             }
         });
 
@@ -659,7 +659,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
             @Override
             public void onClick(final DialogInterface dialog, final int id){
                 // Intent callGPSSettingIntent = new Intent(
-                OSM_Map.this.startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                GeoODKMainMapActivity.this.startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                 //startActivity(callGPSSettingIntent);
             }
         });
@@ -682,7 +682,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
         // TODO Auto-generated method stub
         //FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
         //View view=fl.inflate(self, R.layout.showlayers_layout, null);
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(OSM_Map.this);
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(GeoODKMainMapActivity.this);
         alertDialog.setTitle("Select Offline Layer");
         OffilineOverlays = MapHelper.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
@@ -697,26 +697,26 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 try {
                     switch (item) {
                         case 0:
-                            OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
-                            OSM_Map.this.layerStatus = false;
+                            GeoODKMainMapActivity.this.mapView.getOverlays().remove(GeoODKMainMapActivity.this.mbTileOverlay);
+                            GeoODKMainMapActivity.this.layerStatus = false;
                             break;
                         default:
-                            OSM_Map.this.mapView.getOverlays().remove(OSM_Map.this.mbTileOverlay);
+                            GeoODKMainMapActivity.this.mapView.getOverlays().remove(GeoODKMainMapActivity.this.mbTileOverlay);
                             //String mbTileLocation = getMBTileFromItem(item);
 
                             final String mbFilePath = getMBTileFromItem(item);
                             //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                             final File mbFile = new File(mbFilePath);
-                            OSM_Map.this.mbprovider = new MBTileProvider(OSM_Map.this, mbFile);
-                            OSM_Map.this.mbTileOverlay = new TilesOverlay(OSM_Map.this.mbprovider, OSM_Map.this);
-                            OSM_Map.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                            OSM_Map.this.mapView.getOverlays().add(OSM_Map.this.mbTileOverlay);
-                            OSM_Map.this.drawMarkers();
-                            OSM_Map.this.mapView.invalidate();
+                            GeoODKMainMapActivity.this.mbprovider = new MBTileProvider(GeoODKMainMapActivity.this, mbFile);
+                            GeoODKMainMapActivity.this.mbTileOverlay = new TilesOverlay(GeoODKMainMapActivity.this.mbprovider, GeoODKMainMapActivity.this);
+                            GeoODKMainMapActivity.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+                            GeoODKMainMapActivity.this.mapView.getOverlays().add(GeoODKMainMapActivity.this.mbTileOverlay);
+                            GeoODKMainMapActivity.this.drawMarkers();
+                            GeoODKMainMapActivity.this.mapView.invalidate();
 
                     }
                     //This resets the map and sets the selected Layer
-                    OSM_Map.this.selected_layer = item;
+                    GeoODKMainMapActivity.this.selected_layer = item;
                     dialog.dismiss();
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), false);
@@ -726,7 +726,7 @@ public class OSM_Map extends Activity implements IRegisterReceiver{
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        OSM_Map.this.mapView.invalidate();
+                        GeoODKMainMapActivity.this.mapView.invalidate();
                     }
                 }, 400);
 
