@@ -138,9 +138,10 @@ public class GeoRender {
                             if (type.equals( geopoint)){
                                 geoObject.setPointMarker(createPointOverlay(geoFeature, geoObject));
                             }
-                            if (type.equals(geoshape)) {
+                            if (type.equals(geoshape) || type.equals(geotrace)) {
                                 createPathOverlay(geoFeature, geoObject);
                             }
+
 
                             geoFields.add(geoObject);
                         }
