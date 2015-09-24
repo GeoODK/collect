@@ -266,53 +266,6 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         transformer.transform(source, results);
     }
 
-//    public void createMaker (final String[] cur_mark) throws XmlPullParserException, IOException {
-//        final XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-//        factory.setNamespaceAware(true);
-//        final XmlPullParser xpp = factory.newPullParser();
-//        xpp.setInput(new FileReader(new File(cur_mark[pos_url])));
-//        int eventType = xpp.getEventType();
-//
-//        //For each of the objects in the instance xml <location>
-//        while (eventType != XmlPullParser.END_DOCUMENT) {
-//            if (xpp.getName()!=null){
-//                if(xpp.getName().equals(cur_mark[pos_geoField])){
-//                    if (eventType == XmlPullParser.START_TAG){
-//                        final String tagname = xpp.getName();
-//                        eventType = xpp.next();
-//                        final String value = xpp.getText();
-//                        if (value != null){
-//                            String[] location = xpp.getText().split(" ");
-//                            Double lat = Double.parseDouble(location[0]);
-//                            Double lng = Double.parseDouble(location[1]);
-//                            GeoPoint point = new GeoPoint(lat, lng);
-//                            CustomMarkerHelper startMarker = new CustomMarkerHelper(mapView);
-//                            startMarker.setMarker_name(cur_mark[pos_name]);
-//                            startMarker.setMarker_uri(Uri.parse(cur_mark[pos_uri]));
-//                            startMarker.setMarker_status(cur_mark[pos_status]);
-//                            startMarker.setMarker_url(cur_mark[pos_url]);
-//                            startMarker.setMarker_id(cur_mark[pos_id]);
-//                            startMarker.setMarker_geoField(cur_mark[pos_geoField]);
-//                            startMarker.setPosition(point);
-//                            startMarker.setIcon(this.getResources().getDrawable(R.drawable.map_marker));
-//                            startMarker.setTitle("Name: "+ cur_mark[pos_name]);
-//                            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-//                            startMarker.setSnippet("Status: "+cur_mark[pos_status]);
-//                            startMarker.setDraggable(true);
-//                            startMarker.setOnMarkerDragListener(draglistner);
-//                            startMarker.setInfoWindow(new CustomPopupMaker(mapView, Uri.parse(cur_mark[pos_uri])));
-//                            mapView.getOverlays().add(startMarker);
-//                            break;
-//                        }else{
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//            }
-//            eventType = xpp.next();
-//        }
-//    }
 
     private void disableMyLocation(){
         final LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
@@ -326,112 +279,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
     private void drawMarkers(){
         geoRender = new GeoRender(this.getApplicationContext(),mapView);
     }
-//    private void drawMarkers() {
-//        final String selection = InstanceColumns.STATUS + " != ?"; // Find out what this does
-//        final String[] selectionArgs = {InstanceProviderAPI.STATUS_SUBMITTED};  //Look like if arguments passed idk.
-//
-//        //For each instance in the db if there is a point then add it to the overlay/marker list
-//        final String sortOrder = InstanceColumns.STATUS + " DESC, " + InstanceColumns.DISPLAY_NAME + " ASC";
-//        final Cursor instance_cur = this.getContentResolver().query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, sortOrder);
-//        //todo catch when c==null
-//        instance_cur.moveToFirst();
-//        while (!instance_cur.isAfterLast()) {
-//            final String instance_url = instance_cur.getString(instance_cur.getColumnIndex("instanceFilePath"));
-//            final String instance_form_id = instance_cur.getString(instance_cur.getColumnIndex("jrFormId"));
-//            final String instance_form_name = instance_cur.getString(instance_cur.getColumnIndex("displayName"));
-//            final String instance_form_status = instance_cur.getString(instance_cur.getColumnIndex("status"));
-//            final Uri instanceUri = ContentUris.withAppendedId(InstanceColumns.CONTENT_URI, instance_cur.getLong(instance_cur.getColumnIndex(InstanceColumns._ID)));
-//            final String instanceUriString = instanceUri.toString();
-//            String geopoint_field = null;
-//
-//            try {
-//                geopoint_field = this.getGeoField(instance_form_id);
-//                //Toast.makeText(this,geopoint_field, Toast.LENGTH_SHORT).show();
-//            } catch (final XmlPullParserException e1) {
-//                // TODO Auto-generated catch block
-//                e1.printStackTrace();
-//            } catch (final IOException e1) {
-//                // TODO Auto-generated catch block
-//                e1.printStackTrace();
-//            }
-//
-//            final String[] markerObj = {instance_url,instance_form_id,instance_form_name,instance_form_status,instanceUriString,geopoint_field};
-//            markerListArray.add(markerObj);
-//            //startActivity(new Intent(Intent.ACTION_EDIT, instanceUri));
-//            //Determine the geoPoint Field
-//            try {
-//                createMaker(markerObj);
-//                //addGeoPointMarkerList(instance_cur);
-//            } catch (final XmlPullParserException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            } catch (final IOException e) {
-//                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
-//            instance_cur.moveToNext();
-//        }
-//
-//        instance_cur.close();
-//    }
-    //Make this more eficient so that you dont have to use the cursoron all the time only if the form has not be queried
-//    public String getGeoField(final String form_id) throws XmlPullParserException, IOException{
-//        String formFilePath ="";
-//        final String formsortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
-//        final Cursor form_curser =  getContentResolver().query(FormsColumns.CONTENT_URI, null, null, null, formsortOrder);
-//        form_curser.moveToFirst();
-//        //int count = 0;
-//        while(!form_curser.isAfterLast()){
-//            final String tempformID = form_curser.getString(form_curser.getColumnIndex("jrFormId"));
-//            if(tempformID.equals(form_id)){
-//                //read xml and get geopoint table name
-//                //Toast.makeText(this,form_id+" == "+tempformID, Toast.LENGTH_SHORT).show();
-//                formFilePath =form_curser.getString(form_curser.getColumnIndex("formFilePath"));
-//                break;
-//                //Read the
-//                //count++;
-//            }else{
-//                //Toast.makeText(this,form_id+" !: "+tempformID, Toast.LENGTH_SHORT).show();
-//            }
-//            form_curser.moveToNext();
-//        }
-//        form_curser.close();
-//        String db_field_name= "";
-//        if (formFilePath != ""){
-//            //That file exists
-//            //Read the Xml file of the instance
-//            factory = XmlPullParserFactory.newInstance();
-//            factory.setNamespaceAware(true);
-//            final XmlPullParser xpp = factory.newPullParser();
-//            xpp.setInput(new FileReader(new File(formFilePath)));
-//            int eventType = xpp.getEventType();
-//
-//            while (eventType != XmlPullParser.END_DOCUMENT) {
-//                final String name = xpp.getName();
-//                final String name_space = xpp.getNamespace();
-//                if (xpp.getName()!=null){
-//                    if(xpp.getName().equals("bind")){
-//                        if (xpp.getAttributeValue(null,"type")!=null){
-//                            final String bind_type = xpp.getAttributeValue(null,"type");
-//                            if (bind_type.equals("geopoint")){
-//                                final String[] bind_nodeset = (xpp.getAttributeValue(null, "nodeset")).split("/");
-//                                final String bind_db_name = bind_nodeset[bind_nodeset.length -1];
-//                                db_field_name= bind_db_name;
-//                                break;
-//                            }
-//                        }
-//
-//                    }
-//                }
-//                eventType = xpp.next();
-//
-//            }
-//        }else{
-//            //File file Does not exist
-//        }
-//        return db_field_name;
-//
-//    }
+
 
     private String getMBTileFromItem(final int item) {
         final String folderName = OffilineOverlays[item];
@@ -544,45 +392,8 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
             }
         }, 100);
 
-        
-        //CompassOverlay compassOverlay = new CompassOverlay(this, mapView);
-        //compassOverlay.enableCompass();
-        //mapView.getOverlays().add(compassOverlay);
         mapView.invalidate();
 
-//        // TODO, put this in a class to deal with other pages that want
-//        // to also use it
-//
-//        collect_data = (ImageButton) findViewById(R.id.collect_data);
-//        collect_data.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View v) {
-//                // TODO Auto-generated method stub
-//                final Intent i = new Intent(self, FormChooserList.class);
-//                startActivity(i);
-//
-//            }
-//        });
-//        edit_data = (ImageButton) findViewById(R.id.edit_data);
-//        edit_data.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View v) {
-//                // TODO Auto-generated method stub
-//                final Intent i = new Intent(self, InstanceChooserList.class);
-//                startActivity(i);
-//
-//            }
-//        });
-//        settings_data = (ImageButton) findViewById(R.id.setting_data);
-//        settings_data.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(final View v) {
-//                // TODO Auto-generated method stub
-//                final Intent i = new Intent(self, MainSettingsActivity.class);
-//                startActivity(i);
-//
-//            }
-//        });
     }
 
     @Override
@@ -684,15 +495,10 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         //View view=fl.inflate(self, R.layout.showlayers_layout, null);
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(GeoODKMainMapActivity.this);
         alertDialog.setTitle("Select Offline Layer");
-        OffilineOverlays = MapHelper.getOfflineLayerList(); // Maybe this should only be done once. Have not decided yet.
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
-        alertDialog.setSingleChoiceItems(this.OffilineOverlays, this.selected_layer, new DialogInterface.OnClickListener() {
+        alertDialog.setSingleChoiceItems(MapHelper.getOfflineLayerList(), this.selected_layer, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int item) {
-                //Toast.makeText(OSM_Map.this,item, Toast.LENGTH_LONG).show();
-                // The 'which' argument contains the index position
-                // of the selected item
-                //Toast.makeText(OSM_Map.this,item +" ", Toast.LENGTH_LONG).show();
 
                 try {
                     switch (item) {
@@ -732,7 +538,6 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
 
             }
         });
-        //alertDialog.setView(view);
         alertDialog.show();
 
     }

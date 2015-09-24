@@ -1,5 +1,6 @@
 package com.geoodk.collect.android.spatial;
 
+import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 
 import org.osmdroid.tileprovider.MapTile;
@@ -7,11 +8,19 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 public class MapHelper {
+    public String[] OffilineOverlays = this.getOfflineLayerList();
 
-	public static ITileSource getTileSource(String basemap) {
+    public String[] getOffilineOverlays() {
+        return OffilineOverlays;
+    }
+
+
+
+    public static ITileSource getTileSource(String basemap) {
 		// TODO Auto-generated method stub
 
         //Having Custom Tile Sources, this allows for custom zoom level
@@ -64,20 +73,31 @@ public class MapHelper {
     	 }*/
         return finala;
     }
-    /*private String getMBTileFromItem(final int item) {
-	    // TODO Auto-generated method stub
-	    final String foldername = OffilineOverlays[item];
-	    final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+foldername);
-	    String mbtilePath;
-	    final File[] files = dir.listFiles(new FilenameFilter() {
-	        @Override
-	        public boolean accept(final File dir, final String name) {
-	            return name.toLowerCase().endsWith(".mbtiles");
-	        }
-	    });
-	    mbtilePath =Collect.OFFLINE_LAYERS+File.separator+foldername+File.separator+files[0].getName();
-	    //returnFile = new File(Collect.OFFLINE_LAYERS+File.separator+foldername+files[0]);
-	
-	    return mbtilePath;
-    }*/
+
+    private String getMBTileFromItem(final int item) {
+        String folderName = OffilineOverlays[item];
+        File dir = new File(Collect.OFFLINE_LAYERS+File.separator+folderName);
+
+        if (dir.isFile()) {
+            // we already have a file
+            return dir.getAbsolutePath();
+        }
+
+        // search first mbtiles file in the directory
+        String mbtilePath;
+        final File[] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(final File dir, final String name) {
+                return name.toLowerCase().endsWith(".mbtiles");
+            }
+        });
+
+        if (files.length == 0) {
+            throw new RuntimeException(Collect.getInstance().getString(R.string.mbtiles_not_found, dir.getAbsolutePath()));
+        }
+        mbtilePath = files[0].getAbsolutePath();
+
+        return mbtilePath;
+    }
+
 }
