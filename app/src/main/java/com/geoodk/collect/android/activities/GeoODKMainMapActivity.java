@@ -97,9 +97,6 @@ import javax.xml.transform.stream.StreamResult;
 public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver{
     private MapView mapView;
     private MapController myMapController;
-    //private ItemizedIconOverlay<OverlayItem> complete_overlays;
-    //private ItemizedIconOverlay<OverlayItem> final_overlays;
-    //private ItemizedIconOverlay<OverlayItem> defalt_overlays;
     private DefaultResourceProxyImpl resource_proxy;
     private final Context self = this;
     private Marker loc_marker;  //This is the marker used to display the user's location
@@ -116,8 +113,6 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
     public SharedPreferences sharedPreferences;
     private Boolean online;
     private String basemap;
-
-    //This section is used to know the order of a array of instance data in the db cursor
     public static final int pos_url=0;
     public static final int pos_id=1;
     public static final int pos_name=2;
@@ -126,29 +121,18 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
     public static final int pos_geoField=5;
     public int zoom_level =-1;
     public boolean zoom_been_changed = false;
-
-    //This is used to store temp latitude values
     private Double lat_temp;
     private Double lng_temp;
-
-    //Keep Track if GPS button is on or off
-    //MyLocationOverlay myLocationOverlay = null;
-
     public Boolean gpsStatus = true;
     public Boolean layerStatus = false;
     private int selected_layer= -1;
-
     private MBTileProvider mbprovider;
     private TilesOverlay mbTileOverlay;
-
     private String[] OffilineOverlays;
     private ITileSource baseTiles;
     private ImageButton gps_button;
     private ImageButton layers_button;
     private ImageButton map_setting_button;
-    private ImageButton collect_data;
-    private ImageButton edit_data;
-    private ImageButton settings_data;
     private GeoRender geoRender;
 
     XmlPullParserFactory factory;
@@ -181,39 +165,28 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
             final GeoPoint newlocation = m.getPosition();
             newlocation.getLatitude();
             newlocation.getLongitude();
-            GeoODKMainMapActivity.this.loc_marker = new Marker(GeoODKMainMapActivity.this.mapView);
-            final String lat = Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
-            final String lng = Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
-            //Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
+            loc_marker = new Marker(mapView);
+            String lat = Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
+            String lng = Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
             askToChangePoint(m);
-            // TODO Auto-generated method stub
-            //Toast.makeText(OSM_Map.this,((CustomMarkerHelper)m).getMarker_url(), Toast.LENGTH_LONG).show();
+
         }
 
         @Override
         public void onMarkerDragStart(final Marker m) {
-            // TODO Auto-generated method stub
-            //lat_temp =  Double.toString(((CustomMarkerHelper)m).getPosition().getLatitude());
-            //lng_temp  =  Double.toString(((CustomMarkerHelper)m).getPosition().getLongitude());
             lat_temp =  ((CustomMarkerHelper)m).getPosition().getLatitude();
             lng_temp  =  ((CustomMarkerHelper)m).getPosition().getLongitude();
-            //Toast.makeText(OSM_Map.this,lat+" "+lng, Toast.LENGTH_LONG).show();
-
         }
 
     };
 
     protected void askToChangePoint(final Marker m) {
         final Marker mk = m;
-        //final Double lat = ((CustomMarkerHelper)m).getPosition().getLatitude();
-        //final Double lng = ((CustomMarkerHelper)m).getPosition().getLongitude();
         final DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(final DialogInterface dialog, final int which) {
                 switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    //loadPublicLegends(mainActivity);
-
                     try {
                         changeInstanceLocation(mk);
                     } catch (final XmlPullParserException e) {
@@ -242,7 +215,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
             }
         };
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(GeoODKMainMapActivity.this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(
                 "Are you sure you want to change the location of this point?")
                 .setPositiveButton("Yes", dialogClickListener)
@@ -358,7 +331,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         gps_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                GeoODKMainMapActivity.this.setGPSStatus();
+                setGPSStatus();
             }
         });
 
@@ -470,7 +443,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
             @Override
             public void onClick(final DialogInterface dialog, final int id){
                 // Intent callGPSSettingIntent = new Intent(
-                GeoODKMainMapActivity.this.startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                 //startActivity(callGPSSettingIntent);
             }
         });
@@ -493,7 +466,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         // TODO Auto-generated method stub
         //FrameLayout fl = (ScrollView) findViewById(R.id.layer_scroll);
         //View view=fl.inflate(self, R.layout.showlayers_layout, null);
-        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(GeoODKMainMapActivity.this);
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setTitle("Select Offline Layer");
         //alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
         alertDialog.setSingleChoiceItems(MapHelper.getOfflineLayerList(), this.selected_layer, new DialogInterface.OnClickListener() {
@@ -503,26 +476,26 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
                 try {
                     switch (item) {
                         case 0:
-                            GeoODKMainMapActivity.this.mapView.getOverlays().remove(GeoODKMainMapActivity.this.mbTileOverlay);
-                            GeoODKMainMapActivity.this.layerStatus = false;
+                            mapView.getOverlays().remove(mbTileOverlay);
+                            layerStatus = false;
                             break;
                         default:
-                            GeoODKMainMapActivity.this.mapView.getOverlays().remove(GeoODKMainMapActivity.this.mbTileOverlay);
+                            mapView.getOverlays().remove(mbTileOverlay);
                             //String mbTileLocation = getMBTileFromItem(item);
 
                             final String mbFilePath = getMBTileFromItem(item);
                             //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                             final File mbFile = new File(mbFilePath);
-                            GeoODKMainMapActivity.this.mbprovider = new MBTileProvider(GeoODKMainMapActivity.this, mbFile);
-                            GeoODKMainMapActivity.this.mbTileOverlay = new TilesOverlay(GeoODKMainMapActivity.this.mbprovider, GeoODKMainMapActivity.this);
-                            GeoODKMainMapActivity.this.mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                            GeoODKMainMapActivity.this.mapView.getOverlays().add(GeoODKMainMapActivity.this.mbTileOverlay);
-                            GeoODKMainMapActivity.this.drawMarkers();
-                            GeoODKMainMapActivity.this.mapView.invalidate();
+                            mbprovider = new MBTileProvider(GeoODKMainMapActivity.this, mbFile);
+                            mbTileOverlay = new TilesOverlay(GeoODKMainMapActivity.this.mbprovider, GeoODKMainMapActivity.this);
+                            mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+                            mapView.getOverlays().add(GeoODKMainMapActivity.this.mbTileOverlay);
+                            drawMarkers();
+                            mapView.invalidate();
 
                     }
                     //This resets the map and sets the selected Layer
-                    GeoODKMainMapActivity.this.selected_layer = item;
+                    selected_layer = item;
                     dialog.dismiss();
                 } catch (RuntimeException e) {
                     createErrorDialog(e.getMessage(), false);
@@ -532,7 +505,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        GeoODKMainMapActivity.this.mapView.invalidate();
+                        mapView.invalidate();
                     }
                 }, 400);
 

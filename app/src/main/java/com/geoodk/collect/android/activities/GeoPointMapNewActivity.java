@@ -54,7 +54,6 @@ import com.geoodk.collect.android.utilities.InfoLogger;
 import com.geoodk.collect.android.widgets.GeoPointNewWidget;
 
 import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -125,20 +124,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 		setGPSStatus();
 	}
 
-    @Override
-     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save the user's current locationMarker if any
-        if (locationMarker != null){
-            double lat = locationMarker.getPosition().getLatitude();
-            double lon = locationMarker.getPosition().getLongitude();
-            savedInstanceState.putDouble(LOCATION_MARKER_LAT, lat);
-            savedInstanceState.putDouble(LOCATION_MARKER_LON, lon);
-			savedInstanceState.putCharSequence(CURRENT_MODE, currentMode);
-			savedInstanceState.putDouble(GeoPointNewWidget.ACCURACY_THRESHOLD, targetAccuracy);
-        }
-        // Always call the superclass so it can save the view hierarchy state
-        super.onSaveInstanceState(savedInstanceState);
-    }
 
 	@Override
 	public void onBackPressed() {
@@ -290,7 +275,20 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
         mapView.invalidate();
 	}
-
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current locationMarker if any
+        if (locationMarker != null){
+            double lat = locationMarker.getPosition().getLatitude();
+            double lon = locationMarker.getPosition().getLongitude();
+            savedInstanceState.putDouble(LOCATION_MARKER_LAT, lat);
+            savedInstanceState.putDouble(LOCATION_MARKER_LON, lon);
+            savedInstanceState.putCharSequence(CURRENT_MODE, currentMode);
+            savedInstanceState.putDouble(GeoPointNewWidget.ACCURACY_THRESHOLD, targetAccuracy);
+        }
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
     /**
      * Set the drawable for che locationMarker
      * @param icon
