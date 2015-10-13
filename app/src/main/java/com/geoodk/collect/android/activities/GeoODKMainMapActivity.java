@@ -23,7 +23,6 @@ package com.geoodk.collect.android.activities;
 /*
  * 06.30.2014
  * Jon Nordling
- * Mathias Karner
  *
  * This activity is to map the data offline
  *
@@ -250,6 +249,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         }
     }
     private void drawMarkers(){
+        clearMapMarkers();
         geoRender = new GeoRender(this.getApplicationContext(),mapView);
     }
 
@@ -379,7 +379,7 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
     
     private void clearMapMarkers() {
         mapView.getOverlays().clear();
-        markerListArray.clear();
+        mapView.invalidate();
     }
 
 

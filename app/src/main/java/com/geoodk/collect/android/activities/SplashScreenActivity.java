@@ -39,14 +39,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class SplashScreenActivity extends Activity {
-
-    private static final int mSplashTimeout = 4000; // milliseconds
+    private static final int mSplashTimeout = 1000; // milliseconds
     private static final boolean EXIT = true;
-
     private int mImageMaxWidth;
     private AlertDialog mAlertDialog;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

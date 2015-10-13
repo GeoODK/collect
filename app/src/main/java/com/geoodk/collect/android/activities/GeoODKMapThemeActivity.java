@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,15 +44,18 @@ import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
 import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.spatial.GeoRender;
+import com.geoodk.collect.android.spatial.MBTileProvider;
 import com.geoodk.collect.android.spatial.MapHelper;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.TilesOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -61,14 +65,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class GeoODKMapThemeActivity extends Activity {
+public class GeoODKMapThemeActivity extends Activity implements IRegisterReceiver {
 	private static final String t = "GeoODK";
 	private static boolean EXIT = true;
+	public Boolean layerStatus = false;
 	private AlertDialog mAlertDialog;
 	private String[] assestFormList;
 	private MapView mapView;
 	public SharedPreferences sharedPreferences;
 	private DefaultResourceProxyImpl resource_proxy;
+	private MBTileProvider mbprovider;
 	private ITileSource baseTiles;
 	private String basemap;
 	private Boolean online;
@@ -80,6 +86,8 @@ public class GeoODKMapThemeActivity extends Activity {
 	public MyLocationNewOverlay mMyLocationOverlay;
 	private final Context self = this;
 	public int zoom_level =-1;
+	private int selected_layer= -1;
+	private TilesOverlay mbTileOverlay;
 
 	private GeoRender geoRender;
 
@@ -168,7 +176,7 @@ public class GeoODKMapThemeActivity extends Activity {
 
 //		geoRender = new GeoRender(this.getApplicationContext(),mapView);
 		//Initial Map Setting before Location is found
-		drawMarkers();
+//		drawMarkers();
 
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
@@ -204,6 +212,17 @@ public class GeoODKMapThemeActivity extends Activity {
 			}
 		});
 
+		layers_button = (ImageButton)this.findViewById(R.id.layers);
+		layers_button.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(final View v) {
+				// TODO Auto-generated method stub
+				showLayersDialog();
+
+			}
+		});
+
 		gps_button = (ImageButton) findViewById(R.id.gps);
 		gps_button.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -215,6 +234,12 @@ public class GeoODKMapThemeActivity extends Activity {
 		final GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
 		imlp.setLocationUpdateMinDistance(1000);
 		imlp.setLocationUpdateMinTime(60000);
+
+		//Location lastKnownLocation = imlp.getLastKnownLocation();
+		//LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		//String locationProvider = LocationManager.GPS_PROVIDER;
+		//Location las = locationManager.getLastKnownLocation(locationProvider);
+
 		mMyLocationOverlay = new MyLocationNewOverlay(this, this.mapView);
 		mMyLocationOverlay.runOnFirstFix(this.centerAroundFix);
 		mapView.invalidate();
@@ -234,7 +259,7 @@ public class GeoODKMapThemeActivity extends Activity {
 
 	private void zoomToMyLocation(){
 		if (this.mMyLocationOverlay.getMyLocation()!= null){
-			if (this.zoom_level ==3){
+			if (this.zoom_level ==4){
 				this.mapView.getController().setZoom(15);
 			}else{
 				this.mapView.getController().setZoom(this.zoom_level);
@@ -395,6 +420,56 @@ public class GeoODKMapThemeActivity extends Activity {
 		mAlertDialog.setCancelable(false);
 		mAlertDialog.setButton(getString(R.string.ok), errorListener);
 		mAlertDialog.show();
+	}
+
+	private void showLayersDialog() {
+		// TODO Auto-generated method stub
+		final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+		alertDialog.setTitle("Select Offline Layer");
+		//alertDialog.setItems(list, new  DialogInterface.OnClickListener() {
+		alertDialog.setSingleChoiceItems(MapHelper.getOfflineLayerList(), this.selected_layer, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(final DialogInterface dialog, final int item) {
+
+				try {
+					switch (item) {
+						case 0:
+							mapView.getOverlays().remove(mbTileOverlay);
+							layerStatus = false;
+							break;
+						default:
+							mapView.getOverlays().remove(mbTileOverlay);
+							String mbFilePath = MapHelper.getMBTileFromItem(item);
+							//File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
+							final File mbFile = new File(mbFilePath);
+							mbprovider = new MBTileProvider(GeoODKMapThemeActivity.this, mbFile);
+							mbTileOverlay = new TilesOverlay(mbprovider, self.getApplicationContext());
+							mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
+							clearMapMarkers();
+							mapView.getOverlays().add(mbTileOverlay);
+							drawMarkers();
+							mapView.invalidate();
+
+					}
+					//This resets the map and sets the selected Layer
+					selected_layer = item;
+					dialog.dismiss();
+				} catch (RuntimeException e) {
+					createErrorDialog(e.getMessage(), false);
+					return;
+				}
+				final Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mapView.invalidate();
+					}
+				}, 400);
+
+			}
+		});
+		alertDialog.show();
+
 	}
 
 	private final Handler mHandler = new Handler(Looper.getMainLooper());

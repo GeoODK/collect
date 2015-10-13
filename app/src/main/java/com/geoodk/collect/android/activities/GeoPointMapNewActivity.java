@@ -245,7 +245,25 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
         mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
 
-		this.setGPSStatus();
+        progress = new ProgressDialog(this);
+        // Progress dialog is shown just if user specified accuracyThreshold in their XForm
+        // and data is not being reviewed from previuos survey
+        progress.setTitle(getString(R.string.getting_location));
+        progress.setMessage(getString(R.string.please_wait_long));
+        progress.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                //play_button.setImageResource(R.drawable.ic_menu_mylocation);
+            }
+        });
+        if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY && data_loaded == false) {
+            progress.setTitle(getString(R.string.getting_location));
+            progress.setMessage(buildProgressMessage(mMyLocationOverlay, targetAccuracy));
+            progress.show();
+        }
+        this.setGPSStatus();
+
+
 
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -261,14 +279,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             }
         });
 
-        progress = new ProgressDialog(this);
-        // Progress dialog is shown just if user specified accuracyThreshold in their XForm
-        // and data is not being reviewed from previuos survey
-        if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY && data_loaded == false) {
-            progress.setTitle(getString(R.string.getting_location));
-            progress.setMessage(buildProgressMessage(mMyLocationOverlay, targetAccuracy));
-            progress.show();
-        }
 
         // Set TextView for informin about current accuracy
         this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider());
@@ -369,6 +379,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
             upMyLocationOverlayLayers();
             gpsStatus = true;
+            progress.show();
         }else{
             gps_button.setImageResource(R.drawable.ic_menu_mylocation);
             disableMyLocation();
@@ -416,6 +427,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
             locationMarker.setIcon(locationMarkerIcon);
             locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             locationMarker.setOnMarkerDragListener(draglistner);
+            locationMarker.setOnMarkerClickListener(nullmarkerlistner);
             mapView.getOverlays().add(locationMarker);
         } else {
             Toast.makeText(this, "No GPS position to use for new Marker!",Toast.LENGTH_LONG).show();
@@ -507,6 +519,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     			mapView.getController().setZoom(zoom_level);
     		}
     		mapView.getController().setCenter(mMyLocationOverlay.getMyLocation());
+            progress.dismiss();
     		//mapView.getController().animateTo(mMyLocationOverlay.getMyLocation());
     	}else{
     		mapView.getController().setZoom(zoom_level);

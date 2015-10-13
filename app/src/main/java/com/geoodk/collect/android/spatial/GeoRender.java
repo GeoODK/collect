@@ -263,6 +263,7 @@ public class GeoRender {
 //                                marker.setOnMarkerClickListener(nullmarkerlistner);
 //                                map_markers.add(marker);
                                 pathOverlay.addPoint(marker.getPosition());
+
 //                                marker.setDraggable(true);
 ////                                marker.setOnMarkerDragListener(draglistner);
 //                                mapView.getOverlays().add(marker);

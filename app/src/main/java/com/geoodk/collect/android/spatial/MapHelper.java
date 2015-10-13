@@ -12,7 +12,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 
 public class MapHelper {
-    public String[] OffilineOverlays = this.getOfflineLayerList();
+    public static String[] OffilineOverlays = getOfflineLayerList();
 
     public String[] getOffilineOverlays() {
         return OffilineOverlays;
@@ -74,7 +74,7 @@ public class MapHelper {
         return finala;
     }
 
-    private String getMBTileFromItem(final int item) {
+    public static String getMBTileFromItem(final int item) {
         String folderName = OffilineOverlays[item];
         File dir = new File(Collect.OFFLINE_LAYERS+File.separator+folderName);
 
