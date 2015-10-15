@@ -26,12 +26,22 @@
         android:key="@string/map_basemap_key"
         android:title="@string/map_basemap_key" >
        <ListPreference android:id="@+id/map_basemap"
-            android:defaultValue="MAPQUESTOSM"
+            android:defaultValue="Default"
             android:dialogTitle="@string/map_basemap_behavior"
             android:entries="@array/basemap_entries"
             android:entryValues="@array/basemap_entries"
             android:key="map_basemap"
             android:title="@string/map_basemap_behavior" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/map_online_offline_key"
+        android:title="Points Editable">
+        <CheckBoxPreference
+            android:id="@+id/pointeditable"
+            android:defaultValue="true"
+            android:key="pointeditable"
+            android:summary="Points Editable"
+            android:title="Points Editable" />
     </PreferenceCategory>
     
 </PreferenceScreen>
