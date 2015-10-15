@@ -117,7 +117,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 	protected void onResume() {
 		super.onResume();
 		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "Default");
 		baseTiles = MapHelper.getTileSource(basemap);
 		mapView.setTileSource(baseTiles);
 		mapView.setUseDataConnection(online);
@@ -259,8 +259,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY && data_loaded == false) {
             progress.setTitle(getString(R.string.getting_location));
             progress.setMessage(buildProgressMessage(mMyLocationOverlay, targetAccuracy));
-            progress.show();
         }
+        progress.show();
         this.setGPSStatus();
 
 
@@ -268,14 +268,14 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         clear_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // If no accuracyThreshold is set, fire plain clearing point logic
-                if (targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY ) {
-                    currentMode = MODE_AUTO;
-                    resetLocationPointAtCurrentPosition();
-                    refreshClearButtonVisibility();
-                } else {
-                    showClearDialog();
-                }
+//                // If no accuracyThreshold is set, fire plain clearing point logic
+//                if (targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY ) {
+//                    currentMode = MODE_AUTO;
+//                    resetLocationPointAtCurrentPosition();
+//                    refreshClearButtonVisibility();
+//                } else {
+//                    showClearDialog();
+//                }
             }
         });
 
@@ -371,20 +371,23 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
      }
 
     /**
-     * Depending on gpsStatus var, change gps-button icon
-     * and enables|disables MyLocationOverlayLayers
+     * Since the point of the widget is to collect location, we should always have the GPS one
+     *
+     *
      */
 	private void setGPSStatus(){
-        if(gpsStatus == false){
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
-            upMyLocationOverlayLayers();
-            gpsStatus = true;
-            progress.show();
-        }else{
-            gps_button.setImageResource(R.drawable.ic_menu_mylocation);
-            disableMyLocation();
-            gpsStatus = false;
-        }
+//        if(gpsStatus == false){
+//            gps_button.setImageResource(R.drawable.ic_menu_mylocation_blue);
+//            upMyLocationOverlayLayers();
+//            gpsStatus = true;
+//        }else{
+//            gps_button.setImageResource(R.drawable.ic_menu_mylocation);
+//            disableMyLocation();
+//            gpsStatus = false;
+//        }
+        upMyLocationOverlayLayers();
+        gpsStatus = true;
+         
     }
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
@@ -491,6 +494,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     	LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     	if (locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)){
     		overlayMyLocationLayers();
+//            progress.dismiss();
     		//zoomToMyLocation();
     	} else {
     		showGPSDisabledAlertToUser();
