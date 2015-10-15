@@ -77,6 +77,8 @@
 	<string-array translatable="false"
 	    name="basemap_entries">
 		<item>Default</item>
+		<item>Google Maps Street</item>
+		<item>Google Maps Satellite</item>
 		<item>Steets Classic</item>
 		<item>Outdoors</item>
 		<item>Dark</item>

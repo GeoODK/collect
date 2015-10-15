@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 public class MapHelper {
     public static String[] OffilineOverlays = getOfflineLayerList();
+    public final static  String MAPBOX = "mapbox";
+    public final static  String GOOGLE = "google";
 
     public String[] getOffilineOverlays() {
         return OffilineOverlays;
@@ -21,39 +23,56 @@ public class MapHelper {
 
 
     public static ITileSource getTileSource(String basemap) {
-		// TODO Auto-generated method stub
-
-        //Having Custom Tile Sources, this allows for custom zoom level
-
-		
 		ITileSource baseTiles;
         String[] baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
+        String mapProvider;
         if (basemap.equals("Default")){
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
         }else if(basemap.equals("Steets Classic")){
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n141ednk/"};
         }else if(basemap.equals("Outdoors")){
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n1417e4k/"};
         }else if(basemap.equals("Dark")){
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.n1425ld2/"};
-        }else if(basemap.equals("Activities")){
+        }else if(basemap.equals("Activities")) {
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
-
+        }else if (basemap.equals("Google Maps Street")){
+            mapProvider = GOOGLE;
+            baseURL= new String[]{
+                    "http://mt0.google.com/vt/lyrs=m@135&hl=zh-CN&x=%d&y=%d&z=%d",
+                    "http://mt1.google.com/vt/lyrs=m@135&hl=zh-CN&x=%d&y=%d&z=%d",
+                    "http://mt2.google.com/vt/lyrs=m@135&hl=zh-CN&x=%d&y=%d&z=%d",
+                    "http://mt3.google.com/vt/lyrs=m@135&hl=zh-CN&x=%d&y=%d&z=%d" };
+        }else if (basemap.equals("Google Maps Satellite")){
+            mapProvider = GOOGLE;
+            baseURL= new String[]{
+                    "http://khms0.googleapis.com/kh?v=186&x=%d&y=%d&z=%d",
+                    "http://khms1.googleapis.com/kh?v=186&x=%d&y=%d&z=%d",
+                    "http://khms2.googleapis.com/kh?v=186&x=%d&y=%d&z=%d",
+                    "http://khms3.googleapis.com/kh?v=186&x=%d&y=%d&z=%d" };
         }else{
             //Else nothing
+            mapProvider = MAPBOX;
             baseURL = new String[]{"http://api.mapbox.com/v4/jonnordling.0d981b0d/"};
         	
         }
-
-        final String accessToken = "pk.eyJ1Ijoiam9ubm9yZGxpbmciLCJhIjoiZTcwNDcxN2ZiMWU0YTZhZjM2ZWFlNTMxZWI4Y2QwNWMifQ.mMQKvbPR2IYIv7DsV2HU4A#4";
-        baseTiles = new XYTileSource(basemap, null, 1, 22, 256, ".png", baseURL){
-            @Override
-            public String getTileURLString(MapTile aTile) {
-                String str = super.getTileURLString(aTile) + "?access_token=" + accessToken;
-                return str;
-            }
-        };
-
+        if (mapProvider == MAPBOX) {
+            final String accessToken = "pk.eyJ1Ijoiam9ubm9yZGxpbmciLCJhIjoiZTcwNDcxN2ZiMWU0YTZhZjM2ZWFlNTMxZWI4Y2QwNWMifQ.mMQKvbPR2IYIv7DsV2HU4A#4";
+            baseTiles = new XYTileSource(basemap, null, 1, 22, 256, ".png", baseURL){
+                @Override
+                public String getTileURLString(MapTile aTile) {
+                    String str = super.getTileURLString(aTile) + "?access_token=" + accessToken;
+                    return str;
+                }
+            };
+        }else{
+            baseTiles = new GoogleEarthMarkTileSource(basemap,baseURL);
+        }
         return baseTiles;
 	}
     public static String[] getOfflineLayerList() {

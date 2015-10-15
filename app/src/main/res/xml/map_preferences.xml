@@ -37,10 +37,10 @@
         android:key="@string/map_online_offline_key"
         android:title="Points Editable">
         <CheckBoxPreference
-            android:id="@+id/pointeditable"
+            android:id="@+id/points_editable"
             android:defaultValue="true"
-            android:key="pointeditable"
-            android:summary="Points Editable"
+            android:key="points_editable"
+            android:summary="Points are Editable"
             android:title="Points Editable" />
     </PreferenceCategory>
     

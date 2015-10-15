@@ -14,39 +14,17 @@
 
 package com.geoodk.collect.android.preferences;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import com.geoodk.collect.android.R;
-import com.geoodk.collect.android.utilities.UrlUtils;
-
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
-import android.provider.MediaStore.Images;
-import android.text.InputFilter;
-import android.text.Spanned;
-import android.widget.Toast;
+
+import com.geoodk.collect.android.R;
+
+import java.io.File;
 
 /**
  * Handles Map preferences.
@@ -59,8 +37,10 @@ public class MapSettings extends PreferenceActivity implements
 	public static final String KEY_offlineLayer_URL = "oflinelayers_url";
 	public static final String KEY_online_offlinePrefernce = "online_maps_key";
 	public static final String KEY_map_basemap = "map_basemap";
+	public  static final String KEY_point_editable = "points_editable";
 	
-	private CheckBoxPreference online_offlinePrefernce;	
+	private CheckBoxPreference online_offlinePrefernce;
+	private CheckBoxPreference points_editable;
 	private EditTextPreference offlineLayerUrl;
 	private ListPreference basemapList;
 
@@ -140,17 +120,35 @@ public class MapSettings extends PreferenceActivity implements
 
 			@Override
 			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
+											  Object newValue) {
 				// TODO Auto-generated method stub
-				if (newValue.equals(true)){
+				if (newValue.equals(true)) {
 					preference.setSummary(newValue.toString());
-				}else{
+				} else {
 					preference.setSummary(newValue.toString());
 				}
 				return true;
 			}
-    		
-    	});
+
+		});
+
+		points_editable = (CheckBoxPreference) findPreference(KEY_point_editable);
+		points_editable.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference,
+											  Object newValue) {
+				// TODO Auto-generated method stub
+				if (newValue.equals(true)) {
+					preference.setSummary("Points are Editable");
+				} else {
+					preference.setSummary("Points are NOT Editable");
+				}
+				return true;
+			}
+
+		});
+
     	
     	//End of Settings function
     }

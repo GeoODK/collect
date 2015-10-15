@@ -112,12 +112,16 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     private Drawable locationMarkerIcon;
     public Drawable markerRed;
     public Drawable markerGreen;
+    private Boolean point_editable;
+    private Boolean online;
+    private String basemap;
 
     @Override
 	protected void onResume() {
 		super.onResume();
-		Boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-		String basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "Default");
+		online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+        point_editable = sharedPreferences.getBoolean(MapSettings.KEY_point_editable, true);
+		basemap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "Default");
 		baseTiles = MapHelper.getTileSource(basemap);
 		mapView.setTileSource(baseTiles);
 		mapView.setUseDataConnection(online);
@@ -154,10 +158,9 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         textViewTargetAccuracy = ((TextView) findViewById(R.id.textViewTargetAccuracy));
 
         //Defining the System prefereces from the mapSetting
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
-        String baeMap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "MAPQUESTOSM");
+        String baeMap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "Street");
         baseTiles = MapHelper.getTileSource(baeMap);
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
 
@@ -426,10 +429,15 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         if (point != null) {
             locationMarker = new Marker(mapView);
             locationMarker.setPosition(point);
-            locationMarker.setDraggable(true);
+            if (point_editable.equals(true)){
+                locationMarker.setDraggable(true);
+                locationMarker.setOnMarkerDragListener(draglistner);
+            }else{
+                locationMarker.setDraggable(false);
+            }
             locationMarker.setIcon(locationMarkerIcon);
             locationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            locationMarker.setOnMarkerDragListener(draglistner);
+
             locationMarker.setOnMarkerClickListener(nullmarkerlistner);
             mapView.getOverlays().add(locationMarker);
         } else {
