@@ -80,8 +80,7 @@ public class GeoODKClassicActivity extends Activity {
         ImageButton geoodk_manage_but = (ImageButton) findViewById(R.id.geoodk_edit_butt);
 		geoodk_manage_but.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				Collect.getInstance().getActivityLogger()
-						.logAction(this, "editSavedForm", "click");
+				Collect.getInstance().getActivityLogger().logAction(this, "editSavedForm", "click");
 				Intent i = new Intent(getApplicationContext(),InstanceChooserList.class);
 				startActivity(i);
 			}

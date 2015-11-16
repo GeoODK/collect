@@ -196,7 +196,8 @@ public class GeoODKMapThemeActivity extends Activity implements IRegisterReceive
 			public void onClick(View v) {
 				// Do something in response to button click
 				Collect.getInstance().getActivityLogger().logAction(this, "OpenClassicView", "click");
-				Intent i = new Intent(getApplicationContext(), GeoODKClassicActivity.class);
+//				Intent i = new Intent(getApplicationContext(), GeoODKClassicActivity.class);
+				Intent i = new Intent(getApplicationContext(), GeoODKOptionActivity.class);
 				startActivity(i);
 			}
 		});

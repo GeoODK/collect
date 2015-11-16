@@ -276,6 +276,12 @@
             android:label="@string/title_activity_geo_trace" >
 
         </activity>
+        <activity
+            android:name=".activities.GeoODKOptionActivity"
+            android:configChanges="orientation"
+            android:label="@string/geoodk_mainTitle" >
+
+        </activity>
     </application>
 
 </manifest>
