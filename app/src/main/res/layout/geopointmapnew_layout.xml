@@ -42,7 +42,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Target GPS accuracy: XX.X\nCurrent GPS accuracy: YY.YY"
+        android:text="Target GPS accuracy: 0.0\nCurrent GPS accuracy: 0.0"
         android:id="@+id/textViewTargetAccuracy"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"

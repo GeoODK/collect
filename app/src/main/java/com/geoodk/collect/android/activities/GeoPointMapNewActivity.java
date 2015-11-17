@@ -159,7 +159,8 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
         //Defining the System prefereces from the mapSetting
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+        online = sharedPreferences.getBoolean(MapSettings.KEY_online_offlinePrefernce, true);
+        point_editable = sharedPreferences.getBoolean(MapSettings.KEY_point_editable, true);
         String baeMap = sharedPreferences.getString(MapSettings.KEY_map_basemap, "Street");
         baseTiles = MapHelper.getTileSource(baeMap);
         resource_proxy = new DefaultResourceProxyImpl(getApplicationContext());
@@ -220,34 +221,6 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
         mMyLocationOverlay = new MyLocationNewOverlay(this, gpsLocationProvider, mapView);
 
-
-        Intent intent = getIntent();
-        if (intent != null && intent.getExtras() != null) {
-            //Retrieve target accuracy from calling intent (GeopointNewWidget)ACCURACY_THRESHOLD
-            if ( intent.hasExtra(GeoPointNewWidget.ACCURACY_THRESHOLD) ) {
-                targetAccuracy = intent.getDoubleExtra(GeoPointNewWidget.ACCURACY_THRESHOLD, GeoPointNewWidget.UNSET_LOCATION_ACCURACY);
-            }
-			if ( intent.hasExtra(GeoPointNewWidget.POINT_LOCATION) ) {
-				data_loaded = true;
-				String s = intent.getStringExtra(GeoPointNewWidget.POINT_LOCATION);
-				overlayIntentPoint(s);
-				zoomToCentroid();
-			}
-		}else{
-			final Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				public void run() {
-					//Do something after 100ms
-					GeoPoint point = new GeoPoint(34.08145, -39.85007);
-					mapView.getController().setZoom(3);
-					mapView.getController().setCenter(point);
-				}
-			}, 100);
-		}
-
-        //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
-        mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
-
         progress = new ProgressDialog(this);
         // Progress dialog is shown just if user specified accuracyThreshold in their XForm
         // and data is not being reviewed from previuos survey
@@ -259,13 +232,45 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                 //play_button.setImageResource(R.drawable.ic_menu_mylocation);
             }
         });
+
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null && intent.hasExtra(GeoPointNewWidget.POINT_LOCATION)) {
+            //Retrieve target accuracy from calling intent (GeopointNewWidget)ACCURACY_THRESHOLD
+            if ( intent.hasExtra(GeoPointNewWidget.ACCURACY_THRESHOLD) ) {
+                targetAccuracy = intent.getDoubleExtra(GeoPointNewWidget.ACCURACY_THRESHOLD, GeoPointNewWidget.UNSET_LOCATION_ACCURACY);
+            }
+			if ( intent.hasExtra(GeoPointNewWidget.POINT_LOCATION) ) {
+				data_loaded = true;
+				String s = intent.getStringExtra(GeoPointNewWidget.POINT_LOCATION);
+				overlayIntentPoint(s);
+				zoomToCentroid();
+			}
+            //this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider());
+        } else {
+            progress.show();
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //Do something after 100ms
+                    GeoPoint point = new GeoPoint(34.08145, -39.85007);
+                    mapView.getController().setZoom(3);
+                    mapView.getController().setCenter(point);
+                }
+            }, 100);
+
+            mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
+            this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider) mMyLocationOverlay.getMyLocationProvider());
+
+            setGPSStatus();
+		}
+
+        //Sets executing a runnable for zooming to location and dismissing progress dialog on first fix.
+//        mMyLocationOverlay.runOnFirstFix(centerAroundFixAndDisplayLocMarker);
+
         if (targetAccuracy != GeoPointNewWidget.UNSET_LOCATION_ACCURACY && data_loaded == false) {
             progress.setTitle(getString(R.string.getting_location));
             progress.setMessage(buildProgressMessage(mMyLocationOverlay, targetAccuracy));
         }
-        progress.show();
-        this.setGPSStatus();
-
 
 
         clear_button.setOnClickListener(new View.OnClickListener() {
@@ -284,7 +289,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
 
 
         // Set TextView for informin about current accuracy
-        this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider());
+        //this.updateTextViewTargetAccuracy((CustomGpsMyLocationProvider)mMyLocationOverlay.getMyLocationProvider());
 
         mapView.invalidate();
 	}
