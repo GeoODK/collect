@@ -13,7 +13,7 @@
 	<string translatable="false" name="protocol_google_maps_engine">google_maps_engine</string>
     <string translatable="false" name="default_form_processing_logic">-1</string>
     <string translatable="false" name="protocol_other">other_protocol</string>
-	<string translatable="false" name="default_server_url">http://52.7.179.249/jonnordling</string>
+	<string translatable="false" name="default_server_url">http://data.geomarvel.io/jonnordling</string>
 	<string translatable="false" name="default_odk_formlist">/formList</string>
 	<string translatable="false" name="default_odk_submission">/submission</string>
     <item name="mapview" type="id"/>

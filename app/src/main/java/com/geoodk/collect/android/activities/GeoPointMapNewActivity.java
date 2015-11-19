@@ -116,6 +116,7 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
     private Boolean online;
     private String basemap;
 
+
     @Override
 	protected void onResume() {
 		super.onResume();

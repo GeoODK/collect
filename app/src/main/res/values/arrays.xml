@@ -77,7 +77,6 @@
 	<string-array translatable="false"
 	    name="basemap_entries">
 		<item>Default</item>
-		<item>Google Maps Street</item>
 		<item>Google Maps Satellite</item>
 		<item>Steets Classic</item>
 		<item>Outdoors</item>
@@ -97,9 +96,15 @@
 		<item>20</item>
 		<item>30</item>
 	</string-array>
+
+	<string-array name="geoodk_themes_entries" translatable="false">
+		<item>classic</item>
+		<item>map</item>
+	</string-array>
+
 	<string-array name="geoodk_themes" translatable="false">
-		<item>Clasic Theme</item>
-		<item>Map Theme</item>
+		<item>Classic</item>
+		<item>Map</item>
 	</string-array>
 
 </resources>

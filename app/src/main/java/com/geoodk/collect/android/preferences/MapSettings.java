@@ -14,6 +14,7 @@
 
 package com.geoodk.collect.android.preferences;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -37,12 +38,15 @@ public class MapSettings extends PreferenceActivity implements
 	public static final String KEY_offlineLayer_URL = "oflinelayers_url";
 	public static final String KEY_online_offlinePrefernce = "online_maps_key";
 	public static final String KEY_map_basemap = "map_basemap";
-	public  static final String KEY_point_editable = "points_editable";
+	public static final String KEY_point_editable = "points_editable";
+	public static final String KEY_geoodk_theme = "geoodk_theme";
 	
 	private CheckBoxPreference online_offlinePrefernce;
 	private CheckBoxPreference points_editable;
 	private EditTextPreference offlineLayerUrl;
 	private ListPreference basemapList;
+	private ListPreference themeList;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,16 +93,15 @@ public class MapSettings extends PreferenceActivity implements
 					
 				});
     	
-    	
-    	// This is for the offline line online settings
+
     	online_offlinePrefernce = (CheckBoxPreference) findPreference(KEY_online_offlinePrefernce);
     	if (online_offlinePrefernce.isChecked()){
     		online_offlinePrefernce.setSummary("Maps are ONLINE");
     	}else{
     		online_offlinePrefernce.setSummary("Maps are OFFLINE");
     	}
-    	online_offlinePrefernce.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
+    	online_offlinePrefernce.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference,
 					Object newValue) {
@@ -131,6 +134,27 @@ public class MapSettings extends PreferenceActivity implements
 			}
 
 		});
+		themeList = (ListPreference) findPreference(KEY_geoodk_theme);
+		themeList.setSummary(themeList.getEntry());
+		themeList.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+
+			@Override
+			public boolean onPreferenceChange(Preference preference,
+											  Object newValue) {
+				// TODO Auto-generated method stub
+				if (newValue.equals(true)) {
+					preference.setSummary(newValue.toString());
+				} else {
+					preference.setSummary(newValue.toString());
+				}
+				Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+				i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(i);
+				return true;
+			}
+
+		});
+
 
 		points_editable = (CheckBoxPreference) findPreference(KEY_point_editable);
 		points_editable.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {

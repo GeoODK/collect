@@ -31,6 +31,7 @@ import android.view.Window;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.application.Collect;
+import com.geoodk.collect.android.preferences.MapSettings;
 import com.geoodk.collect.android.preferences.PreferencesActivity;
 
 import java.io.File;
@@ -43,6 +44,7 @@ public class SplashScreenActivity extends Activity {
     private static final boolean EXIT = true;
     private int mImageMaxWidth;
     private AlertDialog mAlertDialog;
+    private String theme;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,7 @@ public class SplashScreenActivity extends Activity {
 
         // get the shared preferences object
         SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        theme = mSharedPreferences.getString(MapSettings.KEY_geoodk_theme, "map");
         Editor editor = mSharedPreferences.edit();
 
         // get the package info object with version number
@@ -85,7 +88,6 @@ public class SplashScreenActivity extends Activity {
         if (mSharedPreferences.getLong(PreferencesActivity.KEY_LAST_VERSION, 0) < packageInfo.versionCode) {
             editor.putLong(PreferencesActivity.KEY_LAST_VERSION, packageInfo.versionCode);
             editor.commit();
-
             firstRun = true;
         }
 
@@ -108,7 +110,12 @@ public class SplashScreenActivity extends Activity {
 //    	startActivity(new Intent(SplashScreenActivity.this, OSM_Map.class));
     	//Used when testing specific activity :)
 //        startActivity(new Intent(SplashScreenActivity.this, GeoODKClassicActivity.class));
-        startActivity(new Intent(SplashScreenActivity.this, GeoODKMapThemeActivity.class));
+        if (theme.equals("map")){
+            startActivity(new Intent(SplashScreenActivity.this, GeoODKMapThemeActivity.class));
+        }else{
+            startActivity(new Intent(SplashScreenActivity.this, GeoODKClassicActivity.class));
+        }
+        //startActivity(new Intent(SplashScreenActivity.this, GeoODKMapThemeActivity.class));
     	//startActivity(new Intent(SplashScreenActivity.this, GeoTraceActivity.class));
         //startActivity(new Intent(SplashScreenActivity.this, MainMenuActivity.class));
         finish();

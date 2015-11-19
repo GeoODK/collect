@@ -25,7 +25,8 @@
       <PreferenceCategory
         android:key="@string/map_basemap_key"
         android:title="@string/map_basemap_key" >
-       <ListPreference android:id="@+id/map_basemap"
+       <ListPreference
+            android:id="@+id/map_basemap"
             android:defaultValue="Default"
             android:dialogTitle="@string/map_basemap_behavior"
             android:entries="@array/basemap_entries"
@@ -42,6 +43,18 @@
             android:key="points_editable"
             android:summary="Points are Editable"
             android:title="Points Editable" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/geoodk_theme_key"
+        android:title="Theme Options" >
+        <ListPreference
+            android:id="@+id/geoodk_theme"
+            android:defaultValue="map_theme"
+            android:dialogTitle="@string/geoodk_theming_title"
+            android:entries="@array/geoodk_themes"
+            android:entryValues="@array/geoodk_themes_entries"
+            android:key="geoodk_theme"
+            android:title="@string/geoodk_theming_title" />
     </PreferenceCategory>
     
 </PreferenceScreen>
