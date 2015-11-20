@@ -249,7 +249,6 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
         }
     }
     private void drawMarkers(){
-        clearMapMarkers();
         geoRender = new GeoRender(this.getApplicationContext(),mapView);
     }
 
@@ -257,7 +256,6 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
     private String getMBTileFromItem(final int item) {
         final String folderName = OffilineOverlays[item];
         final File dir = new File(Collect.OFFLINE_LAYERS+File.separator+folderName);
-
         if (dir.isFile()) {
             // we already have a file
             return dir.getAbsolutePath();
@@ -481,15 +479,14 @@ public class GeoODKMainMapActivity extends Activity implements IRegisterReceiver
                             break;
                         default:
                             mapView.getOverlays().remove(mbTileOverlay);
-                            //String mbTileLocation = getMBTileFromItem(item);
-
-                            final String mbFilePath = getMBTileFromItem(item);
+                            String mbFilePath = MapHelper.getMBTileFromItem(item);
                             //File mbFile = new File(Collect.OFFLINE_LAYERS+"/GlobalLights/control-room.mbtiles");
                             final File mbFile = new File(mbFilePath);
                             mbprovider = new MBTileProvider(GeoODKMainMapActivity.this, mbFile);
-                            mbTileOverlay = new TilesOverlay(GeoODKMainMapActivity.this.mbprovider, GeoODKMainMapActivity.this);
+                            mbTileOverlay = new TilesOverlay(mbprovider, self.getApplicationContext());
                             mbTileOverlay.setLoadingBackgroundColor(Color.TRANSPARENT);
-                            mapView.getOverlays().add(GeoODKMainMapActivity.this.mbTileOverlay);
+                            clearMapMarkers();
+                            mapView.getOverlays().add(mbTileOverlay);
                             drawMarkers();
                             mapView.invalidate();
 

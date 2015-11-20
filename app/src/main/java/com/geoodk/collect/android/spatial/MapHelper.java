@@ -108,19 +108,15 @@ public class MapHelper {
 	}
     public static String[] getOfflineLayerList() {
         // TODO Auto-generated method stub
-        final File files = new File(Collect.OFFLINE_LAYERS);
-        final ArrayList<String> results = new ArrayList<String>();
+        File files = new File(Collect.OFFLINE_LAYERS);
+        ArrayList<String> results = new ArrayList<String>();
         results.add("None");
-        final String[] overlay_folders =  files.list();
+        String[] overlay_folders =  files.list();
         for(int i =0;i<overlay_folders.length;i++){
             results.add(overlay_folders[i]);
-            //Toast.makeText(self, overlay_folders[i]+" ", Toast.LENGTH_LONG).show();
         }
         String[] finala = new String[results.size()];
         finala = results.toArray(finala);
-        /*for(int j = 0;j<finala.length;j++){
-    		 Toast.makeText(self, finala[j]+" ", Toast.LENGTH_LONG).show();
-    	 }*/
         return finala;
     }
 
