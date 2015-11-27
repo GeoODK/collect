@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
-import android.util.Log;
 
 import com.geoodk.collect.android.R;
 import com.geoodk.collect.android.provider.FormsProviderAPI;
@@ -66,21 +65,18 @@ public class GeoRender {
                 Uri instanceUri = ContentUris.withAppendedId(InstanceProviderAPI.InstanceColumns.CONTENT_URI, instanceCursor.getLong(instanceCursor.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID)));
                 String instanceUriString = instanceUri.toString();
                 String formFilePath = getFormFilePath(instance_form_id);
-                File fXmlFile = new File(formFilePath);
-                Log.i("mylog", instance_form_name);
-                GeoFeature geoFeature = new GeoFeature();
-                geoFeature.setInstance_form_id(instance_form_id);
-                geoFeature.setInstance_form_name(instance_form_name);
-                geoFeature.setInstance_form_status(instance_form_status);
-                geoFeature.setInstance_url(instance_url);
-                geoFeature.setInstanceUriString(instanceUriString);
-                geoFeature.setGeoFields(getGeoField(geoFeature, fXmlFile));
+                if( formFilePath != null ){
+                    File fXmlFile = new File(formFilePath);
+                    GeoFeature geoFeature = new GeoFeature();
+                    geoFeature.setInstance_form_id(instance_form_id);
+                    geoFeature.setInstance_form_name(instance_form_name);
+                    geoFeature.setInstance_form_status(instance_form_status);
+                    geoFeature.setInstance_url(instance_url);
+                    geoFeature.setInstanceUriString(instanceUriString);
+                    geoFeature.setGeoFields(getGeoField(geoFeature, fXmlFile));
+                    this.geoFeatures.add(geoFeature);
+                }
 
-                this.geoFeatures.add(geoFeature);
-
-                Log.i("mylog","herer");
-//                createPointOverlay(geoFeature);
-                String tesss = "sds";
 
             }
             instanceCursor.close();
@@ -101,8 +97,11 @@ public class GeoRender {
         String selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=?";
         String selectionArgs[] = {instance_form_id};
         Cursor form_curser =  this.context.getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, null, selection, selectionArgs, formsortOrder);
-        form_curser.moveToNext();
-        String formFilePath = form_curser.getString(form_curser.getColumnIndex("formFilePath"));
+        String formFilePath = null;
+        if(form_curser != null && form_curser.moveToFirst()) {
+//            form_curser.moveToNext();
+            formFilePath = form_curser.getString(form_curser.getColumnIndex("formFilePath"));
+        }
         form_curser.close();
         return formFilePath;
     }
