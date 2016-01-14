@@ -1,0 +1,280 @@
+Enter file contents here<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+  <h:head>
+    <h:title>BDI ActFincas</h:title>
+    <model>
+      <instance>
+        <data id="build_BDI-ActFincas_1452690121">
+          <meta>
+            <instanceID/>
+          </meta>
+          <Localidad/>
+          <MZNA/>
+          <Lote/>
+          <Frente/>
+          <Nivel/>
+          <Puerta/>
+          <CGV/>
+          <TipoFinca/>
+          <NIS/>
+          <NIC/>
+          <Medidor/>
+          <Coord/>
+          <CT/>
+          <Propietario/>
+          <Fecha/>
+          <Comentario/>
+        </data>
+      </instance>
+      <itext>
+        <translation lang="eng">
+          <text id="/data/Localidad:label">
+            <value>Localidad</value>
+          </text>
+          <text id="/data/Localidad:hint">
+            <value>Digite Localidad</value>
+          </text>
+          <text id="/data/MZNA:label">
+            <value>Cod. MZNA</value>
+          </text>
+          <text id="/data/MZNA:hint">
+            <value>Digite No. MZNA</value>
+          </text>
+          <text id="/data/Lote:label">
+            <value>Lote</value>
+          </text>
+          <text id="/data/Lote:hint">
+            <value>Digitar No. Lote</value>
+          </text>
+          <text id="/data/Frente:label">
+            <value>Frente</value>
+          </text>
+          <text id="/data/Nivel:label">
+            <value>Nivel</value>
+          </text>
+          <text id="/data/Puerta:label">
+            <value>Puerta</value>
+          </text>
+          <text id="/data/Puerta:hint">
+            <value>Digitel el no. Puerta</value>
+          </text>
+          <text id="/data/CGV:label">
+            <value>CGV</value>
+          </text>
+          <text id="/data/TipoFinca:label">
+            <value>Tipo Finca</value>
+          </text>
+          <text id="/data/TipoFinca:hint">
+            <value>Escoja el tipo de finca</value>
+          </text>
+          <text id="/data/TipoFinca:option0">
+            <value>Vivienda</value>
+          </text>
+          <text id="/data/TipoFinca:option1">
+            <value>Comercial</value>
+          </text>
+          <text id="/data/TipoFinca:option2">
+            <value>Industrial</value>
+          </text>
+          <text id="/data/TipoFinca:option3">
+            <value>Construccion</value>
+          </text>
+          <text id="/data/TipoFinca:option4">
+            <value>Caseta</value>
+          </text>
+          <text id="/data/TipoFinca:option5">
+            <value>Ruinas</value>
+          </text>
+          <text id="/data/TipoFinca:option6">
+            <value>Solar</value>
+          </text>
+          <text id="/data/TipoFinca:option7">
+            <value>Otros</value>
+          </text>
+          <text id="/data/NIS:label">
+            <value>NIS</value>
+          </text>
+          <text id="/data/NIS:hint">
+            <value>Digite el NIS</value>
+          </text>
+          <text id="/data/NIS:constraintMsg">
+            <value>NIS</value>
+          </text>
+          <text id="/data/NIC:label">
+            <value>NIC</value>
+          </text>
+          <text id="/data/NIC:hint">
+            <value>Digite el NIC</value>
+          </text>
+          <text id="/data/NIC:constraintMsg">
+            <value>NIC</value>
+          </text>
+          <text id="/data/Medidor:label">
+            <value>Medidor</value>
+          </text>
+          <text id="/data/Medidor:hint">
+            <value>Numero del Medidor</value>
+          </text>
+          <text id="/data/Coord:label">
+            <value>Coords</value>
+          </text>
+          <text id="/data/Coord:hint">
+            <value>Espere la tome el equipo</value>
+          </text>
+          <text id="/data/CT:label">
+            <value>CT</value>
+          </text>
+          <text id="/data/CT:hint">
+            <value>Digite el CT</value>
+          </text>
+          <text id="/data/CT:constraintMsg">
+            <value>CT</value>
+          </text>
+          <text id="/data/Propietario:label">
+            <value>Propietario</value>
+          </text>
+          <text id="/data/Propietario:hint">
+            <value>A quien pertenece el CT</value>
+          </text>
+          <text id="/data/Propietario:option0">
+            <value>Particular</value>
+          </text>
+          <text id="/data/Propietario:option1">
+            <value>Edenorte</value>
+          </text>
+          <text id="/data/Fecha:label">
+            <value>Fecha</value>
+          </text>
+          <text id="/data/Fecha:hint">
+            <value>Escoja la fecha</value>
+          </text>
+          <text id="/data/Comentario:label">
+            <value>Comentario</value>
+          </text>
+          <text id="/data/Comentario:hint">
+            <value>Grabe Mensaje</value>
+          </text>
+        </translation>
+      </itext>
+      <bind nodeset="/data/meta/instanceID" type="string" readonly="true()" calculate="concat('uuid:', uuid())"/>
+      <bind nodeset="/data/Localidad" type="string" required="true()"/>
+      <bind nodeset="/data/MZNA" type="string" required="true()"/>
+      <bind nodeset="/data/Lote" type="int" required="true()"/>
+      <bind nodeset="/data/Frente" type="int" required="true()"/>
+      <bind nodeset="/data/Nivel" type="string" required="true()"/>
+      <bind nodeset="/data/Puerta" type="string" required="true()"/>
+      <bind nodeset="/data/CGV" type="string" required="true()"/>
+      <bind nodeset="/data/TipoFinca" type="select1" required="true()"/>
+      <bind nodeset="/data/NIS" type="int" constraint="(. &gt;= '6' and . &lt;= '8')" jr:constraintMsg="jr:itext('/data/NIS:constraintMsg')"/>
+      <bind nodeset="/data/NIC" type="int" constraint="(. &gt;= '6' and . &lt;= '8')" jr:constraintMsg="jr:itext('/data/NIC:constraintMsg')"/>
+      <bind nodeset="/data/Medidor" type="string"/>
+      <bind nodeset="/data/Coord" type="geopoint" required="true()"/>
+      <bind nodeset="/data/CT" type="string" constraint="(regex(., &quot;^.{6,6}$&quot;))" jr:constraintMsg="jr:itext('/data/CT:constraintMsg')"/>
+      <bind nodeset="/data/Propietario" type="select1"/>
+      <bind nodeset="/data/Fecha" type="date" required="true()"/>
+      <bind nodeset="/data/Comentario" type="binary"/>
+    </model>
+  </h:head>
+  <h:body>
+    <input ref="/data/Localidad">
+      <label ref="jr:itext('/data/Localidad:label')"/>
+      <hint ref="jr:itext('/data/Localidad:hint')"/>
+    </input>
+    <input ref="/data/MZNA">
+      <label ref="jr:itext('/data/MZNA:label')"/>
+      <hint ref="jr:itext('/data/MZNA:hint')"/>
+    </input>
+    <input ref="/data/Lote">
+      <label ref="jr:itext('/data/Lote:label')"/>
+      <hint ref="jr:itext('/data/Lote:hint')"/>
+    </input>
+    <input ref="/data/Frente">
+      <label ref="jr:itext('/data/Frente:label')"/>
+    </input>
+    <input ref="/data/Nivel">
+      <label ref="jr:itext('/data/Nivel:label')"/>
+    </input>
+    <input ref="/data/Puerta">
+      <label ref="jr:itext('/data/Puerta:label')"/>
+      <hint ref="jr:itext('/data/Puerta:hint')"/>
+    </input>
+    <input ref="/data/CGV">
+      <label ref="jr:itext('/data/CGV:label')"/>
+    </input>
+    <select1 ref="/data/TipoFinca">
+      <label ref="jr:itext('/data/TipoFinca:label')"/>
+      <hint ref="jr:itext('/data/TipoFinca:hint')"/>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option0')"/>
+        <value>V</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option1')"/>
+        <value>C</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option2')"/>
+        <value>Ind</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option3')"/>
+        <value>Cons</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option4')"/>
+        <value>Ca</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option5')"/>
+        <value>Ru</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option6')"/>
+        <value>S</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/TipoFinca:option7')"/>
+        <value>O</value>
+      </item>
+    </select1>
+    <input ref="/data/NIS">
+      <label ref="jr:itext('/data/NIS:label')"/>
+      <hint ref="jr:itext('/data/NIS:hint')"/>
+    </input>
+    <input ref="/data/NIC">
+      <label ref="jr:itext('/data/NIC:label')"/>
+      <hint ref="jr:itext('/data/NIC:hint')"/>
+    </input>
+    <input ref="/data/Medidor">
+      <label ref="jr:itext('/data/Medidor:label')"/>
+      <hint ref="jr:itext('/data/Medidor:hint')"/>
+    </input>
+    <input ref="/data/Coord">
+      <label ref="jr:itext('/data/Coord:label')"/>
+      <hint ref="jr:itext('/data/Coord:hint')"/>
+    </input>
+    <input ref="/data/CT">
+      <label ref="jr:itext('/data/CT:label')"/>
+      <hint ref="jr:itext('/data/CT:hint')"/>
+    </input>
+    <select1 ref="/data/Propietario">
+      <label ref="jr:itext('/data/Propietario:label')"/>
+      <hint ref="jr:itext('/data/Propietario:hint')"/>
+      <item>
+        <label ref="jr:itext('/data/Propietario:option0')"/>
+        <value>PART</value>
+      </item>
+      <item>
+        <label ref="jr:itext('/data/Propietario:option1')"/>
+        <value>EDN</value>
+      </item>
+    </select1>
+    <input ref="/data/Fecha">
+      <label ref="jr:itext('/data/Fecha:label')"/>
+      <hint ref="jr:itext('/data/Fecha:hint')"/>
+    </input>
+    <upload ref="/data/Comentario" mediatype="audio/*">
+      <label ref="jr:itext('/data/Comentario:label')"/>
+      <hint ref="jr:itext('/data/Comentario:hint')"/>
+    </upload>
+  </h:body>
+</h:html>
