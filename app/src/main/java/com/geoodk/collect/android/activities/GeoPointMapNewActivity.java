@@ -606,12 +606,13 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
         if (locationMarker != null) {
             // GPS has already made a fix or a Manual point was set
             String temp_string = "";
+            double currentAccuracy = ((CustomGpsMyLocationProvider) mMyLocationOverlay.getMyLocationProvider()).getCurrentAccuracy();
             // User did not ask for a specific accuracyThreshold: return any data from locationMarker
             if(targetAccuracy == GeoPointNewWidget.UNSET_LOCATION_ACCURACY) {
                 String lat = Double.toString(locationMarker.getPosition().getLatitude());
                 String lng = Double.toString(locationMarker.getPosition().getLongitude());
-                String alt = "0.0";
-                String acu = "0.0";
+                String alt = Double.toString(locationMarker.getPosition().getAltitude());
+                String acu = Double.toString(currentAccuracy);
                 temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
             } else
             // User asked for a specific accuracyThreshold
@@ -622,19 +623,18 @@ public class GeoPointMapNewActivity extends Activity implements IRegisterReceive
                     // ..so do not care about current accuracy and just return the same point
                     String lat = Double.toString(locationMarker.getPosition().getLatitude());
                     String lng = Double.toString(locationMarker.getPosition().getLongitude());
-                    String alt = "0.0";
-                    String acu = "0.0";
+                    String alt = Double.toString(locationMarker.getPosition().getAltitude());
+                    String acu = Double.toString(currentAccuracy);;
                     temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
                 } else {
                     // The displayed point is surely from GPS but since accuracyThreshold is required, we must chech before returning a point
-                    double currentAccuracy = ((CustomGpsMyLocationProvider) mMyLocationOverlay.getMyLocationProvider()).getCurrentAccuracy();
                     // Accuracy meet requirements
                     if (currentAccuracy <= targetAccuracy) {
                         // Return data from GPS placed marker
                         String lat = Double.toString(locationMarker.getPosition().getLatitude());
                         String lng = Double.toString(locationMarker.getPosition().getLongitude());
-                        String alt = "0.0";
-                        String acu = "0.0";
+                        String alt = Double.toString(locationMarker.getPosition().getAltitude());
+                        String acu = Double.toString(currentAccuracy) ;
                         temp_string = temp_string + lat + " " + lng + " " + alt + " " + acu;
                     } else {
                         Toast.makeText(this, "Insufficient GPS accuracy.\nNothing returned.", Toast.LENGTH_LONG).show();
