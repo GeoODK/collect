@@ -454,7 +454,7 @@ public class GeoShapeActivity extends Activity implements IRegisterReceiver {
 		for (int i = 0 ; i < map_markers.size();i++){
 			String lat = Double.toString(map_markers.get(i).getPosition().getLatitude());
 			String lng = Double.toString(map_markers.get(i).getPosition().getLongitude());
-			String alt ="0.0";
+			String alt = Double.toString(map_markers.get(i).getPosition().getAltitude());
 			String acu = "0.0";
 			temp_string = temp_string+lat+" "+lng +" "+alt+" "+acu+";";
 		}
