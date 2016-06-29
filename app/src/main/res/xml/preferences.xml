@@ -7,7 +7,7 @@
         android:title="@string/app_name" >
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="http://opendatakit.org" />
+            android:data="http://iirs.gov.in" />
     </PreferenceScreen>
 
     <PreferenceCategory
