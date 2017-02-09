@@ -1,6 +1,7 @@
 #GeoODK Collect
 Version 2.0
 
+Now supported by [GeoMarvel](http://geomarvel.com)
 =======
 Need to convert you geoshape/geotrace or geopoint data, check out [GeoConverter Blog](http://blog.geoodk.com/posts/convert-geoshape-geotrace-geopoint-to-shapefile)
 
