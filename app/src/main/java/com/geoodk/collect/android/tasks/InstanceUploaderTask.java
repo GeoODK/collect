@@ -14,6 +14,43 @@
 
 package com.geoodk.collect.android.tasks;
 
+import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import com.geoodk.collect.android.R;
+import com.geoodk.collect.android.application.Collect;
+import com.geoodk.collect.android.listeners.InstanceUploaderListener;
+import com.geoodk.collect.android.logic.PropertyManager;
+import com.geoodk.collect.android.preferences.PreferencesActivity;
+import com.geoodk.collect.android.provider.InstanceProviderAPI;
+import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import com.geoodk.collect.android.utilities.WebUtils;
+
+import org.opendatakit.httpclientandroidlib.Header;
+import org.opendatakit.httpclientandroidlib.HttpEntity;
+import org.opendatakit.httpclientandroidlib.HttpResponse;
+import org.opendatakit.httpclientandroidlib.HttpStatus;
+import org.opendatakit.httpclientandroidlib.client.ClientProtocolException;
+import org.opendatakit.httpclientandroidlib.client.HttpClient;
+import org.opendatakit.httpclientandroidlib.client.methods.HttpHead;
+import org.opendatakit.httpclientandroidlib.client.methods.HttpPost;
+import org.opendatakit.httpclientandroidlib.conn.ConnectTimeoutException;
+import org.opendatakit.httpclientandroidlib.conn.HttpHostConnectException;
+import org.opendatakit.httpclientandroidlib.entity.mime.MultipartEntity;
+import org.opendatakit.httpclientandroidlib.entity.mime.content.FileBody;
+import org.opendatakit.httpclientandroidlib.entity.mime.content.StringBody;
+import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
+import org.opendatakit.httpclientandroidlib.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,37 +68,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.geoodk.collect.android.R;
-import org.opendatakit.httpclientandroidlib.Header;
-import org.opendatakit.httpclientandroidlib.HttpResponse;
-import org.opendatakit.httpclientandroidlib.HttpStatus;
-import org.opendatakit.httpclientandroidlib.client.ClientProtocolException;
-import org.opendatakit.httpclientandroidlib.client.HttpClient;
-import org.opendatakit.httpclientandroidlib.client.methods.HttpHead;
-import org.opendatakit.httpclientandroidlib.client.methods.HttpPost;
-import org.opendatakit.httpclientandroidlib.conn.ConnectTimeoutException;
-import org.opendatakit.httpclientandroidlib.conn.HttpHostConnectException;
-import org.opendatakit.httpclientandroidlib.entity.mime.MultipartEntity;
-import org.opendatakit.httpclientandroidlib.entity.mime.content.FileBody;
-import org.opendatakit.httpclientandroidlib.entity.mime.content.StringBody;
-import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
-
-import com.geoodk.collect.android.application.Collect;
-import com.geoodk.collect.android.listeners.InstanceUploaderListener;
-import com.geoodk.collect.android.logic.PropertyManager;
-import com.geoodk.collect.android.preferences.PreferencesActivity;
-import com.geoodk.collect.android.provider.InstanceProviderAPI;
-import com.geoodk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import com.geoodk.collect.android.utilities.WebUtils;
-
-import android.content.ContentValues;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Background task for uploading completed forms.
@@ -102,6 +111,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
         ContentValues cv = new ContentValues();
         Uri u = Uri.parse(urlString);
         HttpClient httpclient = WebUtils.createHttpClient(CONNECTION_TIMEOUT);
+        String xmlString = null;
 
         boolean openRosaServer = false;
         if (uriRemap.containsKey(u)) {
@@ -432,16 +442,20 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
 
             // prepare response and return uploaded
             HttpResponse response = null;
+
             try {
                 Log.i(t, "Issuing POST request for " + id + " to: " + u.toString());
                 response = httpclient.execute(httppost, localContext);
                 int responseCode = response.getStatusLine().getStatusCode();
+                HttpEntity httpEntity = response.getEntity();
+                xmlString = EntityUtils.toString(httpEntity);
                 WebUtils.discardEntityBytes(response);
 
                 Log.i(t, "Response code:" + responseCode);
                 // verify that the response was a 201 or 202.
                 // If it wasn't, the submission has failed.
                 if (responseCode != HttpStatus.SC_CREATED && responseCode != HttpStatus.SC_ACCEPTED) {
+
                     if (responseCode == HttpStatus.SC_OK) {
                     	outcome.mResults.put(id, fail + "Network login failure? Again?");
                     } else if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
@@ -450,9 +464,17 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                     	outcome.mResults.put(id, fail + response.getStatusLine().getReasonPhrase()
                                 + " (" + responseCode + ") at " + urlString);
                     } else {
-                    	outcome.mResults.put(id, fail + response.getStatusLine().getReasonPhrase()
-                                + " (" + responseCode + ") at " + urlString);
+
+                        String responseServerMessage = parseXMLMessage(xmlString);
+                        if (responseServerMessage !=null){
+                            outcome.mResults.put(id, fail + responseServerMessage);
+                        }else{
+                            outcome.mResults.put(id, fail + response.getStatusLine().getReasonPhrase()
+                                    + " (" + responseCode + ") at " + urlString);
+                        }
+
                     }
+
                     cv.put(InstanceColumns.STATUS,
                         InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                     Collect.getInstance().getContentResolver()
@@ -475,10 +497,44 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
         }
 
         // if it got here, it must have worked
-        outcome.mResults.put(id, Collect.getInstance().getString(R.string.success));
+        String responseServerMessage = parseXMLMessage(xmlString);
+        if (responseServerMessage !=null){
+            outcome.mResults.put(id, responseServerMessage);
+        }else{
+            outcome.mResults.put(id, Collect.getInstance().getString(R.string.success));
+        }
+
         cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMITTED);
         Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
         return true;
+    }
+
+    public String parseXMLMessage(String xmlString){
+        String message = null;
+
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        try{
+            dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = null;
+            try {
+                doc = dBuilder.parse(new ByteArrayInputStream(xmlString.getBytes()));
+                doc.getDocumentElement().normalize();
+                message = doc.getElementsByTagName("message").item(0).getTextContent();
+                return message;
+
+            } catch (SAXException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }catch(ParserConfigurationException e){
+            e.printStackTrace();
+        }
+
+        return message;
     }
 
     // TODO: This method is like 350 lines long, down from 400.
