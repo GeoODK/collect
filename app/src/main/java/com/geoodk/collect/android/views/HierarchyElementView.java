@@ -14,14 +14,16 @@
 
 package com.geoodk.collect.android.views;
 
-import com.geoodk.collect.android.logic.HierarchyElement;
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.geoodk.collect.android.logic.HierarchyElement;
+import com.geoodk.collect.android.utilities.TextUtils;
+import com.geoodk.collect.android.widgets.QuestionWidget;
 
 public class HierarchyElementView extends RelativeLayout {
 
@@ -37,7 +39,7 @@ public class HierarchyElementView extends RelativeLayout {
 
         mIcon = new ImageView(context);
         mIcon.setImageDrawable(it.getIcon());
-        mIcon.setId(1);
+        mIcon.setId(QuestionWidget.newUniqueId());
         mIcon.setPadding(0, 0, dipToPx(4), 0);
 
         addView(mIcon, new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -45,11 +47,12 @@ public class HierarchyElementView extends RelativeLayout {
 
         mPrimaryTextView = new TextView(context);
         mPrimaryTextView.setTextAppearance(context, android.R.style.TextAppearance_Large);
-        mPrimaryTextView.setText(it.getPrimaryText());
-        mPrimaryTextView.setId(2);
+        setPrimaryText(it.getPrimaryText());
+        mPrimaryTextView.setId(QuestionWidget.newUniqueId());
         mPrimaryTextView.setGravity(Gravity.CENTER_VERTICAL);
         LayoutParams l =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT);
         l.addRule(RelativeLayout.RIGHT_OF, mIcon.getId());
         addView(mPrimaryTextView, l);
 
@@ -59,7 +62,8 @@ public class HierarchyElementView extends RelativeLayout {
         mSecondaryTextView.setGravity(Gravity.CENTER_VERTICAL);
 
         LayoutParams lp =
-            new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                        LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.BELOW, mPrimaryTextView.getId());
         lp.addRule(RelativeLayout.RIGHT_OF, mIcon.getId());
         addView(mSecondaryTextView, lp);
@@ -70,12 +74,12 @@ public class HierarchyElementView extends RelativeLayout {
 
 
     public void setPrimaryText(String text) {
-        mPrimaryTextView.setText(text);
+        mPrimaryTextView.setText(TextUtils.textToHtml(text));
     }
 
 
     public void setSecondaryText(String text) {
-        mSecondaryTextView.setText(text);
+        mSecondaryTextView.setText(TextUtils.textToHtml(text));
     }
 
 
@@ -100,7 +104,7 @@ public class HierarchyElementView extends RelativeLayout {
 
         }
     }
-    
+
     public int dipToPx(int dip) {
         return (int) (dip * getResources().getDisplayMetrics().density + 0.5f);
     }
