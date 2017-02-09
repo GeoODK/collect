@@ -109,11 +109,25 @@ public class MBTileSource extends BitmapTileSourceBase {
         value = getInt(db, "SELECT MAX(zoom_level) FROM tiles;");
         maxZoomLevel = value > -1 ? value : maxZoom;
  
-        // Get the tile size
-        Cursor cursor = db.rawQuery("SELECT tile_data FROM images LIMIT 0,1",
-                                    new String[] {});
+        Cursor cursor = null;
+
+        // Check if tiles or images table exist, and get tile_data if they do
+        Cursor tilesExistCursor = db.rawQuery("SELECT * FROM sqlite_master WHERE name ='tiles' and type='table'",
+                                                new String[] {});
+        Cursor imagesExistCursor = db.rawQuery("SELECT * FROM sqlite_master WHERE name ='images' and type='table'",
+                                                new String[] {});
+        if(tilesExistCursor.getCount() != 0){
+            cursor = db.rawQuery("SELECT tile_data FROM tiles LIMIT 0,1",
+                    new String[] {});
+        }else if(imagesExistCursor.getCount() != 0){
+            cursor = db.rawQuery("SELECT tile_data FROM images LIMIT 0,1",
+                    new String[] {});
+        }
+        tilesExistCursor.close();
+        imagesExistCursor.close();
  
-        if (cursor.getCount() != 0) {
+	       // Get the tile size from images or tiles table
+        if (cursor != null && cursor.getCount() != 0) {
             cursor.moveToFirst();
             is = new ByteArrayInputStream(cursor.getBlob(0));
  
