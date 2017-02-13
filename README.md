@@ -24,7 +24,7 @@ GeoODK Developemnt will be moving to [Android Studio](http://developer.android.c
 
 =======
 ## Being Developed
-* geoTrace, the ability to collect points while moving moving locations.
+* geoTrace, the ability to collect points while moving locations.
 * The ability to collect only spatial information (point/polygon/polyline) and then attache location to form when filling our survey.
 * KML functionality
 
